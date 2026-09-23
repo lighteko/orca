@@ -4,6 +4,7 @@ import { OrcaRuntimeService } from '../orca-runtime'
 import { OrchestrationDb } from '../orchestration/db'
 import type { RpcRequest } from './core'
 import { OrchestrationMutationExecutor } from './orchestration-mutation-executor'
+import { createWorkerCallerPayloadIdentity } from './orchestration-mutation-payload-identity'
 
 const promptParams = {
   terminal: 'term-prompt',
@@ -12,6 +13,9 @@ const promptParams = {
   agentPrompt: true,
   client: { id: 'orca-cli', type: 'desktop' }
 } as const
+
+const primaryLeafId = '11111111-1111-4111-8111-111111111111'
+const otherLeafId = '22222222-2222-4222-8222-222222222222'
 
 function promptRequest(requestId: string): RpcRequest {
   return {
@@ -43,15 +47,74 @@ function createHarness() {
     generation: 1
   })
   // Every handle for this PTY resolves to one pane, so a re-minted handle is the same terminal.
-  vi.spyOn(runtime, 'getTerminalPaneKey').mockReturnValue('window-1:leaf-prompt')
+  const pane = vi.spyOn(runtime, 'getTerminalPaneKey').mockReturnValue(`tab-1:${primaryLeafId}`)
   return {
     db,
+    runtime,
     executor: new OrchestrationMutationExecutor(runtime),
     bindTerminal: (next: { generation: number; processIncarnation: string }) => {
       binding.mockReturnValue({ ptyId: 'pty-prompt', ...next })
-    }
+    },
+    bindPane: (paneKey: string | null) => pane.mockReturnValue(paneKey)
   }
 }
+
+function seedPendingWorkerStart(
+  harness: ReturnType<typeof createHarness>,
+  requestId: string,
+  params: unknown
+) {
+  const method = 'orchestration.workerStart'
+  const identity = {
+    callerFingerprint: harness.db.getOrCreateLocalMutationCallerFingerprint(),
+    requestId,
+    method,
+    payloadHash: createWorkerCallerPayloadIdentity(harness.runtime, method, params).payloadHash
+  }
+  harness.db.beginMutationReceipt(identity)
+  harness.db.checkpointPendingMutationReceipt({
+    ...identity,
+    receipt: JSON.stringify({ accepted: { dispatchId: 'dispatch-1' } })
+  })
+}
+
+function acceptedWorkerStartInvoke(harness: ReturnType<typeof createHarness>) {
+  return vi.fn(
+    async (mutation?: { identity: Parameters<OrchestrationDb['beginMutationReceipt']>[0] }) => {
+      if (mutation) {
+        harness.db.beginMutationReceipt(mutation.identity)
+      }
+      return { dispatchId: 'dispatch-1' }
+    }
+  )
+}
+
+const workerStartCallerCases = [
+  {
+    name: 'lost pane lookup',
+    paneKey: null,
+    params: { from: 'term-old', taskId: 'task-1' },
+    sameCaller: true
+  },
+  {
+    name: 'a re-minted handle on the same leaf',
+    paneKey: `tab-2:${primaryLeafId}`,
+    params: { from: 'term-new', taskId: 'task-1' },
+    sameCaller: true
+  },
+  {
+    name: 'a genuinely different leaf',
+    paneKey: `tab-2:${otherLeafId}`,
+    params: { from: 'term-old', taskId: 'task-1' },
+    sameCaller: false
+  },
+  {
+    name: 'changed non-identity input',
+    paneKey: `tab-2:${primaryLeafId}`,
+    params: { from: 'term-new', taskId: 'task-2' },
+    sameCaller: false
+  }
+]
 
 describe('terminal prompt mutation receipt retry boundary', () => {
   const databases: OrchestrationDb[] = []
@@ -286,4 +349,107 @@ describe('worker start mutation coalescing', () => {
     await first
     expect(invoke).toHaveBeenCalledOnce()
   })
+
+  it('fences an in-flight worker start when one binding changes leaf and another is lost', async () => {
+    const harness = createHarness()
+    databases.push(harness.db)
+    const callerLeaf = '11111111-1111-4111-8111-111111111111'
+    const targetLeaf = '22222222-2222-4222-8222-222222222222'
+    const differentLeaf = '33333333-3333-4333-8333-333333333333'
+    const bindings = new Map([
+      ['caller', `caller-tab:${callerLeaf}`],
+      ['target', `target-tab:${targetLeaf}`]
+    ])
+    vi.mocked(harness.runtime.getTerminalPaneKey).mockImplementation(
+      (handle) => bindings.get(handle) ?? null
+    )
+    let release!: () => void
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    const invoke = vi.fn(
+      async (mutation?: { identity: Parameters<OrchestrationDb['beginMutationReceipt']>[0] }) => {
+        if (mutation) {
+          harness.db.beginMutationReceipt(mutation.identity)
+        }
+        await gate
+        return { dispatchId: 'dispatch-1' }
+      }
+    )
+    const params = { from: 'caller', terminal: 'target', taskId: 'task-1' }
+    const first = harness.executor.run(
+      workerStartRequest('orchestration.workerStart', 'partial-in-flight', params),
+      params,
+      invoke
+    )
+    bindings.set('caller', `other-tab:${differentLeaf}`)
+    bindings.delete('target')
+
+    await expect(
+      harness.executor.run(
+        workerStartRequest('orchestration.workerStart', 'partial-in-flight', params),
+        params,
+        invoke
+      )
+    ).rejects.toMatchObject({ code: 'request_mismatch' })
+    release()
+    await first
+    expect(invoke).toHaveBeenCalledOnce()
+  })
+
+  it.each(workerStartCallerCases)(
+    'characterizes a pending worker start after $name',
+    async ({ name, paneKey, params, sameCaller }) => {
+      const harness = createHarness()
+      databases.push(harness.db)
+      const requestId = `pending-${name}`
+      seedPendingWorkerStart(harness, requestId, { from: 'term-old', taskId: 'task-1' })
+      harness.bindPane(paneKey)
+      const invoke = vi.fn()
+      const replay = new OrchestrationMutationExecutor(harness.runtime).run(
+        workerStartRequest('orchestration.workerStart', requestId, params),
+        params,
+        invoke
+      )
+
+      await (sameCaller
+        ? expect(replay).rejects.toMatchObject({
+            code: 'operation_unknown',
+            data: { dispatchId: 'dispatch-1' }
+          })
+        : expect(replay).rejects.toMatchObject({ code: 'request_mismatch' }))
+      expect(invoke).not.toHaveBeenCalled()
+    }
+  )
+
+  it.each(workerStartCallerCases)(
+    'characterizes a completed worker start after $name',
+    async ({ paneKey, params, sameCaller }) => {
+      const harness = createHarness()
+      databases.push(harness.db)
+      const initialParams = { from: 'term-old', taskId: 'task-1' }
+      const requestId = `completed-${params.taskId}-${paneKey ?? 'missing'}`
+      const invoke = acceptedWorkerStartInvoke(harness)
+
+      await harness.executor.run(
+        workerStartRequest('orchestration.workerStart', requestId, initialParams),
+        initialParams,
+        invoke
+      )
+      harness.bindPane(paneKey)
+      const replay = harness.executor.run(
+        workerStartRequest('orchestration.workerStart', requestId, params),
+        params,
+        invoke
+      )
+
+      await (sameCaller
+        ? expect(replay).resolves.toMatchObject({
+            dispatchId: 'dispatch-1',
+            mutation: { replayed: true }
+          })
+        : expect(replay).rejects.toMatchObject({ code: 'request_mismatch' }))
+      expect(invoke).toHaveBeenCalledOnce()
+    }
+  )
 })

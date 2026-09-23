@@ -8,7 +8,7 @@ import { join } from 'node:path'
 import { promisify } from 'node:util'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { listWorktreesStrict, removeWorktree } from './worktree'
-import { isPrunableGitFileWorktree } from '../worktree-prunable-git-file'
+import { areWorktreePathsEqual } from './worktree-path-comparison'
 import { removeStaleLocalWorktreeRegistration } from '../local-worktree-removal-recovery'
 import {
   getWorktreeTrashRoot,
@@ -28,6 +28,12 @@ let worktreePath = ''
 async function git(args: string[], cwd: string): Promise<string> {
   const { stdout } = await execFileAsync('git', args, { cwd })
   return stdout
+}
+
+async function isWorktreeRegistered(targetPath: string): Promise<boolean> {
+  return (await listWorktreesStrict(repoPath)).some((entry) =>
+    areWorktreePathsEqual(entry.path, targetPath)
+  )
 }
 
 beforeEach(async () => {
@@ -64,7 +70,7 @@ describe('deferred worktree removal against the real Git binary', () => {
 
     // The user-visible removal is complete: nothing on disk, nothing registered.
     expect(existsSync(worktreePath)).toBe(false)
-    expect(await git(['worktree', 'list'], repoPath)).not.toContain(worktreePath)
+    expect(await isWorktreeRegistered(worktreePath)).toBe(false)
     // Only the rename path creates this root, so its presence proves the deletion was deferred.
     expect(existsSync(trashRoot)).toBe(true)
     expect((await readdir(trashRoot)).every(isWorktreeTrashEntryName)).toBe(true)
@@ -79,8 +85,41 @@ describe('deferred worktree removal against the real Git binary', () => {
 
     await removeWorktree(repoPath, worktreePath, false, { deleteBranch: false })
 
-    expect(await git(['worktree', 'list'], repoPath)).toContain(siblingPath)
+    expect(await isWorktreeRegistered(siblingPath)).toBe(true)
     expect(existsSync(siblingPath)).toBe(true)
+  })
+
+  it('preserves a merged branch at the exact recorded head when branch deletion is disabled', async () => {
+    const headBeforeRemoval = (await git(['rev-parse', 'refs/heads/feature'], repoPath)).trim()
+    expect(await isWorktreeRegistered(worktreePath)).toBe(true)
+
+    await expect(
+      removeWorktree(repoPath, worktreePath, false, { deleteBranch: false })
+    ).resolves.toEqual({})
+
+    expect((await git(['rev-parse', 'refs/heads/feature'], repoPath)).trim()).toBe(
+      headBeforeRemoval
+    )
+    expect(await isWorktreeRegistered(worktreePath)).toBe(false)
+    expect(existsSync(worktreePath)).toBe(false)
+  })
+
+  it('preserves an unmerged branch at the exact recorded head when branch deletion is disabled', async () => {
+    await writeFile(join(worktreePath, 'feature.txt'), 'unmerged feature\n')
+    await git(['add', 'feature.txt'], worktreePath)
+    await git(['commit', '-qm', 'unmerged feature'], worktreePath)
+    const headBeforeRemoval = (await git(['rev-parse', 'refs/heads/feature'], repoPath)).trim()
+    expect(await isWorktreeRegistered(worktreePath)).toBe(true)
+
+    await expect(
+      removeWorktree(repoPath, worktreePath, false, { deleteBranch: false })
+    ).resolves.toEqual({})
+
+    expect((await git(['rev-parse', 'refs/heads/feature'], repoPath)).trim()).toBe(
+      headBeforeRemoval
+    )
+    expect(await isWorktreeRegistered(worktreePath)).toBe(false)
+    expect(existsSync(worktreePath)).toBe(false)
   })
 
   it('deletes the branch exactly as the in-place removal did', async () => {
@@ -94,7 +133,7 @@ describe('deferred worktree removal against the real Git binary', () => {
 
     await expect(removeWorktree(repoPath, worktreePath, false)).rejects.toThrow()
     expect(existsSync(join(worktreePath, 'seed.txt'))).toBe(true)
-    expect(await git(['worktree', 'list'], repoPath)).toContain(worktreePath)
+    expect(await isWorktreeRegistered(worktreePath)).toBe(true)
     expect(existsSync(getWorktreeTrashRoot(worktreePath))).toBe(false)
   })
 
@@ -120,17 +159,20 @@ describe('deferred worktree removal against the real Git binary', () => {
     const markerPath = join(worktreePath, '.git')
     const marker = await readFile(markerPath, 'utf8')
     const adminPath = marker.trim().replace(/^gitdir: /, '')
-    await writeFile(join(adminPath, 'gitdir'), `${join(markerPath, '.git')}\n`)
+    const malformedRegisteredPath = join(markerPath, '.git')
+    await writeFile(join(adminPath, 'gitdir'), `${malformedRegisteredPath}\n`)
     await writeFile(join(worktreePath, 'untracked.txt'), 'keep this work\n')
-    const row = (await listWorktreesStrict(repoPath)).find((entry) => entry.path === markerPath)
+    const row = (await listWorktreesStrict(repoPath)).find((entry) =>
+      areWorktreePathsEqual(entry.path, malformedRegisteredPath)
+    )
     expect(row).toBeDefined()
     if (!row) {
       throw new Error('Missing malformed registration')
     }
-    expect(await isPrunableGitFileWorktree(row)).toBe(true)
+    expect(row.prunable).toBe(true)
 
     const result = await removeStaleLocalWorktreeRegistration({
-      canonicalWorktreePath: markerPath,
+      canonicalWorktreePath: row.path,
       repoPath,
       localWorktreeGitOptions: {},
       registeredWorktree: row,
@@ -141,9 +183,7 @@ describe('deferred worktree removal against the real Git binary', () => {
     expect(await readFile(markerPath, 'utf8')).toBe(marker)
     expect(await readFile(join(worktreePath, 'untracked.txt'), 'utf8')).toBe('keep this work\n')
     expect(await git(['rev-parse', 'refs/heads/feature'], repoPath)).toBe(`${row.head}\n`)
-    expect((await listWorktreesStrict(repoPath)).some((entry) => entry.path === markerPath)).toBe(
-      false
-    )
+    expect(await isWorktreeRegistered(malformedRegisteredPath)).toBe(false)
     expect(existsSync(adminPath)).toBe(false)
   })
 

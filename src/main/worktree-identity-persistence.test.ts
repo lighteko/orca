@@ -6,6 +6,7 @@ import type { PersistedState } from '../shared/persisted-state-types'
 import { canonicalWorktreeIdentity } from '../shared/worktree/identity'
 import { composeWorktreeHostIdentity } from '../shared/worktree/host-qualified-identity'
 import type { Store } from './persistence/loading-store/store'
+import { resolveWorktreeRemovalMetadata } from './worktree-removal-repo-owner'
 import {
   createStore,
   makeRepo,
@@ -47,6 +48,34 @@ describe('host-qualified worktree metadata', () => {
     const persisted = readDataFile() as PersistedState
     expect(Object.keys(persisted.worktreeMetaByIdentity ?? {})).toHaveLength(2)
     expect(store.getWorktreeMeta(worktreeId)?.displayName).toBe('Local feature')
+  })
+
+  it('feeds host-qualified preservation metadata into removal when locators collide', () => {
+    const store = createStore()
+    store.addRepo(makeRepo({ id: 'repo-1', path: '/workspace' }))
+    store.addRepo(
+      makeRepo({
+        id: 'repo-1',
+        path: '/workspace',
+        connectionId: 'build-box',
+        executionHostId: 'ssh:build-box'
+      })
+    )
+    store.setWorktreeMetaForHost(worktreeId, 'local', { preserveBranchOnDelete: false })
+    store.setWorktreeMetaForHost(worktreeId, 'ssh:build-box', {
+      preserveBranchOnDelete: true
+    })
+
+    expect(resolveWorktreeRemovalMetadata(store, 'repo-1', worktreeId, 'local')).toMatchObject({
+      hostId: 'local',
+      preserveBranchOnDelete: false
+    })
+    expect(
+      resolveWorktreeRemovalMetadata(store, 'repo-1', worktreeId, 'ssh:build-box')
+    ).toMatchObject({
+      hostId: 'ssh:build-box',
+      preserveBranchOnDelete: true
+    })
   })
   it('projects canonical-only metadata for exactly one host', () => {
     const store = createStore()
