@@ -28,7 +28,8 @@ export function parseWorktreeList(
 
     for (const line of lines) {
       if (line.startsWith('worktree ')) {
-        path = line.slice('worktree '.length)
+        const rawPath = line.slice('worktree '.length)
+        path = options.nulDelimited ? rawPath : decodeGitCQuotedPath(rawPath)
       } else if (line.startsWith('HEAD ')) {
         head = line.slice('HEAD '.length)
       } else if (line.startsWith('branch ')) {

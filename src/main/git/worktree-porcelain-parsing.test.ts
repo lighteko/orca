@@ -244,6 +244,13 @@ branch refs/heads/main
     ])
   })
 
+  it('decodes C-quoted paths from the baseline-compatible line format', () => {
+    const output =
+      'worktree "/repo/new\\nname \\303\\251"\nHEAD abc123\nbranch refs/heads/feature\n'
+
+    expect(parseWorktreeList(output)[0]?.path).toBe('/repo/new\nname é')
+  })
+
   it('parses NUL-delimited porcelain output with newline paths', () => {
     const output = [
       'worktree /repo',

@@ -7,6 +7,7 @@ import { untranslatedGitOutputEnv } from './git-process-env'
 import { prepareWindowsHostGitEnvironment } from './windows-host-git-environment'
 import type { GitAdmissionTier } from './git-exec-options'
 import { acquireGitAdmission } from './git-subprocess-admission'
+import type { ResolvedCommand } from './wsl-command-resolution'
 
 /**
  * Spawn a git child process. Drop-in replacement for
@@ -101,13 +102,18 @@ export async function withGitAdmission(
   }
 }
 
-export function gitSpawn(args: string[], options: GitSpawnOptions): ChildProcess {
+export function gitSpawn(
+  args: string[],
+  options: GitSpawnOptions,
+  onCommandResolved?: (command: ResolvedCommand) => void
+): ChildProcess {
   const { wslDistro, admissionTier: _admissionTier, ...spawnOptions } = options
   const resolved = resolveGitCommand(args, {
     cwd: options.cwd,
     ...(wslDistro ? { wslDistro } : {}),
     ...(spawnOptions.env ? { env: spawnOptions.env } : {})
   })
+  onCommandResolved?.(resolved)
   const spawnStartedAt = performance.now()
   const child = spawn(resolved.binary, resolved.args, {
     ...spawnOptions,

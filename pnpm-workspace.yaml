@@ -3,11 +3,12 @@
 # package graph. Without this file `pnpm -r` auto-discovers mobile/ and its
 # nested package, and the root's patchedDependencies fail as ERR_PNPM_UNUSED_PATCH.
 #
-# native/windows-registry is listed explicitly rather than reached by a glob: as a `file:`
+# Windows native packages are listed explicitly rather than reached by a glob: as `file:`
 # dependency pnpm re-linked it on every install (including --frozen-lockfile), and that
 # virtual-store churn raced node-gyp reading the same tree, which lost @vscode/windows-process-tree's
 # binding.gyp mid-rebuild on Windows CI. A workspace link is resolved once instead.
 packages:
+  - native/windows-path-evidence
   - native/windows-registry
 
 minimumReleaseAge: 4320
@@ -54,7 +55,8 @@ allowBuilds:
   node-pty: true
   sherpa-onnx: true
   ssh2: false
-  "@orca/windows-registry": false
+  '@orca/windows-path-evidence': false
+  '@orca/windows-registry': false
 
 overrides:
   monaco-editor>dompurify: 3.4.14

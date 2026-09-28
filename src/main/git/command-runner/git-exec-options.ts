@@ -18,6 +18,8 @@ export type GitExecOptions = {
   signal?: AbortSignal
   wslDistro?: string
   preferWslDirectGit?: boolean
+  /** Reject WSL routes and require the resolved command to execute on this process host. */
+  requireNativeExecution?: boolean
   useConfiguredSshCommandForNetwork?: boolean
   terminationBarrier?: boolean
   captureWslLoginShellOutput?: boolean

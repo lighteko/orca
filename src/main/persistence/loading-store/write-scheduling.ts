@@ -13,6 +13,7 @@ type WriteSchedulingOperationsRuntime = Pick<
   | 'pendingWrite'
   | 'quitFlushStarted'
   | 'writeGeneration'
+  | 'worktreeCatalogBindingRevision'
   | 'writeTimer'
 >
 
@@ -38,27 +39,27 @@ export class WriteSchedulingOperations {
 }
 
 export function scheduleSave(owner: WriteSchedulingOperations): void {
-  owner[writeSchedulingOperationsContext].runtime.automationListProjectionCache = null
+  const runtime = owner[writeSchedulingOperationsContext].runtime
+  runtime.automationListProjectionCache = null
+  // Why: over-invalidation is safe; a binding token must never outlive a persisted route/identity write.
+  runtime.worktreeCatalogBindingRevision += 1
   // Why: once the quit flush has snapshotted, a newly debounced write would fire during
   // teardown with nothing awaiting it, and the process can exit mid-rename. The quit
   // flush is the last write by construction.
-  if (owner[writeSchedulingOperationsContext].runtime.quitFlushStarted) {
+  if (runtime.quitFlushStarted) {
     return
   }
-  owner[writeSchedulingOperationsContext].runtime.writeGeneration += 1
+  runtime.writeGeneration += 1
   const now = Date.now()
-  owner[writeSchedulingOperationsContext].runtime.firstPendingSaveAt ??= now
-  if (owner[writeSchedulingOperationsContext].runtime.writeTimer) {
-    clearTimeout(owner[writeSchedulingOperationsContext].runtime.writeTimer)
+  runtime.firstPendingSaveAt ??= now
+  if (runtime.writeTimer) {
+    clearTimeout(runtime.writeTimer)
   }
-  const untilMaxWait = Math.max(
-    0,
-    owner[writeSchedulingOperationsContext].runtime.firstPendingSaveAt + SAVE_MAX_WAIT_MS - now
-  )
+  const untilMaxWait = Math.max(0, runtime.firstPendingSaveAt + SAVE_MAX_WAIT_MS - now)
   const delay = Math.min(SAVE_DEBOUNCE_MS, untilMaxWait)
-  owner[writeSchedulingOperationsContext].runtime.writeTimer = setTimeout(() => {
-    owner[writeSchedulingOperationsContext].runtime.writeTimer = null
-    owner[writeSchedulingOperationsContext].runtime.firstPendingSaveAt = null
+  runtime.writeTimer = setTimeout(() => {
+    runtime.writeTimer = null
+    runtime.firstPendingSaveAt = null
     void enqueueWrite(owner[writeSchedulingOperationsContext].writes)
   }, delay)
 }

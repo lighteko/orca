@@ -4,6 +4,18 @@ import { RuntimeFileCommands } from './orca-runtime-files'
 import { nativeChatTranscriptIncludesPath } from '../native-chat/native-chat-file-provenance'
 import { createRuntimeFileWatcherRemoval } from './runtime-file-watcher-removal'
 import { RuntimeGitCommands } from './orca-runtime-git'
+import {
+  RuntimeWorktreeCatalogBindingCommands,
+  type ExactLocalNativeGitWorktreeBinding
+} from './runtime-worktree-catalog-binding'
+import type { WorktreeCatalogBindingRequest } from '../persistence/loading-store/worktree-catalog-binding-types'
+import { listNativeGitWorktreesForCatalog } from '../git/worktree-catalog-listing'
+import { readNativeGitWorktreeRegistrationIdentity } from '../git/worktree-catalog-registration-identity'
+import { readNativeGitEffectiveWorktreeSubject } from '../git/native-worktree-subject-attestation'
+import { RuntimeGitSubjectAttestationCommands } from './runtime-git-subject-attestation'
+import { RuntimeGitStatusRecordCaptureCommands } from './runtime-git-status-record-capture'
+import { readNativeGitWorktreeStatusRecords } from '../git/native-worktree-status-record-capture'
+import { readNativeGitOperationMarkers } from '../git/native-git-operation-marker-capture'
 import type { GlobalSettings } from '../../shared/global-settings-types'
 import type { RuntimeTerminalAgentStatus } from '../../shared/runtime-types'
 import { RuntimeHostedReviewCommands } from './runtime-hosted-review-commands'
@@ -109,6 +121,59 @@ export class OrcaRuntimeWithFileCommands extends OrcaRuntimeWithPreservedBranchC
       store.setWorktreeMeta(worktreeId, { pushTarget })
     }
   })
+
+  protected readonly worktreeCatalogBindingCommands = new RuntimeWorktreeCatalogBindingCommands({
+    getWorktreeCatalogBindingSourceSnapshot: (request) =>
+      this.store?.getWorktreeCatalogBindingSourceSnapshot(request) ?? null,
+    listNativeGitWorktrees: listNativeGitWorktreesForCatalog,
+    readWorktreeRegistrationIdentity: readNativeGitWorktreeRegistrationIdentity
+  })
+
+  protected readonly gitSubjectAttestationCommands = new RuntimeGitSubjectAttestationCommands({
+    isBindingCurrent: (binding, signal) =>
+      this.revalidateExactLocalNativeGitWorktreeCatalogBinding(binding, signal),
+    readEffectiveSubject: (binding, signal) =>
+      readNativeGitEffectiveWorktreeSubject(binding.target.worktree.path, signal)
+  })
+
+  protected readonly gitStatusRecordCaptureCommands = new RuntimeGitStatusRecordCaptureCommands({
+    attestSubject: (binding, signal) =>
+      this.attestExactLocalNativeGitWorktreeSubject(binding, signal),
+    readStatusRecords: (binding, signal) =>
+      readNativeGitWorktreeStatusRecords(binding.target.worktree.path, signal),
+    readOperationMarkers: (subject, signal) => readNativeGitOperationMarkers(subject, signal)
+  })
+
+  protected resolveExactLocalNativeGitWorktreeCatalogBinding(
+    request: WorktreeCatalogBindingRequest,
+    signal?: AbortSignal
+  ) {
+    return this.worktreeCatalogBindingCommands.resolveExactLocalNativeGitTarget(request, signal)
+  }
+
+  protected revalidateExactLocalNativeGitWorktreeCatalogBinding(
+    binding: ExactLocalNativeGitWorktreeBinding,
+    signal?: AbortSignal
+  ) {
+    return this.worktreeCatalogBindingCommands.isExactLocalNativeGitBindingCurrent(binding, signal)
+  }
+
+  protected attestExactLocalNativeGitWorktreeSubject(
+    binding: ExactLocalNativeGitWorktreeBinding,
+    signal?: AbortSignal
+  ) {
+    return this.gitSubjectAttestationCommands.attestExactLocalNativeGitSubject(binding, signal)
+  }
+
+  protected captureExactLocalNativeGitWorktreeStatusRecords(
+    binding: ExactLocalNativeGitWorktreeBinding,
+    signal?: AbortSignal
+  ) {
+    return this.gitStatusRecordCaptureCommands.captureExactLocalNativeGitStatusRecords(
+      binding,
+      signal
+    )
+  }
 
   /** Set by pty IPC: fires when a PTY gains/loses remote view subscribers so
    *  the daemon background mark (keep-tail stream thinning) can resync — a
