@@ -13,7 +13,7 @@ TW-06T ──> TW-06 ──> TW-07 ──> TW-08 ──> TW-04C ─────�
 TW-02 + TW-04B + other owner-source contracts ──> TW-03
 ```
 
-`TW-01` and the read-only `TW-00` source audit can run in parallel. Implementation of TW-02 through TW-08 is gated by the specific contracts below. M2 effects, role mutation, and Tickets actions must not start from fixture-only evidence.
+TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independent review; TW-00 still needs portable source publication and current test verification. Implementation of TW-02 through TW-08 is gated by the specific contracts below. M2 effects, role mutation, and Tickets actions must not start from fixture-only evidence.
 
 ## Tasks
 
@@ -242,10 +242,8 @@ TW-02 + TW-04B + other owner-source contracts ──> TW-03
 - **PARALLELIZATION SAFETY:** Release gate follows integration; platform checks may run in parallel on isolated runners.
 - **POTENTIAL CONFLICTS:** Untracked standalone package content, native toolchains, fork/upstream compatibility.
 
-## First execution cycle allocation
+## First execution cycle result and next allocation
 
-1. **Sol Orchestrator:** finish TW-00's read-only content/provenance audit in the located WSL checkout, preserving its dirty files. Record which M1 claims are source/test verified and which remain unresolved. This may run beside TW-01 without touching its files.
-2. **Fresh Luna xhigh worker A:** TW-01 only, with exclusive ownership of the runtime capture seam and focused tests. The previous main Luna session is historical evidence only and is never resumed as a worker.
-3. **Fresh Sol xhigh reviewer:** after TW-01 and the TW-00 audit checkpoint, review the implementation, integration boundary, and this DAG against repository/test evidence before another task is released.
-
-The historical plan explicitly leaves TW-01 implementation awaiting user authorization. Report this recovery and allocation before launching worker A; the Orchestrator requests any required approval directly. No other implementation worker is allocatable until TW-00 resolves its source and contract gate.
+1. **TW-01:** user authorized the slice. A fresh Luna xhigh worker implemented it exclusively in the runtime capture seam; the first fresh Sol xhigh review found a pre-attestation deadline gap, the worker corrected it, and a second fresh Sol xhigh review passed. The implementation is committed locally at `0c4b53ac2`. Focused tests passed 12/12; the reviewer ran 27 related tests; Node typecheck and changed-code quality passed. The previous main Luna session remains historical evidence only.
+2. **TW-00 audit:** a separate fresh Luna xhigh worker recorded [ticket-source-audit.md](./ticket-source-audit.md) and [ticket-source-files.sha256](./ticket-source-files.sha256). The manifest was checked against the WSL checkout. No ticket-package tests ran because Linux Node is absent. TW-00 remains open.
+3. **Next allocation:** prepare a source publication candidate, then publish the complete ticket checkout to a retrievable private revision and verify it from a fresh retrieval with Linux Node/pnpm. The user proposed pinning that separate repository as an Orca submodule; assess public-fork clone/CI access before integrating the gitlink. TW-02, TW-04A, TW-05, and TW-06T remain gated on TW-00.
