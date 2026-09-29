@@ -1,6 +1,6 @@
 # Ticket Workspace — Active Review Findings
 
-Snapshot date: 2026-09-29. This is a concise carry-forward of valid reviewer conclusions, not a reasoning transcript. See [project-state.md](./project-state.md) for current code/test evidence.
+Snapshot date: 2026-09-30. This is a concise carry-forward of valid reviewer conclusions, not a reasoning transcript. See [project-state.md](./project-state.md) for current code/test evidence.
 
 ## Active invariants
 
@@ -25,6 +25,7 @@ Snapshot date: 2026-09-29. This is a concise carry-forward of valid reviewer con
 19. **Fixture milestones are read-only checkpoints.** The original M4/M5 plan accepts a fixture-backed boundary and Tickets tree before live producer/transport. Fixture provenance must be explicit and cannot become live `current` by relabeling, feed public `clear`, or expose mutation actions. Live TW-06/TW-07 cutover is a separate review gate.
 20. **Fixture navigation rebinds to Orca authority.** Renderer click requests contain only snapshot revision, ticket key and repository ID. Main reloads the validated fixture and exact Orca local-native binding; the returned Orca ID may enter only existing navigation with an explicit local execution host. Do not derive navigation from producer `referenceState` or the targetless display rows.
 21. **Resource-universe presence needs two proofs.** A joined `present` needs an exact complete scope, canonical physical identity, ledger/source/adapter/route agreement between discovery and fresh read-back, and separately verified owner proofs. Same-name ABA, a changed ledger revision, and partial or untrusted clocks are unavailable. A complete exact-target zero result can be `absent` without a present-object read-back. Payload `targetPresence` alone is not current-state authority; freshness must also be fresh.
+22. **M5 fixture UI must respect available evidence.** TW-07F is the next fixture milestone, but its first serial step is a selector-only main/preload match/click bridge: TW-02F currently has no production caller. The shipped `snapshot.full` is an owner-mismatch case, so positive navigation needs an injected synthetic Orca-owned fixture. `coordinatorTargetDeclared` is a declaration, not a verified Run; agent rows require exact Orca-owned association and the single status store, and the fixture has no issue/MR identifiers. Projects/Tickets mode remains inside the workspaces body; reveal while Tickets is showing must switch to Projects before replay. No worker allocation follows from this review alone.
 
 ## Resolved concerns; retain as regression risks
 
