@@ -104,6 +104,7 @@ TW-01 passed independent review; TW-00's private publication, fresh-clone hashes
 
 ### TW-02F — Bind fixture ticket `WorkspaceRef` to the exact Orca owner tuple
 
+- **STATUS:** Implemented and approved by separate and integrated Sol review; fixture-only binding does not satisfy TW-02L live evidence.
 - **GOAL:** Implement a pure ticket-to-Orca five-field mapping and a separate asynchronous exact local-native owner match for an injected validated fixture snapshot. Live ticket-source admission and Git evidence are later slices.
 - **DEPENDENCIES:** TW-00C/F delivered the canonical snapshot contract/fixture; TW-01 and M0 established internal owner evidence and identity rules. TW-06P/T live producer/transport are not prerequisites for fixture mapping.
 - **OWNERSHIP:** One continuing Luna owner-mapping workstream, exclusive to new Orca runtime selection/binding modules and focused tests. TW-06F owns the main fixture service, canonical snapshot accessor, shared IPC/preload registration and renderer projection; TW-07F wires their navigation join after both.
@@ -149,7 +150,7 @@ TW-01 passed independent review; TW-00's private publication, fresh-clone hashes
 
 ### TW-04A — Freeze external-resource adapter contracts and fixtures
 
-- **STATUS:** The common identity/universe decision draft passed independent review. No schema or adapter is implemented. Docker/IIS production pairs remain gated on owner evidence.
+- **STATUS:** Common versioned universe DTO, validator, generated artifact, and 50-case synthetic corpus implemented in private source `54477c2` and approved by independent Sol review. Docker/IIS production pairs remain gated on owner evidence; no production adapter or effect is implemented.
 - **GOAL:** Define `discover/plan/provision/inspect/teardown`, resource ownership, evidence, preview, and retry semantics before effects.
 - **DEPENDENCIES:** TW-00 verifies canonical schema/CAS and contract repository.
 - **OWNERSHIP:** Fresh Luna worker in the ticket-domain repository; no Orca runtime edits.
@@ -256,7 +257,7 @@ TW-01 passed independent review; TW-00's private publication, fresh-clone hashes
 
 ### TW-06F — Complete the original M4 fixture snapshot boundary
 
-- **STATUS:** Open; there is no tracked main/preload ticket bridge in Orca.
+- **STATUS:** Main/preload fixture bridge and bounded presentation implemented and approved by independent integration review; actual bundled preload semantic corpus passed. TW-07F still owns Projects/Tickets UI fallback and click navigation integration.
 - **GOAL:** Implement the original M4 read-only fixture service through Orca main/preload and a reusable Orca presentation boundary. Live resident transport remains a separate later integration.
 - **DEPENDENCIES:** TW-00C full semantic runtime contract and TW-00F reviewed fixture IPC/corpus delivery; M0 Orca boundary ownership. It does not depend on TW-06P or TW-06T.
 - **OWNERSHIP:** One continuing Luna main/preload workstream, exclusive to new fixture service, IPC/preload registration, Orca presentation projection and focused tests; no TW-02F runtime selector/binder or renderer tree ownership.

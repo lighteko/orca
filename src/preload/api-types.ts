@@ -53,6 +53,7 @@ import type { KeybindingsApi, SettingsApi } from './api/settings-api'
 import type { ShellApi } from './api/shell-api'
 import type { SpeechApi } from './api/speech-api'
 import type { SshApi } from './api/ssh-api'
+import type { TicketWorkspaceFixtureApi } from './api/ticket-workspace-fixture-api'
 import type { DiagnosticsApi, MemoryApi, StatsApi, TelemetryApi } from './api/telemetry-api'
 import type { UiCommandEventApi } from './api/ui-command-event-api'
 import type { UiWindowApi } from './api/ui-window-api'
@@ -147,6 +148,7 @@ export type PreloadApi = {
   gitBash: RuntimeApi['gitBash']
   plugins: PluginsApi
   agentStatus: AgentStatusApi
+  ticketWorkspace: TicketWorkspaceFixtureApi
   mobile: MobileApi
   speech: SpeechApi
 }

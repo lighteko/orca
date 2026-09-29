@@ -847,6 +847,9 @@ jobs:
           done
           exit "$status"
 
+      - name: Verify bundled Ticket Workspace preload fixture boundary
+        run: node config/scripts/verify-orca-ticket-workspace-preload.mjs
+
       - name: Project web client from renderer build
         run: pnpm run build:web-from-renderer
 

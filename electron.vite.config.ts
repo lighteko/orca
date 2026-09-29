@@ -8,6 +8,8 @@ import { createPlainNodeEntryGuardPlugin } from './config/build-plugins/plain-no
 import packageJson from './package.json' with { type: 'json' }
 
 const BUNDLED_MAIN_DEPENDENCIES = new Set([
+  '@lighteko/ticket-workspace-contracts',
+  '@noble/hashes',
   '@streamparser/json',
   '@xterm/headless',
   '@xterm/addon-serialize',
@@ -292,7 +294,7 @@ export const electronViteConfig: UserConfig = {
   preload: {
     build: {
       externalizeDeps: {
-        exclude: ['zod']
+        exclude: ['@lighteko/ticket-workspace-contracts', '@noble/hashes', 'zod']
       }
     }
   },
