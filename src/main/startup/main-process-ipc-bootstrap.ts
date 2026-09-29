@@ -4,9 +4,11 @@ import { logStartupMilestone } from './startup-diagnostics'
 import { mainProcessState as state } from './main-process-state'
 import { resolveOpenedMarkdownDocuments } from './os-opened-markdown-files'
 import { registerTicketWorkspaceFixtureIpcHandler } from '../ipc/ticket-workspace-fixture-ipc'
+import { registerTicketWorkspaceOwnerBindingIpcHandlers } from '../ipc/ticket-workspace-owner-binding-ipc'
 
 export function registerMainProcessIpcHandlers(): void {
   registerTicketWorkspaceFixtureIpcHandler()
+  registerTicketWorkspaceOwnerBindingIpcHandlers()
   ipcMain.handle('app:awaitFirstWindowStartupServices', async () => {
     await Promise.all([
       state.firstWindowStartupServicesReady,

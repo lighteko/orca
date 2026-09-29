@@ -72,6 +72,8 @@ sandbox.globalThis = sandbox
 runInNewContext(bundle, sandbox, { filename: 'out/preload/index.js' })
 assert.ok(exposedApi, 'actual Orca preload did not expose window.api')
 assert.equal(typeof exposedApi.ticketWorkspace.getSnapshot, 'function')
+assert.equal(typeof exposedApi.ticketWorkspace.matchFixtureSelection, 'function')
+assert.equal(typeof exposedApi.ticketWorkspace.rebindFixtureSelection, 'function')
 assert.equal(
   typeof sandbox.parseTicketNavigatorSnapshotUtf8V1,
   'function',
@@ -109,7 +111,7 @@ if (fullResult.status !== 'fixture') {
 assert.equal(fullResult.provenance.snapshotCaseId, 'accepted-full-snapshot')
 assert.equal(fullResult.orcaMatch.status, 'not-evaluated')
 assert.equal(fullResult.tickets.length > 0, true)
-assert.deepEqual(invokeCalls.at(-1), {
+assertJsonEqual(invokeCalls.at(-1), {
   channel: 'ticketWorkspace:getFixtureSnapshot',
   args: []
 })
@@ -125,9 +127,93 @@ assert.equal(
     orcaMatch: { status: 'not-evaluated' }
   })
 )
-assert.deepEqual(invokeCalls.at(-1), {
+assertJsonEqual(invokeCalls.at(-1), {
   channel: 'ticketWorkspace:getFixtureSnapshot',
   args: []
+})
+
+invokeFailure = undefined
+const selector = {
+  snapshotRevision: 'a'.repeat(64),
+  ticketKey: 'ORCA-7',
+  repositoryId: 'common-api'
+}
+const createCrossRealmObject = runInNewContext('(value) => ({ ...value })', sandbox)
+response = createCrossRealmObject({ status: 'matched', ...selector })
+const matchedSelection = await exposedApi.ticketWorkspace.matchFixtureSelection(selector)
+assertJsonEqual(matchedSelection, response)
+assert.equal(Object.hasOwn(matchedSelection, 'worktreeId'), false)
+assertJsonEqual(invokeCalls.at(-1), {
+  channel: 'ticketWorkspace:matchFixtureSelection',
+  args: [selector]
+})
+
+response = { status: 'matched', ...selector, path: '/repo/worktree' }
+assertJsonEqual(await exposedApi.ticketWorkspace.matchFixtureSelection(selector), {
+  status: 'unavailable'
+})
+const matchMismatchCases = [
+  { snapshotRevision: 'b'.repeat(64) },
+  { ticketKey: 'ORCA-8' },
+  { repositoryId: 'other-repo' }
+]
+for (const mismatch of matchMismatchCases) {
+  response = { status: 'matched', ...selector, ...mismatch }
+  assertJsonEqual(await exposedApi.ticketWorkspace.matchFixtureSelection(selector), {
+    status: 'unavailable'
+  })
+}
+const invalidSelectorInvokeCount = invokeCalls.length
+assertJsonEqual(
+  await exposedApi.ticketWorkspace.matchFixtureSelection({ ...selector, path: '/untrusted/path' }),
+  { status: 'unavailable' }
+)
+assert.equal(invokeCalls.length, invalidSelectorInvokeCount)
+
+response = createCrossRealmObject({
+  status: 'rebound',
+  ...selector,
+  worktreeId: 'common-api::/repo/worktree'
+})
+const reboundSelection = await exposedApi.ticketWorkspace.rebindFixtureSelection(selector)
+assertJsonEqual(reboundSelection, response)
+assertJsonEqual(invokeCalls.at(-1), {
+  channel: 'ticketWorkspace:rebindFixtureSelection',
+  args: [selector]
+})
+
+response = {
+  status: 'rebound',
+  ...selector,
+  worktreeId: 'other-repo::/repo/worktree'
+}
+assertJsonEqual(await exposedApi.ticketWorkspace.rebindFixtureSelection(selector), {
+  status: 'unavailable'
+})
+const rebindMismatchCases = [
+  { snapshotRevision: 'b'.repeat(64) },
+  { ticketKey: 'ORCA-8' },
+  { repositoryId: 'other-repo' }
+]
+for (const mismatch of rebindMismatchCases) {
+  response = {
+    status: 'rebound',
+    ...selector,
+    ...mismatch,
+    worktreeId: 'common-api::/repo/worktree'
+  }
+  assertJsonEqual(await exposedApi.ticketWorkspace.rebindFixtureSelection(selector), {
+    status: 'unavailable'
+  })
+}
+
+response = Object.assign(Object.create({ inheritedPath: '/untrusted/path' }), {
+  status: 'rebound',
+  ...selector,
+  worktreeId: 'common-api::/repo/worktree'
+})
+assertJsonEqual(await exposedApi.ticketWorkspace.rebindFixtureSelection(selector), {
+  status: 'unavailable'
 })
 
 console.log(
@@ -137,6 +223,7 @@ console.log(
       fixtureCases: corpus.cases.length,
       bundledParserVerdicts: bundledParserVerdictCounts,
       rejectedIpcCall: 'unavailable',
+      ownerBindingApi: 'passed',
       actualOrcaPreload: 'passed',
       exposedApiKeys: Object.keys(exposedApi).length
     },
@@ -179,4 +266,8 @@ function readSnapshotRevision(value) {
 
 async function readJson(url) {
   return JSON.parse(await readFile(url, 'utf8'))
+}
+
+function assertJsonEqual(actual, expected) {
+  assert.equal(JSON.stringify(actual), JSON.stringify(expected))
 }

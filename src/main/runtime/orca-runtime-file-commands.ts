@@ -1,16 +1,14 @@
 // @ts-nocheck -- mechanically split from OrcaRuntimeService; behavior is covered by AST equivalence and characterization tests.
-import { OrcaRuntimeWithPreservedBranchCleanup } from './orca-runtime-preserved-branch-cleanup'
+import { OrcaRuntimeWithTicketWorkspaceOwnerBinding } from './orca-runtime-ticket-workspace-owner-binding'
 import { RuntimeFileCommands } from './orca-runtime-files'
 import { nativeChatTranscriptIncludesPath } from '../native-chat/native-chat-file-provenance'
 import { createRuntimeFileWatcherRemoval } from './runtime-file-watcher-removal'
 import { RuntimeGitCommands } from './orca-runtime-git'
-import {
-  RuntimeWorktreeCatalogBindingCommands,
-  type ExactLocalNativeGitWorktreeBinding
-} from './runtime-worktree-catalog-binding'
-import type { WorktreeCatalogBindingRequest } from '../persistence/loading-store/worktree-catalog-binding-types'
-import { listNativeGitWorktreesForCatalog } from '../git/worktree-catalog-listing'
-import { readNativeGitWorktreeRegistrationIdentity } from '../git/worktree-catalog-registration-identity'
+import type { ExactLocalNativeGitWorktreeBinding } from './runtime-worktree-catalog-binding'
+import type {
+  WorktreeCatalogBindingRequest,
+  WorktreeCatalogBindingSourceSnapshot
+} from '../persistence/loading-store/worktree-catalog-binding-types'
 import { readNativeGitEffectiveWorktreeSubject } from '../git/native-worktree-subject-attestation'
 import { RuntimeGitSubjectAttestationCommands } from './runtime-git-subject-attestation'
 import { RuntimeGitStatusRecordCaptureCommands } from './runtime-git-status-record-capture'
@@ -35,7 +33,13 @@ import { getRuntimeBrowserPageRegistry } from './runtime-browser-page-registry'
 import { getBrowserHostLeaseRegistry } from './browser-host-lease-registry-instance'
 import type { RuntimeLeafRecord } from './runtime-terminal-state-records'
 
-export class OrcaRuntimeWithFileCommands extends OrcaRuntimeWithPreservedBranchCleanup {
+export class OrcaRuntimeWithFileCommands extends OrcaRuntimeWithTicketWorkspaceOwnerBinding {
+  protected getTicketWorkspaceOwnerBindingSourceSnapshot(
+    request: WorktreeCatalogBindingRequest
+  ): WorktreeCatalogBindingSourceSnapshot | null {
+    return this.store?.getWorktreeCatalogBindingSourceSnapshot(request) ?? null
+  }
+
   protected readonly fileCommands = new RuntimeFileCommands({
     getRuntimeId: () => this.runtimeId,
     requireStore: () => this.requireStore(),
@@ -122,13 +126,6 @@ export class OrcaRuntimeWithFileCommands extends OrcaRuntimeWithPreservedBranchC
     }
   })
 
-  protected readonly worktreeCatalogBindingCommands = new RuntimeWorktreeCatalogBindingCommands({
-    getWorktreeCatalogBindingSourceSnapshot: (request) =>
-      this.store?.getWorktreeCatalogBindingSourceSnapshot(request) ?? null,
-    listNativeGitWorktrees: listNativeGitWorktreesForCatalog,
-    readWorktreeRegistrationIdentity: readNativeGitWorktreeRegistrationIdentity
-  })
-
   protected readonly gitSubjectAttestationCommands = new RuntimeGitSubjectAttestationCommands({
     isBindingCurrent: (binding, signal) =>
       this.revalidateExactLocalNativeGitWorktreeCatalogBinding(binding, signal),
@@ -143,20 +140,6 @@ export class OrcaRuntimeWithFileCommands extends OrcaRuntimeWithPreservedBranchC
       readNativeGitWorktreeStatusRecords(binding.target.worktree.path, signal),
     readOperationMarkers: (subject, signal) => readNativeGitOperationMarkers(subject, signal)
   })
-
-  protected resolveExactLocalNativeGitWorktreeCatalogBinding(
-    request: WorktreeCatalogBindingRequest,
-    signal?: AbortSignal
-  ) {
-    return this.worktreeCatalogBindingCommands.resolveExactLocalNativeGitTarget(request, signal)
-  }
-
-  protected revalidateExactLocalNativeGitWorktreeCatalogBinding(
-    binding: ExactLocalNativeGitWorktreeBinding,
-    signal?: AbortSignal
-  ) {
-    return this.worktreeCatalogBindingCommands.isExactLocalNativeGitBindingCurrent(binding, signal)
-  }
 
   protected attestExactLocalNativeGitWorktreeSubject(
     binding: ExactLocalNativeGitWorktreeBinding,
