@@ -245,6 +245,7 @@ TW-01, TW-02F and TW-06F passed independent review; TW-00's private publication,
 
 ### TW-06P — Produce a bounded ticket navigator snapshot
 
+- **STATUS:** Read-only private source audit and independent Sol review found valid direct catalog field mappings but required a protocol correction before implementation. No production projector or service exists at pin `54477c2`.
 - **GOAL:** Project one validated, current ticket catalog read into an immutable `TicketNavigatorSnapshotV1` without claiming an Orca owner match.
 - **DEPENDENCIES:** TW-00 publishes the canonical catalog/snapshot contracts; freeze the shared producer/transport protocol and catalog-to-snapshot projection rules before implementation.
 - **OWNERSHIP:** One ticket-domain worker owns the producer and service-side response in the private ticket repository; no Orca runtime edits.
@@ -256,7 +257,7 @@ TW-01, TW-02F and TW-06F passed independent review; TW-00's private publication,
 - **ACCEPTANCE CRITERIA:** Mixed local/SSH targets project conservatively; missing/untrusted catalog, revision/digest equivocation, and a valid catalog whose projection exceeds 2 MiB return unavailable with no partial snapshot. Repeated fresh reads, source ordering, and clock/TTL semantics are explicit. The resident service artifact is reproducible, source-pinned and independently checked for the negotiated protocol/version; its provenance is a separate output from TW-M1P base Node/CLI/profile delivery.
 - **VERIFICATION:** Contract corpus, projector and service-side tests, byte-exact artifact checks, typecheck, and independent semantic review.
 - **PARALLELIZATION SAFETY:** May run beside TW-06T only after the shared wire/projection contract is frozen; files and owners are separate.
-- **POTENTIAL CONFLICTS:** The catalog has no ticket `availability` field; projection and same-revision sequence rules must be decided before implementation.
+- **POTENTIAL CONFLICTS:** The catalog has no ticket `availability` field or snapshot disposition counterpart. Freeze pruning/pruned/excluded target suppression, SSH orchestration-only and mixed-host behavior, service producer identity, equal-tuple digest high-water owner, and cross-clock currentness before implementation.
 
 ### TW-06T — Establish the resident no-start ticket transport
 
@@ -331,7 +332,7 @@ TW-01, TW-02F and TW-06F passed independent review; TW-00's private publication,
 - **OUTPUT CONTRACT:** Accessible read-only Tickets tree and preview; existing Projects mode remains available.
 - **CONSTRAINTS:** Follow `docs/STYLEGUIDE.md`, existing tokens/primitives, keyboard/platform rules, single agent-status store.
 - **DO_NOT_TOUCH:** Main transport/schema, ticket ledger, destructive actions, focus-changing prune behavior.
-- **ACCEPTANCE CRITERIA:** Bounded trees, loading/failure states, stable selection/focus, stale actions disabled, Projects regression absent.
+- **ACCEPTANCE CRITERIA:** Bounded trees, loading/failure states, stable selection/focus, stale actions disabled, Projects regression absent. A retained `WorkspaceRef` on a pruning/pruned ticket or excluded repository cannot become a live matched/actionable target merely because Orca's exact local binder finds it; apply the frozen TW-06P/T owner-join disposition policy.
 - **VERIFICATION:** Renderer tests and hidden-renderer CDP screenshots with `ORCA_BACKGROUND_LAUNCH=1`; design-system gate.
 - **PARALLELIZATION SAFETY:** Serial with TW-07F sidebar files; starts after TW-06 live contract freeze.
 - **POTENTIAL CONFLICTS:** Shared sidebar state and snapshot DTO churn.

@@ -32,6 +32,7 @@
 TW-07F만 다음 작업인 것은 아니다. [전체 병렬 작업 경계](./task-graph.md#full-parallel-frontier-at-this-checkpoint)의 다음 항목은 서로 다른 소유 영역에서 계약·증거를 준비할 수 있다. 코드 구현 가능 시점은 각 선행 조건을 따른다.
 
 - [x] **TW-06T 전송 후보 조사:** Orca `spawnProcess`와 기존 WSL hook relay의 범위를 독립 Sol 리뷰로 확인했다. pinned WSL stdio는 주입형 테스트 후보이며 ticket용 인증·수명·clock 계약과 생산 endpoint는 아직 확정되지 않았다.
+- [x] **TW-06P projection 소스 조사:** catalog→snapshot direct 필드 매핑은 확인했지만 producer build ID, pruning/pruned/excluded target, SSH 혼합 상태, 같은 revision의 digest 충돌, clock currentness는 독립 Sol 리뷰에서 미결정으로 판정했다. 생산 projector/service는 아직 없다.
 - [ ] **TW-06P/T 공동 프로토콜:** producer·resident transport의 setup·인증·identity·freshness·framing 계약을 확정한다. [검토된 결정 초안](./resident-ticket-transport.md)은 아직 frozen protocol이 아니다. 생산 setup은 TW-M1P 기본 runtime과 TW-06P service artifact를 모두 기다린다.
 - [x] **TW-05/05G 계약 조사:** 현재 Orca·ticket 소스와 대조한 결정 매트릭스가 독립 리뷰를 통과했다. 일반 Run 호출은 ticket용 엄격한 caller attestation이 아니며, v1 catalog·folder host proof·reset fence에도 빈틈이 있다.
 - [ ] **TW-05/05G 소유자 결정:** 문서 allowlist·기존 pointer 이전·catalog version·Orca folder/Run 증명을 확정한 뒤 구현한다. 효과 코드는 계속 대기한다.
