@@ -18,7 +18,7 @@
 
 - [x] **공개 파일 후보 구성:** [정확한 7개 파일·87,199바이트 제안](./public-redistribution-proposal.md)을 비공개 staging하고 파일별 해시·재생을 새 Sol이 검증했다.
 - [x] **공개 전달 결정:** 사용자가 [정확한 계약 archive 1개와 fixture 6개](./public-redistribution-proposal.md)의 공개 복사와 전달을 승인했다.
-- [ ] **TW-00C/F 공개 전달 통합:** 승인된 7개 파일, 고정 `file:` 의존성·잠금 파일·공개 PR 재생 단계를 넣었다. 로컬 검증과 독립 Sol 리뷰는 통과했고, 원격 PR CI 결과를 확인해야 한다.
+- [x] **TW-00C/F 공개 전달 통합:** 승인된 7개 파일, 고정 `file:` 의존성·잠금 파일·공개 PR 재생 단계를 넣었다. 로컬 검증·독립 Sol 리뷰와 [PR #1의 `cde43160f` 검사](https://github.com/lighteko/orca/actions/runs/36565823569)(31개 성공, 8개 건너뜀, 실패 0개)를 확인했다. 실제 main/preload 연결은 TW-06F다.
 - [ ] **TW-06F (M4 fixture):** 전달된 contract 전체 의미 검증을 사용하는 Orca main/preload 읽기 전용 경계를 구현하고 fixture corpus로 검증한다. 선행: TW-00C + TW-00F.
 - [ ] **TW-02:** ticket `WorkspaceRef`를 정확한 Orca owner tuple에 결합하고 host·instance·revision 변경 시 재검증한다. 선행: TW-00C + TW-01.
 - [ ] **TW-07F (M5 fixture):** 기존 sidebar에 읽기 전용 Projects/Tickets tree를 구현한다. mutation 동작을 숨기고, workspace 이동은 TW-02가 확인한 ID만 허용한다. 선행: TW-06F + TW-02.
