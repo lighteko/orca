@@ -3,10 +3,10 @@
 - Audit date: 2026-09-29
 - Source: `/home/sellmate/ticket-workspace` on Ubuntu-24.04
 - Candidate base: `main` at `cf184eaa588f9155636dec036f624595c3d46532`
-- Current state: 7 modified tracked paths and 90 non-ignored untracked paths; no remote is configured.
+- State at the prepublication audit: 7 modified tracked paths and 90 non-ignored untracked paths; no remote was configured.
 - Status at audit: exact staging recipe prepared; README wording and hash recheck were publication gates.
 
-This section records the prepublication candidate. The README wording was updated and the exact 128-file tree was published at `2045808ffdb6baead2e659855cefb02f7b36491c` to private `lighteko/ticket-workspace`. The fresh clone matched its tree and every file hash. The initial manifest is preserved in Orca commit `d1f86d608`; [the current manifest](./ticket-published-source.sha256) covers the later 148-file snapshot-candidate revision at `ec2dc67`.
+This section records the prepublication candidate. The README wording was updated and the exact 128-file tree was published at `2045808ffdb6baead2e659855cefb02f7b36491c` to private `lighteko/ticket-workspace`. The fresh clone matched its tree and every file hash. The initial manifest is preserved in Orca commit `d1f86d608`; [the current manifest](./ticket-published-source.sha256) covers the 157-file private revision at `31b3768`.
 
 ## Exact content to publish
 

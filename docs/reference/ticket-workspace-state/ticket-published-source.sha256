@@ -1,9 +1,9 @@
 # TW-00 published ticket-source content manifest
 # Captured: 2026-09-29
 # Repository: private lighteko/ticket-workspace (main)
-# Commit: ec2dc6739a65cb882067929ed6d6fcb9bb7df438
-# Tree: 17f5980c08566b87fe3ec13f9d557b9b6b4d623a
-# Git state at capture: clean; 148 tracked regular files.
+# Commit: 31b3768e8043b6aeef66f0fe0fe648439ba80b2b
+# Tree: 150b23c5c7380f255c86d229a04e8f97c3366987
+# Git state at capture: clean; 157 tracked regular files.
 # Scope: every tracked regular file in the pinned commit, including contracts, CLI, fixtures, docs, lockfile, and spikes.
 # Excludes: .git metadata, node_modules, generated dist/build outputs, caches/temp, and ignored local data.
 # Format: sha256sum digest followed by checkout-relative path. Hashes are computed from Git blob bytes.
@@ -14,6 +14,13 @@ e39f7498b4deb5d4fdf4ca7a0d9e3874a242e1562a00544386df3dd686dfa4c5  docs/durable-l
 4b28133a19d91132bbb12be4836a6ab4de22e40a9ca57ef3aba94f487d377a62  docs/git-worktree-adapter.md
 a8d00e6f3d3c2dea108ff45cc97ff5564d09db45761a01a2ef053bb8504a4204  docs/process-fence.md
 81c76aa9c06cd3da57b1526b98ca58abd394d4b785158ce6b6da3d30a4531eea  docs/resource-mutation-safety.md
+4f8b07424ca5bb10fdb6731fa025255b8f029d74aea68ada7eae32e2e105bbac  integration/orca-ticket-snapshot-boundary-v1/README.md
+95adf06f124a5ff85bcf4a73a3dd6c5c04845e8f88f8363fd60817ecfdea4763  integration/orca-ticket-snapshot-boundary-v1/boundary-runtime.mjs
+9c106b3643cea7a2661d445b77959c11c32bddffbb50fb45cc4c642c61ce14b6  integration/orca-ticket-snapshot-boundary-v1/fixture-ipc-corpus-v1.json
+52a68df5b1b76692bcfae3561e3f8b7d58133d924d955a2fd569675fe8b49663  integration/orca-ticket-snapshot-boundary-v1/historical-orca-ipc-boundary-v1.corpus.json
+0809847781245f51c5bfd09c6d60d1224175408821547e4c324327fa475a6da8  integration/orca-ticket-snapshot-boundary-v1/preload-entry.mjs
+4efb5a01f2f97554fb4329134ed3c4ea5e15e8a9df2dc011e59dde4679982f52  integration/orca-ticket-snapshot-boundary-v1/prepare-tarball-consumer-replay.mjs
+72440a880a81b68a1b3e3cd1baf94cfa76fc9d027167ee32557a602308e1dec4  integration/orca-ticket-snapshot-boundary-v1/replay.mjs
 b365342a286651b32b0d9fd10e8e3bf04dc06f9497a6f3856ea29fb0efa47095  package.json
 ab184c5926dc34ec363df305aa7ea164aa910422d9cf7f52f048b70f319ca42c  packages/cli/package.json
 22bc421ca152e65619e4617144ac92e3e48c9074220363221ac0bcf3e02a331f  packages/cli/scripts/mark-cli-executable.mjs
@@ -97,11 +104,12 @@ ad7a982a99a3cb184caded94f441a25311fec192697f8e1f35b6ae416057be76  packages/contr
 ace76707f23cbb94d19a4ab543f0d1ea5c211ede863ae69166958946c63bd0a2  packages/contracts/fixtures/ticket-workspace-schema-v1.corpus.json
 e874d2db84df302084f837d81f1ef4ecd5c679cd68987756d827049dd5b4730f  packages/contracts/package.json
 10139407bc955d038605c557f2c6b21da5dd54237cbb59d28d58463bc6feb0de  packages/contracts/scripts/clean-contract-dist.mjs
-4dc2d0f889f2d6c4235fe728b442cabe72e3f66597cefd6a5d1fd7b7b28ac950  packages/contracts/scripts/stage-navigator-snapshot-candidate.mjs
+aea2b85362c6de29da5f1c0467d7f7fa8488ac73dd78d3b8d2f25afaac66888f  packages/contracts/scripts/stage-navigator-snapshot-candidate.mjs
 bd7f560c2d1920b6bc73479ecc3eecea19a2618930ae966815b0f6788e884be2  packages/contracts/src/canonical-json-v1.ts
 bb3e6a7c13e7f4492d62c4d15835ca65513e319da2f62e23736be7c5c3d17da5  packages/contracts/src/generate-ticket-contract-artifact-v1.ts
 c07f8b253bf8edf7009a5ff96b52ec12876cd587437d125d83a8f6758e8f06e2  packages/contracts/src/generate-ticket-navigator-snapshot-artifact-v1.ts
-20aba44b10059de099b4d77c10daa6c988a455900f939d0641de128d8ce85a3b  packages/contracts/src/navigator-snapshot-v1.ts
+a599b8fe204586ab6b0d49d747eca0b8e1620c71b40507f118cd7e7b2fd30faa  packages/contracts/src/navigator-snapshot-test-fixtures-v1.ts
+4cd0d2306826031ad10196eb343b1229ec1882ba0117bfbe55f58c5f191b6b57  packages/contracts/src/navigator-snapshot-v1.ts
 ae4f84dd2b731732da135666dbf0cf04e4fab89d148a8f2f21389ca1ad9788c9  packages/contracts/src/sha256-utf8-v1.ts
 236eb8f46b20108f3e1f85e20a3dcfb453efdd1518bd1775154a3cd7e93206db  packages/contracts/src/ticket-catalog-v1.ts
 b08b9dcc69c439e46656d8ba16e3052fd1d34593607c151b937c56b4cf02b077  packages/contracts/src/ticket-cleanup-evidence-validator-v1.ts
@@ -110,17 +118,18 @@ b08b9dcc69c439e46656d8ba16e3052fd1d34593607c151b937c56b4cf02b077  packages/contr
 a2c30e032979739a66e1a79ebbc43e16c32cd77cf870ed47623d0e187717c540  packages/contracts/src/ticket-contract-artifact-v1.ts
 eadd6fdfd76039968d71dacdd4e526a375b56a3f6cca5845df7666c375eb93a4  packages/contracts/src/ticket-contract-byte-limits-v1.ts
 e751888c8930c4be19d9671600cb70a761e32640565bcedf0e21ce23769e9927  packages/contracts/src/ticket-contract-corpus-v1.ts
-6f20185ba0e8df450c3e0f6b84520bcf049689919c4713e6c95d88643ad99142  packages/contracts/src/ticket-contract-fixture-generators-v1.ts
-b70232f838dea1c3d49a193c0c8693a78e73f74656a343e4adead35c131c9c1a  packages/contracts/src/ticket-contract-fixture-materializer-v1.ts
+98d655ced32a6e34b634a109ec83da2e433a58b2a4281ca7871ee7549693e553  packages/contracts/src/ticket-contract-fixture-generators-v1.ts
+fa05e07c3a4320a15723d277894f89a7ae207b202136ae062f955a8d317fb6b0  packages/contracts/src/ticket-contract-fixture-materializer-v1.ts
 e722f4896e8c1dd8b32d661e7213760bf429b80af58fac985b1bcc20fbad0e53  packages/contracts/src/ticket-contract-fixture-patch-v1.ts
 b9850a516eb58d69bad61818eb960b4a46a556da6517ed77cdf3e7a1fdce9593  packages/contracts/src/ticket-contract-validation-errors-v1.ts
 66fa258d20f0e3a62fb2673a5d5d1350b619c3b3ed3bebafc71a07f34037fb9a  packages/contracts/src/ticket-contract-validator-v1.ts
 23b7df31088654a47a25681a55214c001fbe7742383fd4e96612521720cfe3af  packages/contracts/src/ticket-navigator-snapshot-admission-v1.ts
 038a10294aa72d4f7ded84de672cb6eb67902f3b3b943c6ed3d0ed49d8c10b08  packages/contracts/src/ticket-navigator-snapshot-artifact-v1.ts
 e7fa625e84026beb98d222c329d40550517ddf4a827119ccd6e0e060d6e30679  packages/contracts/src/ticket-navigator-snapshot-corpus-v1.ts
+911b9bebf9564e956cdc93799a63f664bfd5d23e210b67dacbc92a18a35b8867  packages/contracts/src/ticket-navigator-snapshot-fixture-materializer-v1.ts
 8aacd105d7a4bd2b0607d178bba07a0112286a82eaf06ac72f70b108029d41e2  packages/contracts/src/ticket-navigator-snapshot-primitives-v1.ts
 b471e7096cce599ac9688916af8465f77b03ba6a40619041c6e0a8702c748494  packages/contracts/src/ticket-navigator-snapshot-v1.ts
-9efee6593afc812b8fb2c9a1a92303535454f9175bcdad8caed1bf3418e2c9b3  packages/contracts/src/ticket-navigator-snapshot-validator-v1.ts
+24f97ca59c3a69900900db91de9bc0476b0819aa01cebc45d8c2a1cd14efe7e7  packages/contracts/src/ticket-navigator-snapshot-validator-v1.ts
 c8303ac53339e94f22d9352be36bf60f61eeedad1e7cabf3630dda992ca63ae3  packages/contracts/src/ticket-repository-plan-evidence-v1.ts
 6aed7a14d943c26eea94a5d3dc319057e3bc9c030dbe9609afecae4fdf26802e  packages/contracts/src/ticket-resource-evidence-validator-v1.ts
 d93898c8507f58c43d7721e927991915028224a9953389e0bab310d010af405b  packages/contracts/src/ticket-workspace-common-v1.ts
@@ -136,7 +145,7 @@ efbcecb0389d5cf3ca13fe363c999d61d4b1d5b664ec5b0b9cfbb2af8a4f074e  packages/contr
 debbc125acac33091d9402157cfe59f67f699e5931e1c1bde12ab4db2efe3c34  packages/contracts/test/ticket-contract-cleanup-boundaries-v1.test.ts
 9dd6b073eae637fb2fc129b62e2b8d37748fe2eae5aba6385918f21b28298feb  packages/contracts/test/ticket-contract-corpus-v1.test.ts
 006dc9b395e36568bca0f342de5ddbf3e35d42a474382d9dca638435ec4838ce  packages/contracts/test/ticket-contract-materializer-boundaries-v1.test.ts
-cfafd82817d1976c3b2b3d0f0f02de4272b1e81ed56787e653248fefceb89383  packages/contracts/test/ticket-navigator-snapshot-v1.test.ts
+82373a689a6a62dac6c3961f25253c46355011fad97737613b05439852cc2089  packages/contracts/test/ticket-navigator-snapshot-v1.test.ts
 8949db6a053048a9c6598493ac3d2efe64abc14ebb03343e6e9e9e1fabc57b45  packages/contracts/test/ticket-repository-plan-evidence-v1.test.ts
 bf1fa6cf3a2593516170762e1b40e970ed676b0b69784903910f8437cb1c21d3  packages/contracts/test/ticket-resource-intent.test.ts
 ee3968cade8c960518cdb410a0208a6605c6cfb1f44df77cfb4d3a9876953613  packages/contracts/test/ticket-workspace-config-v1.test.ts

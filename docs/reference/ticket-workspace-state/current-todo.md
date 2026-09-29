@@ -5,17 +5,19 @@
 ## 완료된 기반
 
 - [x] **M0:** Orca의 worktree, folder, agent status, orchestration, cleanup 소유 경계를 확인했다.
-- [x] **TW-00:** 비공개 ticket 소스를 게시하고 Orca 서브모듈에 고정했다. 초기 128개 파일의 fresh-clone 해시와 Linux 314개 테스트(1개 skip), 현재 revision의 48개 contract 테스트와 typecheck를 확인했다.
+- [x] **TW-00:** 비공개 ticket 소스를 게시하고 Orca 서브모듈에 고정했다. 초기 128개 파일의 fresh-clone 해시와 Linux 314개 테스트(1개 skip)를 확인했다. 현재 157개 파일의 Git blob manifest와 51개 contract 테스트·typecheck를 확인했다.
 - [x] **M1 기반:** ticket schema/catalog, ledger CAS, 설정 읽기, `doctor`, `status`, fixture 기반 `plan` 투영을 구현했다. 이는 실제 owner 관측을 연결한 완료 상태는 아니다.
 - [x] **TW-01:** Orca 내부 local-native Git 관측의 freshness 경계를 구현하고 독립 리뷰를 통과했다.
 
 ## 이번 단계 완료
 
-- [x] **TW-00N — 비공개 snapshot 전용 후보:** 기존 Luna contract/fixture 세션이 source-owned 추출, 누락된 거부 사례, 결정적 패키징, 기존 `/v1`과 22건 Node/preload 형태 결과 일치를 검증했다. 새 Sol이 SSH 메타데이터 수정을 요구한 뒤 승인했다. 현재 후보는 25개 파일·14,364바이트 압축이며 공개 배포 승인은 없다.
+- [x] **TW-00N — 비공개 snapshot 전용 후보:** 기존 Luna contract/fixture 세션이 source-owned 추출, 누락된 거부 사례, 결정적 패키징, 기존 `/v1`과 22건 Node/preload 형태 결과 일치를 검증했다. 새 Sol이 SSH 메타데이터 수정을 요구한 뒤 승인했다. 25개 파일·14,364바이트의 초기 후보는 후속 전달 준비에서 갱신됐다.
+- [x] **TW-00C + TW-00F — 비공개 전달 준비:** 같은 Luna 세션이 snapshot 계약을 30개 파일·17,941바이트 archive로 고정하고 fixture 경계·과거 37개 사례를 별도 private 파일로 정리했다. 독립 Sol이 tarball만 사용하는 offline/frozen 설치, 타입 검사, Node/preload형 VM의 22개 source 사례·15개 경계 assertion을 검증했다. private 소스는 `31b3768`에 게시했다. 공개 복사 승인은 없다.
 
 ## 다음 순서: 읽기 전용 M4/M5 검증 지점
 
-- [ ] **TW-00C + TW-00F (진행 중):** 검토된 좁은 후보를 입력으로 정확한 공개 전달 바이트와 CI 재생 경로를 **비공개로 준비**하고, 최신 52-case source에 맞춰 fixture IPC/corpus를 정정한다. 사용자가 이 비공개 준비 작업을 승인했고 기존 Luna 세션에서 진행 중이다. 공개 저장소에 복사할 **정확한 바이트와 권한은 준비 결과를 보고한 뒤 별도 사용자 승인**을 받는다.
+- [ ] **공개 파일 후보 구성:** 위 archive와 별도 private fixture 입력을 Orca에서 사용할 경로·파일 집합으로 비공개 staging하고 파일별 해시와 재생 명령을 고정한다.
+- [ ] **공개 전달 결정:** 완성된 파일 집합의 공개 범위·권한을 사용자에게 정확한 바이트 기준으로 승인받는다. 승인 전에는 Orca 공개 파일, package/lockfile, CI에 복사하지 않는다.
 - [ ] **TW-06F (M4 fixture):** 전달된 contract 전체 의미 검증을 사용하는 Orca main/preload 읽기 전용 경계를 구현하고 fixture corpus로 검증한다. 선행: TW-00C + TW-00F.
 - [ ] **TW-02:** ticket `WorkspaceRef`를 정확한 Orca owner tuple에 결합하고 host·instance·revision 변경 시 재검증한다. 선행: TW-00C + TW-01.
 - [ ] **TW-07F (M5 fixture):** 기존 sidebar에 읽기 전용 Projects/Tickets tree를 구현한다. mutation 동작을 숨기고, workspace 이동은 TW-02가 확인한 ID만 허용한다. 선행: TW-06F + TW-02.
