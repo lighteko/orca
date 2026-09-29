@@ -130,6 +130,9 @@ jobs:
             pnpm-lock.yaml
             mobile/pnpm-lock.yaml
 
+      - name: Verify ticket workspace snapshot package and fixture replay
+        run: pnpm run verify:ticket-workspace-snapshot-fixture
+
       - name: Lint
         run: pnpm exec oxlint --format github
 

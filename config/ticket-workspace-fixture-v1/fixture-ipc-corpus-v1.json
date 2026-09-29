@@ -1,0 +1,266 @@
+{
+  "formatVersion": 1,
+  "purpose": "Fixture-only replay input; not a production IPC contract.",
+  "source": {
+    "ticketWorkspaceContractCommit": "d27fe24e5cead1fae9ba86ac7b57ac5decf067d9",
+    "snapshotCorpusPath": "@lighteko/ticket-workspace-contracts/fixtures/ticket-navigator-snapshot-v1.corpus.json",
+    "snapshotCorpusSha256": "392aa7bb8f25378325b0c82c4698eaa07beb59c8f6e5bf3b9203bbe1730ae7e4",
+    "snapshotArtifactPath": "@lighteko/ticket-workspace-contracts/artifacts/ticket-navigator-snapshot-v1.json",
+    "snapshotArtifactDigest": "630cb8fb3fe577d528614ec0c9cd8e9c1bc6264afb45f53ee0101fee92b28cd4",
+    "historicalBoundaryCorpusSha256": "52a68df5b1b76692bcfae3561e3f8b7d58133d924d955a2fd569675fe8b49663",
+    "historicalBoundaryCaseCount": 37,
+    "historicalBoundaryCorpusPath": "config/ticket-workspace-fixture-v1/historical-orca-ipc-boundary-v1.corpus.json",
+    "ticketWorkspaceFixtureSourceCommit": "31b3768e8043b6aeef66f0fe0fe648439ba80b2b",
+    "ticketWorkspaceFixtureSourceTree": "150b23c5c7380f255c86d229a04e8f97c3366987"
+  },
+  "fixtureResultRules": {
+    "acceptedStatus": "fixture",
+    "rejectedStatus": "unavailable",
+    "provenanceKind": "fixture",
+    "orcaMatch": "not-evaluated",
+    "m5PresentationProjection": "deferred-to-TW-07F",
+    "fixtureUnavailableDiagnosticMaxUtf8Bytes": 4096
+  },
+  "sourceSnapshotCaseIds": [
+    "accepted-minimal-snapshot",
+    "accepted-full-snapshot",
+    "accepted-current-snapshot-sequence-2",
+    "blocked-expired-snapshot",
+    "rejected-snapshot-unknown-field",
+    "rejected-snapshot-future-schema",
+    "rejected-receipt-or-agent-status-copy",
+    "blocked-required-capability",
+    "blocked-authority-epoch-change",
+    "blocked-remote-workspace",
+    "rejected-truncated-publication",
+    "rejected-snapshot-digest-mismatch",
+    "rejected-snapshot-duplicate-ticket-key",
+    "rejected-snapshot-duplicate-repository-id",
+    "rejected-snapshot-ssh-coordinator-presentation",
+    "rejected-snapshot-ssh-workspace-presentation",
+    "blocked-late-snapshot",
+    "rejected-ticket-bound",
+    "rejected-workspace-bound",
+    "rejected-byte-bound",
+    "blocked-no-start-transport-missing",
+    "accepted-enrichment-unknown-does-not-remove-resource"
+  ],
+  "legacyCaseCrosswalk": [
+    {
+      "legacyId": "accepted-full-snapshot-at-both-gates",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:accepted-full-snapshot",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "accepted-minimal-snapshot-at-both-gates",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:accepted-minimal-snapshot",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "unknown-snapshot-field-unavailable-without-cache",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:rejected-snapshot-unknown-field",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "future-snapshot-version-unavailable",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:rejected-snapshot-future-schema",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "truncated-publication-unavailable",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:rejected-truncated-publication",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "invalid-utf8-rejected-before-json-parse",
+      "disposition": "executable-fixture-wire-case",
+      "replacement": "ipc:invalid-utf8",
+      "note": "Fatal UTF-8 decoding fails closed before JSON parsing."
+    },
+    {
+      "legacyId": "multibyte-snapshot-stops-bounded-read-before-json-parse",
+      "disposition": "executable-fixture-wire-case",
+      "replacement": "ipc:multibyte-over-2mib",
+      "note": "UTF-8 payload bytes are counted before snapshot parsing."
+    },
+    {
+      "legacyId": "expired-snapshot-is-not-current",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:blocked-expired-snapshot",
+      "note": "Fixture-only result; no live freshness status is emitted.",
+      "liveAssertion": "deferred-to-TW-06P/T"
+    },
+    {
+      "legacyId": "snapshot-digest-mismatch-unavailable",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:rejected-snapshot-digest-mismatch",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "ticket-count-limit-rejected-before-wire",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:rejected-ticket-bound",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "workspace-count-limit-rejected-before-wire",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:rejected-workspace-bound",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "snapshot-byte-limit-rejected-before-zod",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:rejected-byte-bound",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "authority-copy-rejected-by-shared-schema",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:rejected-receipt-or-agent-status-copy",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "resident-transport-required-without-start",
+      "disposition": "deferred-to-TW-06P/T",
+      "reason": "Resident producer/transport availability is a live TW-06P/T concern."
+    },
+    {
+      "legacyId": "no-start-capability-required",
+      "disposition": "deferred-to-TW-06P/T",
+      "reason": "The fixture boundary must not assert producer no-start behavior; verify that against TW-06T transport."
+    },
+    {
+      "legacyId": "transport-authority-must-match-payload",
+      "disposition": "deferred-to-TW-06P/T",
+      "reason": "Requires authenticated transport authority and a live provenance binding."
+    },
+    {
+      "legacyId": "configured-profile-must-match-payload",
+      "disposition": "deferred-to-TW-06P/T",
+      "reason": "Requires the live coordinator profile/transport binding."
+    },
+    {
+      "legacyId": "authority-change-cannot-use-foreign-cache-partition",
+      "disposition": "deferred-to-TW-06P/T",
+      "reason": "Requires the live service cache and authority rebind lifecycle."
+    },
+    {
+      "legacyId": "profile-change-cannot-use-foreign-cache-partition",
+      "disposition": "deferred-to-TW-06P/T",
+      "reason": "Requires the live service cache partition and profile lifecycle."
+    },
+    {
+      "legacyId": "epoch-change-without-rebind-keeps-bound-cache-stale",
+      "disposition": "deferred-to-TW-06P/T",
+      "reason": "Requires live bound-cache state and authority rebind protocol."
+    },
+    {
+      "legacyId": "late-snapshot-keeps-last-verified-stale",
+      "disposition": "deferred-to-TW-06P/T",
+      "reason": "Requires live request ordering and last-verified cache state."
+    },
+    {
+      "legacyId": "invalid-update-keeps-last-verified-stale",
+      "disposition": "deferred-to-TW-06P/T",
+      "reason": "Requires live cache fallback semantics; do not infer them from a static fixture."
+    },
+    {
+      "legacyId": "strict-main-request-rejects-unknown-field",
+      "disposition": "executable-fixture-envelope-case",
+      "replacement": "ipc:zero-argument-request",
+      "note": "Fixture-only strict envelope check."
+    },
+    {
+      "legacyId": "preload-accepts-valid-current-wire",
+      "disposition": "executable-fixture-envelope-case",
+      "replacement": "ipc:valid-fixture-envelope",
+      "note": "Historical current/stale labels are replaced by status fixture plus explicit fixture provenance."
+    },
+    {
+      "legacyId": "preload-accepts-valid-stale-wire",
+      "disposition": "executable-fixture-envelope-case",
+      "replacement": "ipc:valid-fixture-envelope",
+      "note": "Historical current/stale labels are replaced by status fixture plus explicit fixture provenance.",
+      "liveAssertion": "deferred-to-TW-06P/T"
+    },
+    {
+      "legacyId": "preload-accepts-bounded-unavailable-wire",
+      "disposition": "executable-fixture-envelope-case",
+      "replacement": "ipc:bounded-unavailable",
+      "note": "Fixture-only strict envelope check."
+    },
+    {
+      "legacyId": "preload-rejects-unknown-wire-field",
+      "disposition": "executable-fixture-envelope-case",
+      "replacement": "ipc:unknown-envelope-field",
+      "note": "Fixture-only strict envelope check."
+    },
+    {
+      "legacyId": "preload-rejects-missing-provenance",
+      "disposition": "executable-fixture-envelope-case",
+      "replacement": "ipc:missing-fixture-provenance",
+      "note": "Fixture-only strict envelope check."
+    },
+    {
+      "legacyId": "preload-rejects-future-wire-version",
+      "disposition": "executable-fixture-envelope-case",
+      "replacement": "ipc:unknown-contract-version",
+      "note": "Fixture-only strict envelope check."
+    },
+    {
+      "legacyId": "preload-rejects-byte-count-mismatch-before-parse",
+      "disposition": "executable-fixture-envelope-case",
+      "replacement": "ipc:utf8-byte-count-mismatch",
+      "note": "Fixture-only strict envelope check."
+    },
+    {
+      "legacyId": "preload-rejects-provenance-body-mismatch",
+      "disposition": "executable-fixture-envelope-case",
+      "replacement": "ipc:provenance-snapshot-revision-mismatch",
+      "note": "Fixture-only strict envelope check."
+    },
+    {
+      "legacyId": "preload-rejects-invalid-snapshot-with-valid-wire-shape",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:rejected-snapshot-future-schema",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "preload-rejects-invalid-snapshot-digest",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:rejected-snapshot-digest-mismatch",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "preload-rejects-expired-current-wire",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:blocked-expired-snapshot",
+      "note": "Fixture-only result; no live freshness status is emitted.",
+      "liveAssertion": "deferred-to-TW-06P/T"
+    },
+    {
+      "legacyId": "preload-rejects-over-limit-snapshot-wire",
+      "disposition": "executable-source-semantic-case",
+      "replacement": "snapshot:rejected-byte-bound",
+      "note": "Fixture-only result; no live currentness, cache, or action authority is emitted."
+    },
+    {
+      "legacyId": "preload-counts-multibyte-snapshot-payload-before-parse",
+      "disposition": "executable-fixture-envelope-case",
+      "replacement": "ipc:multibyte-over-2mib",
+      "note": "Fixture-only strict envelope check."
+    },
+    {
+      "legacyId": "preload-diagnostic-limit-counts-utf8-bytes",
+      "disposition": "executable-fixture-envelope-case",
+      "replacement": "ipc:diagnostic-over-4kib-multibyte",
+      "note": "Fixture unavailable envelope rejects diagnostics above 4096 UTF-8 bytes."
+    }
+  ]
+}

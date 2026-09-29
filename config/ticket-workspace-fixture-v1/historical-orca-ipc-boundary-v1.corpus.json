@@ -1,0 +1,928 @@
+{
+  "contractVersion": 1,
+  "fixedNow": "2026-09-22T00:30:00.000Z",
+  "sourceSchemaCorpus": {
+    "path": "docs/fixtures/ticket-workspace-schema-v1/corpus.json",
+    "corpusVersion": 1,
+    "sha256": "e083a1838d3cea35f1cc0a67c08d5422d203d4266069725da0bb1c139bff7801",
+    "hashBytes": "UTF-8 with CRLF normalized to LF"
+  },
+  "sharedSnapshotParity": {
+    "stages": ["main", "preload"],
+    "verdictKind": "snapshot-artifact-validation-pipeline",
+    "verdictSource": "source-schema-corpus.schemaVerdict",
+    "caseIds": [
+      "accepted-minimal-snapshot",
+      "accepted-full-snapshot",
+      "accepted-current-snapshot-sequence-2",
+      "blocked-expired-snapshot",
+      "rejected-snapshot-unknown-field",
+      "rejected-snapshot-future-schema",
+      "rejected-receipt-or-agent-status-copy",
+      "blocked-required-capability",
+      "blocked-authority-epoch-change",
+      "blocked-remote-workspace",
+      "rejected-truncated-publication",
+      "rejected-snapshot-digest-mismatch",
+      "blocked-late-snapshot",
+      "rejected-ticket-bound",
+      "rejected-workspace-bound",
+      "rejected-byte-bound",
+      "blocked-no-start-transport-missing",
+      "accepted-enrichment-unknown-does-not-remove-resource"
+    ]
+  },
+  "snapshotByteGenerators": {
+    "invalid-utf8": {
+      "bytesHex": "7b2276616c7565223a22c328227d",
+      "failure": "fatal-utf8-decode"
+    },
+    "multibyte-over-2mib": {
+      "prefix": "\"",
+      "scalar": "가",
+      "count": 699051,
+      "suffix": "\"",
+      "expectedCodeUnitsAtMost": 2097152,
+      "expectedUtf8BytesAtLeast": 2097153
+    }
+  },
+  "wireGenerators": {
+    "current": "materialize snapshotCaseId, serialize canonical UTF-8, and copy its producer/profile/source/snapshotRevision plus measured byte count into provenance",
+    "last-verified-stale": "same as current, with status last-verified-stale and staleReason transport_unavailable",
+    "unavailable": {
+      "status": "unavailable",
+      "contractVersion": 1,
+      "scope": "tickets-only",
+      "reason": "transport_unavailable",
+      "retryable": true,
+      "diagnostic": "Ticket coordinator is unavailable"
+    }
+  },
+  "fixtures": [
+    {
+      "id": "accepted-full-snapshot-at-both-gates",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "accepted-full-snapshot",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "accepted",
+        "mainDisposition": "current",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "accepted",
+        "rendererDisposition": "current",
+        "projectsAvailable": true
+      }
+    },
+    {
+      "id": "accepted-minimal-snapshot-at-both-gates",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "accepted-minimal-snapshot",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "accepted",
+        "mainDisposition": "current",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "accepted",
+        "rendererDisposition": "current",
+        "projectsAvailable": true
+      }
+    },
+    {
+      "id": "unknown-snapshot-field-unavailable-without-cache",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "rejected-snapshot-unknown-field",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "rejected",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_schema_invalid"
+      }
+    },
+    {
+      "id": "future-snapshot-version-unavailable",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "rejected-snapshot-future-schema",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "rejected",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_version_unsupported"
+      }
+    },
+    {
+      "id": "truncated-publication-unavailable",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "rejected-truncated-publication",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_malformed"
+      }
+    },
+    {
+      "id": "invalid-utf8-rejected-before-json-parse",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotByteGenerator": "invalid-utf8",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_encoding_invalid"
+      }
+    },
+    {
+      "id": "multibyte-snapshot-stops-bounded-read-before-json-parse",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotByteGenerator": "multibyte-over-2mib",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_byte_limit_exceeded"
+      }
+    },
+    {
+      "id": "expired-snapshot-is-not-current",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "blocked-expired-snapshot",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "accepted",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_expired"
+      }
+    },
+    {
+      "id": "snapshot-digest-mismatch-unavailable",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "rejected-snapshot-digest-mismatch",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "accepted",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_digest_mismatch"
+      }
+    },
+    {
+      "id": "ticket-count-limit-rejected-before-wire",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "rejected-ticket-bound",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "rejected",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_schema_invalid"
+      }
+    },
+    {
+      "id": "workspace-count-limit-rejected-before-wire",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "rejected-workspace-bound",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "rejected",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_schema_invalid"
+      }
+    },
+    {
+      "id": "snapshot-byte-limit-rejected-before-zod",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "rejected-byte-bound",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_byte_limit_exceeded"
+      }
+    },
+    {
+      "id": "authority-copy-rejected-by-shared-schema",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "rejected-receipt-or-agent-status-copy",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "rejected",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_schema_invalid"
+      }
+    },
+    {
+      "id": "resident-transport-required-without-start",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "accepted-full-snapshot",
+        "transport": {
+          "residentTransportConnected": false,
+          "noStartCapability": false
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "transport_unavailable"
+      }
+    },
+    {
+      "id": "no-start-capability-required",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "accepted-full-snapshot",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": false,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "no_start_capability_missing"
+      }
+    },
+    {
+      "id": "transport-authority-must-match-payload",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "accepted-full-snapshot",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-foreign",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "accepted",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_provenance_mismatch"
+      }
+    },
+    {
+      "id": "configured-profile-must-match-payload",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "accepted-full-snapshot",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "other-profile"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "accepted",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_provenance_mismatch"
+      }
+    },
+    {
+      "id": "authority-change-cannot-use-foreign-cache-partition",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "accepted-full-snapshot",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-foreign",
+          "profileId": "sellmate",
+          "boundAuthorityId": "authority-1",
+          "boundLedgerEpoch": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          "authorityRebindConfirmed": false
+        },
+        "cache": { "state": "last-verified", "snapshotCaseId": "accepted-full-snapshot" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "accepted",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_provenance_mismatch"
+      }
+    },
+    {
+      "id": "profile-change-cannot-use-foreign-cache-partition",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "accepted-full-snapshot",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "other-profile",
+          "boundAuthorityId": "authority-1",
+          "boundLedgerEpoch": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          "authorityRebindConfirmed": false
+        },
+        "cache": { "state": "last-verified", "snapshotCaseId": "accepted-full-snapshot" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "accepted",
+        "mainDisposition": "unavailable",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_provenance_mismatch"
+      }
+    },
+    {
+      "id": "epoch-change-without-rebind-keeps-bound-cache-stale",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "blocked-authority-epoch-change",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate",
+          "boundAuthorityId": "authority-1",
+          "boundLedgerEpoch": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          "authorityRebindConfirmed": false
+        },
+        "cache": { "state": "last-verified", "snapshotCaseId": "accepted-full-snapshot" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "accepted",
+        "mainDisposition": "last-verified-stale",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "accepted",
+        "rendererDisposition": "last-verified-stale",
+        "projectsAvailable": true,
+        "reason": "snapshot_authority_rebind_required",
+        "returnedSnapshotCaseId": "accepted-full-snapshot"
+      }
+    },
+    {
+      "id": "late-snapshot-keeps-last-verified-stale",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "blocked-late-snapshot",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate",
+          "boundAuthorityId": "authority-1",
+          "boundLedgerEpoch": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          "authorityRebindConfirmed": false
+        },
+        "cache": {
+          "state": "last-verified",
+          "snapshotCaseId": "accepted-current-snapshot-sequence-2"
+        }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "accepted",
+        "mainDisposition": "last-verified-stale",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "accepted",
+        "rendererDisposition": "last-verified-stale",
+        "projectsAvailable": true,
+        "reason": "snapshot_revision_regression",
+        "returnedSnapshotCaseId": "accepted-current-snapshot-sequence-2"
+      }
+    },
+    {
+      "id": "invalid-update-keeps-last-verified-stale",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1 },
+        "snapshotCaseId": "rejected-snapshot-unknown-field",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "last-verified", "snapshotCaseId": "accepted-full-snapshot" }
+      },
+      "expected": {
+        "mainRequestZod": "accepted",
+        "mainSnapshotZod": "rejected",
+        "mainDisposition": "last-verified-stale",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "accepted",
+        "rendererDisposition": "last-verified-stale",
+        "projectsAvailable": true,
+        "reason": "snapshot_schema_invalid",
+        "returnedSnapshotCaseId": "accepted-full-snapshot"
+      }
+    },
+    {
+      "id": "strict-main-request-rejects-unknown-field",
+      "input": {
+        "stage": "end-to-end",
+        "request": { "contractVersion": 1, "path": "C:\\untrusted\\snapshot.json" },
+        "snapshotCaseId": "accepted-full-snapshot",
+        "transport": {
+          "residentTransportConnected": true,
+          "noStartCapability": true,
+          "authorityId": "authority-1",
+          "profileId": "sellmate"
+        },
+        "cache": { "state": "empty" }
+      },
+      "expected": {
+        "mainRequestZod": "rejected",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "ipc-rejected",
+        "preloadWireZod": "not-run",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "boundary_response_invalid"
+      }
+    },
+    {
+      "id": "preload-accepts-valid-current-wire",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "current",
+        "snapshotCaseId": "accepted-full-snapshot",
+        "patch": []
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "accepted",
+        "rendererDisposition": "current",
+        "projectsAvailable": true
+      }
+    },
+    {
+      "id": "preload-accepts-valid-stale-wire",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "last-verified-stale",
+        "snapshotCaseId": "accepted-full-snapshot",
+        "patch": []
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "accepted",
+        "rendererDisposition": "last-verified-stale",
+        "projectsAvailable": true,
+        "reason": "transport_unavailable"
+      }
+    },
+    {
+      "id": "preload-accepts-bounded-unavailable-wire",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "unavailable",
+        "patch": []
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "transport_unavailable"
+      }
+    },
+    {
+      "id": "preload-rejects-unknown-wire-field",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "current",
+        "snapshotCaseId": "accepted-full-snapshot",
+        "patch": [{ "op": "add", "path": "/runtimeToken", "value": "secret" }]
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "rejected",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "boundary_response_invalid"
+      }
+    },
+    {
+      "id": "preload-rejects-missing-provenance",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "current",
+        "snapshotCaseId": "accepted-full-snapshot",
+        "patch": [{ "op": "remove", "path": "/provenance" }]
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "rejected",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "boundary_response_invalid"
+      }
+    },
+    {
+      "id": "preload-rejects-future-wire-version",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "current",
+        "snapshotCaseId": "accepted-full-snapshot",
+        "patch": [{ "op": "replace", "path": "/contractVersion", "value": 2 }]
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "rejected",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "boundary_response_invalid"
+      }
+    },
+    {
+      "id": "preload-rejects-byte-count-mismatch-before-parse",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "current",
+        "snapshotCaseId": "accepted-full-snapshot",
+        "patch": [{ "op": "replace", "path": "/provenance/payloadUtf8Bytes", "value": 1 }]
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "boundary_payload_mismatch"
+      }
+    },
+    {
+      "id": "preload-rejects-provenance-body-mismatch",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "current",
+        "snapshotCaseId": "accepted-full-snapshot",
+        "patch": [{ "op": "replace", "path": "/provenance/source/ledgerRevision", "value": 8 }]
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "accepted",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "boundary_payload_mismatch"
+      }
+    },
+    {
+      "id": "preload-rejects-invalid-snapshot-with-valid-wire-shape",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "current",
+        "snapshotCaseId": "rejected-snapshot-future-schema",
+        "patch": []
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "rejected",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_version_unsupported"
+      }
+    },
+    {
+      "id": "preload-rejects-invalid-snapshot-digest",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "current",
+        "snapshotCaseId": "rejected-snapshot-digest-mismatch",
+        "patch": []
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "accepted",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_digest_mismatch"
+      }
+    },
+    {
+      "id": "preload-rejects-expired-current-wire",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "current",
+        "snapshotCaseId": "blocked-expired-snapshot",
+        "patch": []
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "accepted",
+        "preloadSnapshotZod": "accepted",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "snapshot_expired"
+      }
+    },
+    {
+      "id": "preload-rejects-over-limit-snapshot-wire",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "current",
+        "snapshotCaseId": "rejected-byte-bound",
+        "patch": []
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "rejected",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "boundary_response_invalid"
+      }
+    },
+    {
+      "id": "preload-counts-multibyte-snapshot-payload-before-parse",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "current",
+        "snapshotCaseId": "accepted-full-snapshot",
+        "patch": [
+          {
+            "op": "replace",
+            "path": "/payloadUtf8",
+            "valueGenerator": { "kind": "repeat", "scalar": "가", "count": 699051 }
+          },
+          { "op": "replace", "path": "/provenance/payloadUtf8Bytes", "value": 2097152 }
+        ]
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "rejected",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "boundary_response_invalid"
+      }
+    },
+    {
+      "id": "preload-diagnostic-limit-counts-utf8-bytes",
+      "input": {
+        "stage": "preload-wire",
+        "wireGenerator": "unavailable",
+        "patch": [
+          {
+            "op": "replace",
+            "path": "/diagnostic",
+            "valueGenerator": { "kind": "repeat", "scalar": "가", "count": 1366 }
+          }
+        ]
+      },
+      "expected": {
+        "mainRequestZod": "not-run",
+        "mainSnapshotZod": "not-run",
+        "mainDisposition": "not-run",
+        "preloadWireZod": "rejected",
+        "preloadSnapshotZod": "not-run",
+        "rendererDisposition": "unavailable",
+        "projectsAvailable": true,
+        "reason": "boundary_response_invalid"
+      }
+    }
+  ]
+}

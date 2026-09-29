@@ -210,6 +210,9 @@ importers:
       '@electron/rebuild':
         specifier: ^4.2.0
         version: 4.2.0(supports-color@7.2.0)
+      '@lighteko/ticket-workspace-contracts':
+        specifier: file:config/ticket-workspace-contracts-v1/lighteko-ticket-workspace-contracts-1.0.0.tgz
+        version: file:config/ticket-workspace-contracts-v1/lighteko-ticket-workspace-contracts-1.0.0.tgz
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1250,6 +1253,10 @@ packages:
 
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
+
+  '@lighteko/ticket-workspace-contracts@file:config/ticket-workspace-contracts-v1/lighteko-ticket-workspace-contracts-1.0.0.tgz':
+    resolution: {integrity: sha512-s3m5kl6LuL41s4iHEDMq7RIRgkCihEupAt1nv5O8p9SQf8VpkBAdKoBte0vVfdjC7I9IhGr+yu0eCrHZEpL5yQ==, tarball: file:config/ticket-workspace-contracts-v1/lighteko-ticket-workspace-contracts-1.0.0.tgz}
+    version: 1.0.0
 
   '@linear/sdk@82.1.0':
     resolution: {integrity: sha512-Ok7o+LqXaenx6Um58NQqjQoQanDsCgAIe9yNgpVbqRSh5APz3Ds1kZUz2vWmSNTNATFZm1zDQtEktTMga2X7UQ==}
@@ -8184,6 +8191,11 @@ snapshots:
       keyv: 5.6.0
 
   '@keyv/serialize@1.1.1': {}
+
+  '@lighteko/ticket-workspace-contracts@file:config/ticket-workspace-contracts-v1/lighteko-ticket-workspace-contracts-1.0.0.tgz':
+    dependencies:
+      '@noble/hashes': 1.8.0
+      zod: 4.5.4
 
   '@linear/sdk@82.1.0(graphql@16.14.2)':
     dependencies:

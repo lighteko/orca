@@ -41,3 +41,11 @@
 # Generated method->params catalog: compared byte-for-byte by
 # verify:rpc-params-catalog, so a CRLF checkout would fail the gate.
 /src/shared/rpc-contract/rpc-params-catalog.generated.ts linguist-generated=true text eol=lf
+# Approved snapshot-contract delivery bytes are hash-pinned by the verifier.
+/config/ticket-workspace-fixture-v1/README.md text eol=lf whitespace=-blank-at-eol
+/config/ticket-workspace-fixture-v1/boundary-runtime.mjs text eol=lf
+/config/ticket-workspace-fixture-v1/fixture-ipc-corpus-v1.json text eol=lf
+/config/ticket-workspace-fixture-v1/historical-orca-ipc-boundary-v1.corpus.json text eol=lf
+/config/ticket-workspace-fixture-v1/preload-entry.mjs text eol=lf
+/config/ticket-workspace-fixture-v1/replay.mjs text eol=lf
+/config/ticket-workspace-contracts-v1/lighteko-ticket-workspace-contracts-1.0.0.tgz -text
