@@ -5,17 +5,20 @@ Snapshot: 2026-09-29. This graph refines the [master milestones](./master-plan.m
 ## Dependency graph
 
 ```text
-M0 ──> TW-01 ──> TW-02 ──> TW-03 ────────────────────────────────┐
-TW-00 ──> TW-00C + TW-04A + TW-05 + TW-06P + TW-06T           │
-TW-00C + TW-01 ──> TW-02; TW-00C + TW-06P + TW-06T ──> TW-06  │
-TW-05 ──> TW-05G ──> TW-04B + TW-08                             │
-TW-04A + TW-05G ──> TW-04B ──> TW-03 + TW-04C                  ├─> TW-09 ─> TW-10
-TW-06P + TW-06T ──> TW-06 ──> TW-07 ──> TW-08 ──> TW-04C       │
-TW-02 + TW-04B + other owner-source contracts ──> TW-03        │
-TW-03 + TW-04C + TW-05 + TW-06 + TW-08 ────────────────────────┘
+TW-00 ──> TW-00C + TW-00F
+TW-00C + TW-00F ──> TW-06F; TW-06F + TW-02 ──> TW-07F (original M4/M5 fixture checkpoint)
+M0 ──> TW-01; TW-00C + TW-01 ──> TW-02
+TW-00 + frozen producer/transport protocol ──> TW-06P + TW-06T
+TW-06F + TW-06P + TW-06T ──> TW-06
+TW-07F + TW-06 + TW-02 ──> TW-07          (live Tickets and owner-status cutover)
+TW-00 ──> TW-04A + TW-05; TW-05 ──> TW-05G
+TW-04A + TW-05G ──> TW-04B
+TW-02 + TW-04B + other owner-source contracts ──> TW-03
+TW-05G + TW-06 + TW-07 ──> TW-08; TW-04B + TW-08 ──> TW-04C
+TW-03 + TW-04C + TW-05 + TW-06 + TW-08 ──> TW-09 ──> TW-10
 ```
 
-TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independent review; TW-00's private publication, fresh-clone hashes, isolated Linux test replay, and Orca submodule integration passed. The initial submodule pin is in Orca commit `d1f86d608`; the current working gitlink targets the published private package-preparation commit `59714ba`. Implementation of TW-02 through TW-08 is gated by the specific contracts below. M2 effects, role mutation, and Tickets actions must not start from fixture-only evidence.
+TW-01 passed independent review; TW-00's private publication, fresh-clone hashes, isolated Linux test replay, and Orca submodule integration passed. The initial submodule pin is in Orca commit `d1f86d608`; Orca commit `372fd6049` pins private commit `59714ba`. Original M4 and M5 accept fixture-backed read-only results before live producer/transport. TW-06F and TW-07F restore those checkpoints; TW-06 and TW-07 are later live cutovers. No fixture snapshot can claim live `current`, enable ticket mutation/effects, or support public `clear`; existing workspace navigation requires TW-02 revalidation. Every new worker allocation requires a reviewed next step and explicit user approval; previous A/B assignments were interrupted without tracked changes.
 
 ## Tasks
 
@@ -43,13 +46,29 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **OWNERSHIP:** Ticket-contract worker owns source-derived build/artifact generation; Orca integration worker owns consumption and CI wiring after one reviewed artifact contract. Sol Orchestrator owns the distribution approval and cross-repository pin.
 - **FILES / MODULES LIKELY INVOLVED:** Private `packages/contracts` exports/generator/tests; Orca contract artifact/verification, package or bundler wiring, main/preload boundary tests, public PR CI configuration.
 - **INPUT CONTRACT:** Pinned ticket commit and full semantic rules, including duplicate identities, SSH presentation, canonical UTF-8 cap, and snapshot digest. The current generated JSON Schema alone is insufficient.
-- **OUTPUT CONTRACT:** A source-pinned, digest-verified runtime contract that passes the same corpus in Orca main and sandboxed preload, or an explicitly gated alternative delivery path with equivalent provenance and CI coverage.
+- **OUTPUT CONTRACT:** A source-pinned, digest-verified runtime contract consumable by Orca main and sandboxed preload. A representative preload-shaped artifact harness passes the same corpus before TW-06F; actual Orca main/preload wiring and bundle parity are TW-06F acceptance.
 - **CONSTRAINTS:** Public Orca PR CI cannot require private submodule credentials. The current private `/v1` validator source avoids Node `buffer`/`crypto`, but the package root still reaches Node imports; consumers must use `/v1` and validate the actual preload bundle. The private source's public redistribution scope remains undecided.
 - **DO_NOT_TOUCH:** Ticket CLI lifecycle, external effects, renderer UI, or public release of private protocol bytes before the reviewed distribution decision.
-- **ACCEPTANCE CRITERIA:** Reproducible source/digest pin, full corpus parity in main and sandboxed preload, fail-closed unknown version/digest, and untrusted public PR CI that does not expose private credentials. Document exactly which contract bytes are public.
-- **VERIFICATION:** Source-to-artifact reproducibility check, main/preload runtime tests, build/bundle test, corpus parity, changed-code quality, and independent privacy/semantic review.
+- **ACCEPTANCE CRITERIA:** Reproducible source/digest pin, full corpus parity in a Node/main-shaped harness and representative sandboxed-preload-shaped harness, fail-closed unknown version/digest, and untrusted public PR CI that does not expose private credentials. Document exactly which contract bytes are public. Integrated Orca preload parity remains TW-06F's gate.
+- **VERIFICATION:** Source-to-artifact reproducibility check, Node and representative preload-shaped bundle/corpus tests, public-CI-safe replay, changed-code quality, and independent privacy/semantic review.
 - **PARALLELIZATION SAFETY:** Private contract generation can proceed beside TW-04A/TW-05/TW-06P in disjoint files after schema scope is frozen; Orca consumer wiring follows the accepted artifact and is serial with TW-02/TW-06 boundary edits.
 - **POTENTIAL CONFLICTS:** A private package link would break ordinary public PR CI without scoped access; generated JSON Schema misses runtime checks; a public vendored artifact needs a distribution decision.
+
+### TW-00F — Recover and deliver the M4/M5 fixture boundary inputs
+
+- **STATUS:** Open. `docs/ticket-workspace-ipc-boundary.md`, `docs/contracts/ticket-workspace-ipc-boundary-v1.ts`, and `docs/fixtures/ticket-workspace-ipc-boundary-v1/` exist only as local ignored files. Their contract predates the reviewed full runtime-validator requirement and cannot be treated as a current implementation specification without reconciliation.
+- **GOAL:** Make the original fixture IPC contract and corpus reproducible for a fresh worker and public Orca CI under an approved distribution scope.
+- **DEPENDENCIES:** TW-00's pinned ticket source; coordinate exact runtime-validation and artifact scope with TW-00C. Audit/reconciliation may proceed privately before the distribution decision; public delivery waits for it.
+- **OWNERSHIP:** One contract/provenance worker for bounded audit and candidate preparation; Sol Orchestrator owns the public distribution decision and final pin.
+- **FILES / MODULES LIKELY INVOLVED:** The three locally ignored M4/M5 inputs above, private ticket contract/corpus source, and the approved Orca artifact/CI location.
+- **INPUT CONTRACT:** The original fixture M4/M5 acceptance criteria, pinned private snapshot corpus and semantic validator, and existing ignored IPC proposal as unverified historical evidence.
+- **OUTPUT CONTRACT:** Reviewed, source-pinned fixture IPC wire/renderer contract and corpus that a fresh clone and ordinary public PR CI can consume without private credentials; exact public bytes and provenance documented.
+- **CONSTRAINTS:** Reconcile the ignored proposal's generated-Zod-only language with the full ticket-owned runtime validator, immutable snapshot digest, and separate Orca match result. Do not publish private protocol bytes without the user's scoped decision.
+- **DO_NOT_TOUCH:** Live producer/transport, renderer, mutation authority, and unrelated ignored notes.
+- **ACCEPTANCE CRITERIA:** Fresh-clone reproducibility, full semantic corpus parity, bounded fixture provenance, public-CI-safe delivery, and explicit review of exposed bytes. Unknown or stale contract versions fail closed.
+- **VERIFICATION:** Hash/source comparison, private/public artifact review, fresh-clone fixture replay and CI wiring check, independent semantic/privacy review.
+- **PARALLELIZATION SAFETY:** Private audit can run beside TW-00C candidate work in disjoint files; artifact/publication and shared package edits are serial with TW-00C's accepted delivery contract.
+- **POTENTIAL CONFLICTS:** Ignored IPC files may be stale and contain private contract data; public Orca CI cannot fetch the private submodule.
 
 ### TW-01 — Add owner freshness to internal local-native Git capture
 
@@ -203,34 +222,66 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **PARALLELIZATION SAFETY:** Serial with TW-06 main handler integration; fixture-only schema work can proceed after TW-00 in disjoint files.
 - **POTENTIAL CONFLICTS:** No live resident ticket transport or package-side navigator producer currently exists. The CLI `status` report is a different one-shot DTO and cannot satisfy the no-start snapshot read. Authenticated response correlation alone does not establish a fresh source observation.
 
-### TW-06 — Thin Orca snapshot boundary
+### TW-06F — Complete the original M4 fixture snapshot boundary
+
+- **STATUS:** Open; there is no tracked main/preload ticket bridge in Orca.
+- **GOAL:** Implement the original M4 read-only fixture service through Orca main/preload and a common fixture/live transport interface, with the same validated presentation contract later used by live transport.
+- **DEPENDENCIES:** TW-00C full semantic runtime contract and TW-00F reviewed fixture IPC/corpus delivery; M0 Orca boundary ownership. It does not depend on TW-06P or TW-06T.
+- **OWNERSHIP:** One Orca main/preload worker; no renderer ownership.
+- **FILES / MODULES LIKELY INVOLVED:** Orca main ticket fixture service, bounded IPC handler, preload bridge and focused contract tests.
+- **INPUT CONTRACT:** Source-pinned canonical fixture snapshot, reviewed read-only action descriptor/boundary shape, and strict zero-argument IPC request; full ticket-owned runtime validator for both main and sandboxed preload.
+- **OUTPUT CONTRACT:** Bounded, explicitly fixture-provenance read-only renderer snapshot or Tickets-only unavailable result; no live `current` claim or action authority.
+- **CONSTRAINTS:** No WSL/CLI/process start on read; no path/token exposure; reuse existing workspace/folder/terminal/orchestration runtime clients and preload bridges rather than wrapping their lifecycles in ticket IPC. Keep fixtures isolated from live cache and authority. A fixture must never become a live snapshot by changing presentation metadata.
+- **DO_NOT_TOUCH:** Resident transport, production provider, existing Projects state, renderer tree and mutation paths.
+- **ACCEPTANCE CRITERIA:** Original M4 accepts a fixture snapshot safely without affecting Projects and keeps fixture/live sources behind one interface. Main and preload enforce the full semantic corpus, ticket/workspace/string/byte limits, invalid-response isolation, cache partition, fixture provenance, timeout, service restart, integration disable, and late-response discard. The ticket boundary carries only ticket data and a read-only action descriptor contract; no effect-capable descriptor is exposed. Existing Orca lifecycle authority remains untouched.
+- **VERIFICATION:** Main/preload fixture and failure corpus tests, timeout/restart/disable/late-response tests, actual Orca preload build/parity, Projects regression, changed-code quality and independent review.
+- **PARALLELIZATION SAFETY:** Serial with TW-00C/TW-00F artifact integration; after accepted contract, separate main/preload ownership is possible only with one frozen interface. Can proceed alongside TW-06P/TW-06T in disjoint files after protocol freeze.
+- **POTENTIAL CONFLICTS:** The ignored IPC proposal assumes generated Zod validation alone, which misses runtime semantic checks; shared main handler files will later be touched by TW-06 live cutover.
+
+### TW-06 — Cut the validated snapshot boundary over to live ticket state
 
 - **GOAL:** Transport and validate one bounded ticket snapshot across main/preload with no new state owner.
-- **DEPENDENCIES:** TW-00C delivers the full runtime semantic contract to main/preload; TW-06P delivers the producer and TW-06T delivers the resident no-start transport. TW-02 owns the exact Orca match result when workspace status is exposed.
+- **DEPENDENCIES:** TW-06F provides the accepted fixture boundary; TW-06P delivers the producer and TW-06T delivers the resident no-start transport. TW-02 owns the exact Orca match result when workspace status is exposed.
 - **OWNERSHIP:** One Orca main/preload worker; renderer is read-only consumer in TW-07.
 - **FILES / MODULES LIKELY INVOLVED:** Shared Zod schema, main IPC handler/cache, preload bridge, ticket snapshot boundary fixtures.
-- **INPUT CONTRACT:** Authenticated resident transport, strict zero-argument request, immutable canonical ticket snapshot, profile/authority/epoch provenance, and a separate Orca-owned match result tied to `snapshotRevision` when owner status is shown.
+- **INPUT CONTRACT:** Accepted fixture boundary, authenticated resident transport, immutable canonical ticket snapshot, profile/authority/epoch provenance, and a separate Orca-owned match result tied to `snapshotRevision` when owner status is shown.
 - **OUTPUT CONTRACT:** `current`, `last-verified-stale`, or Tickets-only `unavailable` result under 2 MiB UTF-8 cap.
 - **CONSTRAINTS:** No distro/CLI startup, no raw path/token exposure, main and preload both validate; stale snapshots disable actions.
 - **DO_NOT_TOUCH:** Existing Projects/runtime state, renderer ownership, mutation authority, unnegotiated remote wire opcodes.
 - **ACCEPTANCE CRITERIA:** Full ticket-owned runtime semantic validation in main and preload, including duplicate identities and canonical digest; separate bounded Orca match-result validation; fixture parity, invalid response isolation, cache partition, byte bounds, and no focus/state disruption. A generated JSON Schema alone is insufficient.
 - **VERIFICATION:** Main/preload contract tests, generated fixture parity, changed-code quality and mixed-version review.
-- **PARALLELIZATION SAFETY:** Fixture-only schema and validation tests may start after TW-00 in disjoint files; live handler completion is serial after TW-06P and TW-06T.
-- **POTENTIAL CONFLICTS:** Local IPC contract and fixture corpus are currently ignored/untracked and unavailable to fresh clones.
+- **PARALLELIZATION SAFETY:** Live main handler integration is serial after TW-06F, TW-06P and TW-06T; no concurrent edits to fixture/main handler files.
+- **POTENTIAL CONFLICTS:** The live cutover must preserve fixture-path tests without promoting fixture evidence to live authority.
 
-### TW-07 — Read-only Projects/Tickets tree
+### TW-07F — Complete the original M5 read-only fixture tree
+
+- **STATUS:** Open; Orca has no tracked Tickets renderer integration.
+- **GOAL:** Deliver Projects/Tickets switching, ticket hierarchy and preview from the accepted fixture boundary, with mutation actions hidden and existing Orca navigation/status authorities reused.
+- **DEPENDENCIES:** TW-06F fixture renderer DTO and accepted M4 boundary; TW-02 exact ticket-to-Orca owner mapping for workspace activation. No live producer or resident transport prerequisite.
+- **OWNERSHIP:** One renderer worker with exclusive sidebar/ticket-view files.
+- **FILES / MODULES LIKELY INVOLVED:** Existing sidebar navigator/virtualizer, Tickets tree and preview, renderer snapshot projection and focused UI tests.
+- **INPUT CONTRACT:** Preload-validated fixture snapshot or bounded unavailable result, marked with non-live provenance; TW-02 exact revalidated Orca-owned workspace ID for activation; existing Orca agent-status/orchestration projection and Tasks surfaces for real Orca-owned display data.
+- **OUTPUT CONTRACT:** Accessible read-only Projects/Tickets switch and hierarchy with loading, unavailable, stale and empty states. No mutation action is displayed or enabled.
+- **CONSTRAINTS:** Follow `docs/STYLEGUIDE.md`, tokens/primitives, platform keyboard rules and the single agent-status store; preserve Projects behavior and focus.
+- **DO_NOT_TOUCH:** Main/preload transport, ticket ledger, effect/action routing and root authority.
+- **ACCEPTANCE CRITERIA:** Original M5 Projects/Tickets selector uses the existing workspaces sidebar body, falls back to Projects on error/disable, and presents ticket-to-coordinator and ticket-to-workspace-to-agent hierarchy through existing virtualizer, row focus, keyboard and scroll behavior. Agent rows use the single agent-status store and orchestration projection; workspace navigation uses `activateAndRevealWorkspace` only after TW-02 exact Orca-owned ID revalidation, otherwise remains unavailable. External issue/MR and linked-work-item views reuse Tasks. Loading, unavailable, stale, empty and integration-error states, narrow widths, long names and accessibility are covered. No mutation action is exposed and Projects behavior remains intact.
+- **VERIFICATION:** Focused renderer/navigation/state tests, `pnpm run check:code-quality:changed`, design-system gate and hidden-renderer Playwright CDP screenshots with `ORCA_BACKGROUND_LAUNCH=1`.
+- **PARALLELIZATION SAFETY:** Starts after TW-06F DTO freeze; exclusive ownership of sidebar/ticket files, with no concurrent TW-07 live cutover edits.
+- **POTENTIAL CONFLICTS:** Sidebar state and style enforcement; live statuses cannot be inferred from fixture data.
+
+### TW-07 — Cut the read-only Tickets tree over to live snapshots
 
 - **GOAL:** Present ticket hierarchy and workspace status from a validated snapshot without owning canonical state.
-- **DEPENDENCIES:** TW-06 live validated boundary and stable snapshot DTO. Fixture-only presentation may be prototyped earlier but does not complete this task.
+- **DEPENDENCIES:** TW-07F accepted fixture tree, TW-06 live validated boundary, and TW-02 exact Orca owner mapping before live workspace status is shown.
 - **OWNERSHIP:** Renderer worker with exclusive sidebar/ticket-view files.
 - **FILES / MODULES LIKELY INVOLVED:** Existing sidebar tree/virtualization, ticket preview components, renderer snapshot projection.
-- **INPUT CONTRACT:** Preload-validated current/stale/unavailable renderer DTO.
+- **INPUT CONTRACT:** Accepted fixture renderer path plus preload-validated live current/stale/unavailable renderer DTO.
 - **OUTPUT CONTRACT:** Accessible read-only Tickets tree and preview; existing Projects mode remains available.
 - **CONSTRAINTS:** Follow `docs/STYLEGUIDE.md`, existing tokens/primitives, keyboard/platform rules, single agent-status store.
 - **DO_NOT_TOUCH:** Main transport/schema, ticket ledger, destructive actions, focus-changing prune behavior.
 - **ACCEPTANCE CRITERIA:** Bounded trees, loading/failure states, stable selection/focus, stale actions disabled, Projects regression absent.
 - **VERIFICATION:** Renderer tests and hidden-renderer CDP screenshots with `ORCA_BACKGROUND_LAUNCH=1`; design-system gate.
-- **PARALLELIZATION SAFETY:** Safe after TW-06 contract freeze; avoid concurrent sidebar modifications.
+- **PARALLELIZATION SAFETY:** Serial with TW-07F sidebar files; starts after TW-06 live contract freeze.
 - **POTENTIAL CONFLICTS:** Shared sidebar state and snapshot DTO churn.
 
 ### TW-08 — Connect existing workspace and agent actions
@@ -282,4 +333,7 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 
 1. **TW-01 and TW-00 complete:** Fresh Luna workers implemented the internal owner-freshness capture and published the initial 128-file private ticket source. Fresh Sol reviews passed after corrections. The initial source hashes, 314 tests with one skipped, and typecheck passed. The current 133-file source at `59714ba` passed 48 contract tests, typecheck, clean private packing, and browser/preload-shape corpus parity; its Git-blob manifest is pinned above. The full private tarball remains private and the actual Orca preload integration is open. Orca's TW-01 and submodule commits were pushed; PR checks at `e3705c5db` completed with 31 successes, eight skips, and no failures. The previous main Luna session remains historical evidence only.
 2. **Contract discovery:** [TW-02 owner boundary](./workspace-owner-boundary.md) and [TW-06P/TW-06T resident contract](./resident-ticket-transport.md) passed fresh Sol re-review after the immutable-snapshot, source-currentness, full-validator, and ownership corrections. [TW-05/TW-05G coordinator/root contract](./coordinator-root-authority.md) passed its correction review after adding strict caller attestation, reset-safe exclusion, and folder host proof. [TW-04A external-resource contract](./external-resource-contract.md) passed correction review after adding a separate universe observation and version/migration gate. These documents are decision drafts; endpoint, clock, adapter identity, artifact, token, and lifecycle choices remain open.
-3. **Next allocation:** TW-00C private-source validator portability and private package candidate passed review; a narrow public artifact candidate is being prepared without publication. After TW-00C package edits settle, TW-04A may implement the common universe DTO and synthetic fixtures in the same private contract package; Docker/IIS positive fixtures remain gated on owner evidence. TW-05 document/enrollment decisions can proceed in parallel in disjoint files. TW-02 Orca code waits for TW-00C delivery; TW-06P and TW-06T implementation wait for their shared protocol/setup decisions. TW-05G external effects wait for the strict root attestation and durable exclusion contracts. Public `clear` remains blocked on all live owner evidence.
+3. **Off-track audit and correction:** Fresh read-only review found no off-plan product implementation or external effect. It found a sequencing drift: the original M4/M5 fixture completion checks had been moved behind live producer/transport. The preceding two worker assignments were interrupted before tracked edits; no new worker is currently authorized. TW-04A common DTO and TW-05G design remain valid future branches, but they are not prerequisites for original fixture M4/M5.
+4. **Critical path to the next independently testable checkpoint:** Reconcile TW-00C's full semantic validator delivery and TW-00F's ignored fixture IPC/corpus provenance, obtain a scoped public-byte decision, then implement/review TW-06F fixture boundary and TW-02 exact owner mapping before TW-07F fixture tree. These are read-only M4/M5 checkpoints, not live integration or action readiness. TW-00F private audit and TW-00C private candidate work may be parallel only in disjoint files; public artifact integration is serial. TW-06F and TW-02 can proceed in disjoint main/runtime files after their shared contract is accepted; TW-07F starts after both.
+5. **Separate live path:** TW-06P/TW-06T producer/transport contracts may advance in disjoint workstreams after their own gates; TW-06 live cutover waits for TW-06F plus both live endpoints, and TW-07 live cutover waits for TW-07F, TW-06 and TW-02. TW-02 is shared with the fixture M5 navigation checkpoint. TW-03 provider, TW-04A/TW-04B external evidence, TW-05/TW-05G root authority, TW-08 effects, TW-09 integration and TW-10 release retain their existing dependency gates. Public `clear` and all effects remain blocked on live source authority.
+6. **Proposed first allocation, awaiting explicit approval:** One fresh Luna worker reviews and, if needed, completes the existing TW-00C narrow private contract candidate; another fresh Luna worker performs TW-00F's ignored fixture/IPC provenance and privacy audit, read-only or private candidate only. Ownership is disjoint. Neither worker publishes bytes to public Orca, edits runtime/UI, or begins TW-06F until the Orchestrator presents a reviewed artifact scope and obtains the user's decision. A fresh Sol review validates the two packets and their proposed next task before implementation.
