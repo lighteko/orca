@@ -1,15 +1,21 @@
 # TW-00 published ticket-source content manifest
 # Captured: 2026-09-29
 # Repository: private lighteko/ticket-workspace (main)
-# Commit: 2045808ffdb6baead2e659855cefb02f7b36491c
-# Tree: 50d168f58db92c98b8e70cc32ed1dfbc1c5736a2
-# Working-tree state at capture: clean; 128 tracked files.
-# Scope: regular files under packages/cli/{src,test,scripts}, packages/contracts/{src,test,fixtures,artifacts},
-#        spikes/{sqlite-process-fence,process-restart-harness}; root README/package/workspace/lock/tsconfig;
-#        package tsconfigs/manifests; four tracked package design docs; and .gitignore.
-# Excludes: .git metadata, node_modules, generated dist/build outputs, caches/temp, ignored local machine data, and
-#           any path outside the explicit scope above.
-# Format: sha256sum digest followed by checkout-relative path. Every tracked file in the published tree is listed.
+# Commit: 0b5ac0fbe34adfc4537be3f10ee0227807c0cccc
+# Tree: 5831ae7ab972284316a5d406fe3a89db4abef440
+# Git state at capture: clean; 132 tracked regular files.
+# Scope: every tracked regular file in the pinned commit, including contracts, CLI, fixtures, docs, lockfile, and spikes.
+# Excludes: .git metadata, node_modules, generated dist/build outputs, caches/temp, and ignored local data.
+# Format: sha256sum digest followed by checkout-relative path. Hashes are computed from Git blob bytes.
+83c4760e54b944c15b799fe243207f6dbd5f1da77057a09507c7cf3b4b4ba384  .gitattributes
+ed05d0a2ee67a19f6319d2e33ba49de701b30fb7d172ece3a909d0fbbbcc9e48  .gitignore
+17b0a090bfd832b23597f683ffc61b8051d6cfed91dd3c2de3008431b2dc8d47  README.md
+e39f7498b4deb5d4fdf4ca7a0d9e3874a242e1562a00544386df3dd686dfa4c5  docs/durable-ledger-and-coordinator.md
+4b28133a19d91132bbb12be4836a6ab4de22e40a9ca57ef3aba94f487d377a62  docs/git-worktree-adapter.md
+a8d00e6f3d3c2dea108ff45cc97ff5564d09db45761a01a2ef053bb8504a4204  docs/process-fence.md
+81c76aa9c06cd3da57b1526b98ca58abd394d4b785158ce6b6da3d30a4531eea  docs/resource-mutation-safety.md
+b365342a286651b32b0d9fd10e8e3bf04dc06f9497a6f3856ea29fb0efa47095  package.json
+ab184c5926dc34ec363df305aa7ea164aa910422d9cf7f52f048b70f319ca42c  packages/cli/package.json
 22bc421ca152e65619e4617144ac92e3e48c9074220363221ac0bcf3e02a331f  packages/cli/scripts/mark-cli-executable.mjs
 3c2520e65c2768d13a76f93c597b5e4aa7a9aa58c6e9aa9306900a6c63731698  packages/cli/src/bounded-utf8-file-reader.ts
 e0adda91a89779d2e97f274849ae36d92a47022088bdf56825ded8876a68e2bf  packages/cli/src/sqlite-process-fence-errors.ts
@@ -82,30 +88,35 @@ e5fbb01abc5884491861cc48d4a17fb18aaf762181e9e84e3c8a4fa727828b4d  packages/cli/t
 448c253505c1f31199f19228926079d7344431811442ae1d5109741f536079c8  packages/cli/test/trusted-wsl-ledger-cas-file-v1.test.ts
 3e7a70c7bb0fd9eae48005f278ba56447d1f736d89e3ca516840cef648a02d7d  packages/cli/test/trusted-wsl-ledger-file-v1.test.ts
 c0d0a35b89b33a93cc947cc952ceb1444d1a00e31d81897cba9edce08a058a80  packages/cli/test/trusted-wsl-ledger-initializer-file-v1.test.ts
+8459bfd80ea6fdf439f11690df0623efdf5c2e3ce7adb211901b3f3af638ec2b  packages/cli/tsconfig.json
 2bd25a9265077729522fbb4a7deecde55544ee5e061f0c431f0b843be0cfa130  packages/contracts/artifacts/ticket-workspace-contract-v1.json
 ad7a982a99a3cb184caded94f441a25311fec192697f8e1f35b6ae416057be76  packages/contracts/fixtures/ticket-repository-plan-evidence-v1.corpus.json
 e083a1838d3cea35f1cc0a67c08d5422d203d4266069725da0bb1c139bff7801  packages/contracts/fixtures/ticket-workspace-schema-v1.corpus.json
-7ad5164eaa20719cc8a015e2f67e80fe1f441233861362148faed542aa1bc438  packages/contracts/src/canonical-json-v1.ts
+1d9623eb8cd1772f417d7410dcb23979ec3a162dd11a4db6b12a7b9e057afabf  packages/contracts/package.json
+bd7f560c2d1920b6bc73479ecc3eecea19a2618930ae966815b0f6788e884be2  packages/contracts/src/canonical-json-v1.ts
 bb3e6a7c13e7f4492d62c4d15835ca65513e319da2f62e23736be7c5c3d17da5  packages/contracts/src/generate-ticket-contract-artifact-v1.ts
+ae4f84dd2b731732da135666dbf0cf04e4fab89d148a8f2f21389ca1ad9788c9  packages/contracts/src/sha256-utf8-v1.ts
 92be5b1692cd2b12dfc31792b0a7b35a20a11df987cf9f347d20fd4b74a11cd5  packages/contracts/src/ticket-catalog-v1.ts
 b08b9dcc69c439e46656d8ba16e3052fd1d34593607c151b937c56b4cf02b077  packages/contracts/src/ticket-cleanup-evidence-validator-v1.ts
 db9d7109cefdd41ff147879b0edbf6b07a9d7d11b008df99fae5056e10227fc3  packages/contracts/src/ticket-contract-admission-v1.ts
-7143e07520021544c39172d78a0724c32535bbffae4e2d8bbf32b26be9cc30d3  packages/contracts/src/ticket-contract-artifact-v1.ts
+a2c30e032979739a66e1a79ebbc43e16c32cd77cf870ed47623d0e187717c540  packages/contracts/src/ticket-contract-artifact-v1.ts
 6150d441e4c6db3aafad1dc50e393a74590ee341ec35631064a9cc0c77ce17ed  packages/contracts/src/ticket-contract-corpus-v1.ts
-b7eb1ce6d9d01ab23d59d013255f5b898ef259ddef8761403bf4668ba4f2457b  packages/contracts/src/ticket-contract-fixture-generators-v1.ts
+6f20185ba0e8df450c3e0f6b84520bcf049689919c4713e6c95d88643ad99142  packages/contracts/src/ticket-contract-fixture-generators-v1.ts
 b70232f838dea1c3d49a193c0c8693a78e73f74656a343e4adead35c131c9c1a  packages/contracts/src/ticket-contract-fixture-materializer-v1.ts
 e722f4896e8c1dd8b32d661e7213760bf429b80af58fac985b1bcc20fbad0e53  packages/contracts/src/ticket-contract-fixture-patch-v1.ts
-865cbadfeb848d6cfe18686f1682b82f41bf686e75479b39a13af611caae0ee4  packages/contracts/src/ticket-contract-validator-v1.ts
+2da856b8e5443cf129612b4340d50cfda349c7d201588c18eff6eed2a10402df  packages/contracts/src/ticket-contract-validator-v1.ts
 6b148c63cbeaa40d3aa432d2aa9d6f22a941bcb72a0e8c625dced0a90a37627e  packages/contracts/src/ticket-navigator-snapshot-v1.ts
 c8303ac53339e94f22d9352be36bf60f61eeedad1e7cabf3630dda992ca63ae3  packages/contracts/src/ticket-repository-plan-evidence-v1.ts
 6aed7a14d943c26eea94a5d3dc319057e3bc9c030dbe9609afecae4fdf26802e  packages/contracts/src/ticket-resource-evidence-validator-v1.ts
-0b7920835d621e491d605e58aff18a3263710d5e77f7a35f9d91d4a23042b5b7  packages/contracts/src/ticket-workspace-common-v1.ts
+1247e3d6c278168de6d4ce58951ce982bc2e7d7bde13af261d37cb9cc363a350  packages/contracts/src/ticket-workspace-common-v1.ts
 4d21dc94d7497753d157d7a028f6d0b91c065a97491e471ff60a66ce1e0930ba  packages/contracts/src/ticket-workspace-config-v1.ts
 dc163621e3a02f099f9b15a035c965e3e937c190407be83982db41a0c414da46  packages/contracts/src/ticket-workspace-contract.ts
 7103413568cc50e66a77d0fb14dd91cb28f2dacef76d771a6259321f97f1c2b4  packages/contracts/src/ticket-workspace-resource-v1.ts
 c938a2d1a098cdf5c6826df4491689afe53855006b1f1a5495a870a8739656f2  packages/contracts/src/timestamp-order-v1.ts
+e2f4414a3127cc8665ef131c752d59df54116be047f4e4be1bdfb9f15d31cdfc  packages/contracts/src/utf8-byte-length-v1.ts
 1129fae9d763003e42eee4a90e819b121d2fcc8fe358d2f8b819e51025653e9c  packages/contracts/src/v1.ts
 f8f33a0a29d7ee83cc39981a15d59133e0ed879209630c247fd17e56f869c357  packages/contracts/test/ticket-contract-adversarial-v1.test.ts
+efbcecb0389d5cf3ca13fe363c999d61d4b1d5b664ec5b0b9cfbb2af8a4f074e  packages/contracts/test/ticket-contract-browser-runtime-v1.test.ts
 3c3b5653ed4c804011d2b6e7397fcb50694311f410316e68e83cdcb2056861e9  packages/contracts/test/ticket-contract-byte-limits-v1.test.ts
 debbc125acac33091d9402157cfe59f67f699e5931e1c1bde12ab4db2efe3c34  packages/contracts/test/ticket-contract-cleanup-boundaries-v1.test.ts
 b793c86f38bd380e11c8e6e4625def2d5d074341d4c45796aec326197f6c4e51  packages/contracts/test/ticket-contract-corpus-v1.test.ts
@@ -114,6 +125,9 @@ b793c86f38bd380e11c8e6e4625def2d5d074341d4c45796aec326197f6c4e51  packages/contr
 bf1fa6cf3a2593516170762e1b40e970ed676b0b69784903910f8437cb1c21d3  packages/contracts/test/ticket-resource-intent.test.ts
 ee3968cade8c960518cdb410a0208a6605c6cfb1f44df77cfb4d3a9876953613  packages/contracts/test/ticket-workspace-config-v1.test.ts
 aae0aabee13d1a7b0202c1a7f10d21f69ae106c63735d39e469fe836838ac367  packages/contracts/test/ticket-workspace-contract.test.ts
+8459bfd80ea6fdf439f11690df0623efdf5c2e3ce7adb211901b3f3af638ec2b  packages/contracts/tsconfig.json
+7eebf800d2f4cc30dc68962e960ea099d7fcd650ef2ecddc08b2a95e31930697  pnpm-lock.yaml
+4392294710f696619b77ee55665481bd7c3f40bd64e5643f5df17c9b23355db3  pnpm-workspace.yaml
 515d7eb4e25d819b1bff8addcebbe83d5ad715a2edf310a869576709e7933935  spikes/process-restart-harness/controlled-filesystem-resource-adapter.mjs
 55ef96d71dc02d76f7c0a6114236e7d2d1c2253972a3c8d58733ceb7525aa413  spikes/process-restart-harness/effect-journal.mjs
 cc372f6ada5a42469a128ee231ca789e4ae22bbe4e15dba047477fb243510d72  spikes/process-restart-harness/harness-process.mjs
@@ -124,17 +138,4 @@ b5681790dbd15a982ee69471f35e14f16351fa664b09b7be8c27f774b7f0819b  spikes/sqlite-
 49fdb866741cc50b4c05aa214b59f85edf82c40e6ca3dafde75e50402f302620  spikes/sqlite-process-fence/verify-multi-key.mjs
 5d626aa21c86098d032cb8545587180c2871c767015cde648432e4042b39d2da  spikes/sqlite-process-fence/verify-production.mjs
 fe31fafe42e9464270e511448a1f3ba759853717d332cbc2920e7931ff13a7ec  spikes/sqlite-process-fence/verify.mjs
-17b0a090bfd832b23597f683ffc61b8051d6cfed91dd3c2de3008431b2dc8d47  README.md
-ed05d0a2ee67a19f6319d2e33ba49de701b30fb7d172ece3a909d0fbbbcc9e48  .gitignore
-b365342a286651b32b0d9fd10e8e3bf04dc06f9497a6f3856ea29fb0efa47095  package.json
-4392294710f696619b77ee55665481bd7c3f40bd64e5643f5df17c9b23355db3  pnpm-workspace.yaml
-1e688bb9d3e5dbf406f159199557091fba6453924e8c71e81357c3c1c901e439  pnpm-lock.yaml
 c9849c1ece51c946973d361fd2f544d450926a16dfec6f62001a8318f6e52497  tsconfig.base.json
-ab184c5926dc34ec363df305aa7ea164aa910422d9cf7f52f048b70f319ca42c  packages/cli/package.json
-8459bfd80ea6fdf439f11690df0623efdf5c2e3ce7adb211901b3f3af638ec2b  packages/cli/tsconfig.json
-ed93b4a304908b25117c57e77368b6a354608030570cd3cb103614f40eda7f24  packages/contracts/package.json
-8459bfd80ea6fdf439f11690df0623efdf5c2e3ce7adb211901b3f3af638ec2b  packages/contracts/tsconfig.json
-e39f7498b4deb5d4fdf4ca7a0d9e3874a242e1562a00544386df3dd686dfa4c5  docs/durable-ledger-and-coordinator.md
-4b28133a19d91132bbb12be4836a6ab4de22e40a9ca57ef3aba94f487d377a62  docs/git-worktree-adapter.md
-a8d00e6f3d3c2dea108ff45cc97ff5564d09db45761a01a2ef053bb8504a4204  docs/process-fence.md
-81c76aa9c06cd3da57b1526b98ca58abd394d4b785158ce6b6da3d30a4531eea  docs/resource-mutation-safety.md

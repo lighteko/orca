@@ -15,13 +15,13 @@ TW-02 + TW-04B + other owner-source contracts ──> TW-03        │
 TW-03 + TW-04C + TW-05 + TW-06 + TW-08 ────────────────────────┘
 ```
 
-TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independent review; TW-00's private publication, fresh-clone hashes, isolated Linux test replay, and Orca submodule integration passed. The submodule is pinned in local Orca commit `d1f86d608`. Implementation of TW-02 through TW-08 is gated by the specific contracts below. M2 effects, role mutation, and Tickets actions must not start from fixture-only evidence.
+TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independent review; TW-00's private publication, fresh-clone hashes, isolated Linux test replay, and Orca submodule integration passed. The initial submodule pin is in Orca commit `d1f86d608`; the current working gitlink targets `0b5ac0f`. Implementation of TW-02 through TW-08 is gated by the specific contracts below. M2 effects, role mutation, and Tickets actions must not start from fixture-only evidence.
 
 ## Tasks
 
 ### TW-00 — Verify the ticket-domain source and publish its contracts
 
-- **STATUS:** Complete. Private commit `2045808ffdb6baead2e659855cefb02f7b36491c` (tree `50d168f58db92c98b8e70cc32ed1dfbc1c5736a2`) was fresh-cloned and its 128 file hashes matched [the published manifest](./ticket-published-source.sha256). Isolated Linux tests passed 314 with one skipped, plus typecheck. The user-approved Orca submodule gitlink passed independent review and was committed locally at `d1f86d608`.
+- **STATUS:** Complete. Initial private commit `2045808ffdb6baead2e659855cefb02f7b36491c` (128 files) was fresh-cloned and hash-verified; isolated Linux tests passed 314 with one skipped, plus typecheck. Current private commit `0b5ac0fbe34adfc4537be3f10ee0227807c0cccc` (tree `5831ae7ab972284316a5d406fe3a89db4abef440`; 132 files) is pinned by [the published Git-blob manifest](./ticket-published-source.sha256). Its focused contract tests passed 48/48 with typecheck and browser-bundle parity; the full CLI suite was inconclusive in the current container environment. The user-approved Orca submodule gitlink passed independent review and was committed locally at `d1f86d608`.
 - **GOAL:** Verify the located WSL ticket checkout's M1 contract, ledger/CAS, doctor/status/plan, and fixture claims against its current source and tests, then make their content provenance portable.
 - **DEPENDENCIES:** None; historical plan and current Orca checkout are inputs.
 - **OWNERSHIP:** Sol Orchestrator for source identification and shared-state update; a fresh Luna worker may perform bounded read-only inventory once the source is identified.
@@ -37,13 +37,14 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 
 ### TW-00C — Deliver the ticket-owned semantic contract to Orca
 
+- **STATUS:** Partially complete. The private `/v1` source graph is browser safe and pinned at `0b5ac0f`; Orca delivery, actual preload bundling, and public-CI-safe provenance are still open.
 - **GOAL:** Make the canonical ticket `WorkspaceRefV1` and navigator snapshot types, runtime semantic validator, and corpus reproducibly consumable by Orca main and sandboxed preload without a handwritten second schema owner.
 - **DEPENDENCIES:** TW-00 published the pinned private source and corpus. Decide the delivery channel and any public distribution scope before publishing contract bytes into the public Orca repository.
 - **OWNERSHIP:** Ticket-contract worker owns source-derived build/artifact generation; Orca integration worker owns consumption and CI wiring after one reviewed artifact contract. Sol Orchestrator owns the distribution approval and cross-repository pin.
 - **FILES / MODULES LIKELY INVOLVED:** Private `packages/contracts` exports/generator/tests; Orca contract artifact/verification, package or bundler wiring, main/preload boundary tests, public PR CI configuration.
 - **INPUT CONTRACT:** Pinned ticket commit and full semantic rules, including duplicate identities, SSH presentation, canonical UTF-8 cap, and snapshot digest. The current generated JSON Schema alone is insufficient.
 - **OUTPUT CONTRACT:** A source-pinned, digest-verified runtime contract that passes the same corpus in Orca main and sandboxed preload, or an explicitly gated alternative delivery path with equivalent provenance and CI coverage.
-- **CONSTRAINTS:** Public Orca PR CI cannot require private submodule credentials. The current ticket validator imports Node `buffer`/`crypto`; a preload-safe implementation must preserve exact canonical semantics. The private source's public redistribution scope remains undecided.
+- **CONSTRAINTS:** Public Orca PR CI cannot require private submodule credentials. The current private `/v1` validator source avoids Node `buffer`/`crypto`, but the package root still reaches Node imports; consumers must use `/v1` and validate the actual preload bundle. The private source's public redistribution scope remains undecided.
 - **DO_NOT_TOUCH:** Ticket CLI lifecycle, external effects, renderer UI, or public release of private protocol bytes before the reviewed distribution decision.
 - **ACCEPTANCE CRITERIA:** Reproducible source/digest pin, full corpus parity in main and sandboxed preload, fail-closed unknown version/digest, and untrusted public PR CI that does not expose private credentials. Document exactly which contract bytes are public.
 - **VERIFICATION:** Source-to-artifact reproducibility check, main/preload runtime tests, build/bundle test, corpus parity, changed-code quality, and independent privacy/semantic review.
@@ -145,7 +146,7 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **GOAL:** Create the ticket coordinator folder/document lifecycle using the existing Orca Run root agent.
 - **DEPENDENCIES:** TW-00 published the catalog schema; M0 Run ownership. TW-05 must first freeze coordinator artifact/document, enrollment, and root-authority handoff contracts; the published source has only shallow coordinator and artifact references.
 - **OWNERSHIP:** Ticket-domain worker for catalog/artifacts; Orca changes only through an agreed seam.
-- **FILES / MODULES LIKELY INVOLVED:** Ticket-domain coordinator folder, artifact revision/retention, first-run enrollment.
+- **FILES / MODULES LIKELY INVOLVED:** Ticket-domain coordinator folder, artifact revision/retention, first-run enrollment; Orca `Repo(kind: 'folder')` registration/read-back seam if selected.
 - **INPUT CONTRACT:** Validated ticket identity, explicit user choice, and a newly specified strict Orca caller/root attestation seam. Existing `runCreate`/`runUse` can fall back to a request-supplied terminal `from` handle when evidence is absent, then resolve its pane.
 - **OUTPUT CONTRACT:** Durable folder/document references and recoverable ticket-to-Run correlation. A complete host-qualified folder identity must be proven; current `folderWorkspace.create` does not always populate a host stamp.
 - **CONSTRAINTS:** External ticket process never impersonates a coordinator; enrollment failure after Run creation must preserve and retry safely.
@@ -153,7 +154,7 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **ACCEPTANCE CRITERIA:** Freeze the document set, revision/retention, explicit folder ownership, strict server-side caller attestation, host-qualified folder identity, idempotent Run enrollment, and recovery contract before implementation. Resume/rebind and local documents then survive partial failure with no duplicate root Run enrollment.
 - **VERIFICATION:** Command-authority fixtures, resume/failure tests, focused E2E on isolated display or CI if UI is involved.
 - **PARALLELIZATION SAFETY:** Can proceed beside TW-04A after schema freeze; TW-04B must wait for TW-05G, which depends on this task.
-- **POTENTIAL CONFLICTS:** First-run enrollment recovery and artifact retention policy are not closed.
+- **POTENTIAL CONFLICTS:** First-run enrollment recovery and artifact retention policy are not closed. `repo.add` host-unaware path deduplication can return a row from another host and is not ticket ownership or WSL route proof; `folderWorkspace.create` has no Repo ID for the ticket folder ref.
 
 ### TW-05G — Enforce the root coordinator gateway for effects
 
@@ -277,6 +278,6 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 
 ## Execution checkpoint and next allocation
 
-1. **TW-01 and TW-00 complete:** Fresh Luna workers implemented the internal owner-freshness capture and published the full 128-file private ticket source. Fresh Sol reviews passed after corrections. The source is pinned as the Orca submodule at `2045808`; source hashes, 314 tests with one skipped, and typecheck passed. Orca's TW-01 and submodule commits were pushed; PR checks at `e3705c5db` completed with 31 successes, eight skips, and no failures. The previous main Luna session remains historical evidence only.
+1. **TW-01 and TW-00 complete:** Fresh Luna workers implemented the internal owner-freshness capture and published the initial 128-file private ticket source. Fresh Sol reviews passed after corrections. The initial source hashes, 314 tests with one skipped, and typecheck passed. The current 132-file source at `0b5ac0f` passed focused contract tests, browser-bundle corpus parity, and typecheck; its Git-blob manifest is pinned above. Orca's TW-01 and submodule commits were pushed; PR checks at `e3705c5db` completed with 31 successes, eight skips, and no failures. The previous main Luna session remains historical evidence only.
 2. **Contract discovery:** [TW-02 owner boundary](./workspace-owner-boundary.md) and [TW-06P/TW-06T resident contract](./resident-ticket-transport.md) passed fresh Sol re-review after the immutable-snapshot, source-currentness, full-validator, and ownership corrections. [TW-05/TW-05G coordinator/root contract](./coordinator-root-authority.md) passed its correction review after adding strict caller attestation, reset-safe exclusion, and folder host proof. [TW-04A external-resource contract](./external-resource-contract.md) passed correction review after adding a separate universe observation and version/migration gate. These documents are decision drafts; endpoint, clock, adapter identity, artifact, token, and lifecycle choices remain open.
-3. **Next allocation:** TW-00C private-source validator portability preparation may run in parallel with the separate TW-04A adapter-identity and TW-05 document/enrollment contract decisions. TW-02 Orca code waits for TW-00C delivery; TW-06P and TW-06T implementation wait for their shared protocol/setup decisions. TW-05G external effects wait for the strict root attestation and durable exclusion contracts. Public `clear` remains blocked on all live owner evidence.
+3. **Next allocation:** TW-00C private-source validator portability is complete; its Orca delivery and preload validation may run in parallel with the separate TW-04A adapter-identity and TW-05 document/enrollment contract decisions. TW-02 Orca code waits for TW-00C delivery; TW-06P and TW-06T implementation wait for their shared protocol/setup decisions. TW-05G external effects wait for the strict root attestation and durable exclusion contracts. Public `clear` remains blocked on all live owner evidence.
