@@ -13,9 +13,8 @@ function readRootEntries(sha) {
   return stdout.split('\0').filter(Boolean)
 }
 
-// Why: the Cloud workspace import is the one reviewed root addition; it stays
-// listed until it lands on main, after which the base tree carries it.
-const REVIEWED_ROOT_ENTRIES = new Set(['cloud'])
+// Why: reviewed workspace imports stay listed until they land on main.
+const REVIEWED_ROOT_ENTRIES = new Set(['.gitmodules', 'cloud', 'ticket-workspace'])
 
 function checkRootDirectoryEntries(argv) {
   if (argv.length !== 2) {

@@ -114,6 +114,27 @@ describe('root directory guard', () => {
     expect(result.status).toBe(0)
   })
 
+  it('allows the reviewed ticket workspace gitlink and its metadata', () => {
+    const fixture = makeFixture()
+    writeFileSync(
+      join(fixture.root, '.gitmodules'),
+      '[submodule "ticket-workspace"]\n\tpath = ticket-workspace\n\turl = ../ticket-workspace.git\n'
+    )
+    git(fixture.root, ['add', '.gitmodules'])
+    git(fixture.root, [
+      'update-index',
+      '--add',
+      '--cacheinfo',
+      `160000,${fixture.base},ticket-workspace`
+    ])
+    const tree = git(fixture.root, ['write-tree'])
+    const head = git(fixture.root, ['commit-tree', tree, '-p', fixture.base, '-m', 'head'])
+
+    const result = runGuard({ ...fixture, head })
+
+    expect(result.status).toBe(0)
+  })
+
   it('rejects a new top-level directory', () => {
     const fixture = makeFixture()
     const head = commitFiles(fixture.root, [['new-folder/file.txt', 'too prominent\n']])
