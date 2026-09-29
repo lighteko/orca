@@ -19,16 +19,17 @@
 - [x] **공개 파일 후보 구성:** [정확한 7개 파일·87,199바이트 제안](./public-redistribution-proposal.md)을 비공개 staging하고 파일별 해시·재생을 새 Sol이 검증했다.
 - [x] **공개 전달 결정:** 사용자가 [정확한 계약 archive 1개와 fixture 6개](./public-redistribution-proposal.md)의 공개 복사와 전달을 승인했다.
 - [x] **TW-00C/F 공개 전달 통합:** 승인된 7개 파일, 고정 `file:` 의존성·잠금 파일·공개 PR 재생 단계를 넣었다. 로컬 검증·독립 Sol 리뷰와 [PR #1의 `cde43160f` 검사](https://github.com/lighteko/orca/actions/runs/36565823569)(31개 성공, 8개 건너뜀, 실패 0개)를 확인했다. 실제 main/preload 연결은 TW-06F다.
-- [ ] **TW-06F (M4 fixture):** 전달된 contract 전체 의미 검증을 사용하는 Orca main/preload 읽기 전용 경계를 구현하고 fixture corpus로 검증한다. 선행: TW-00C + TW-00F.
-- [ ] **TW-02:** ticket `WorkspaceRef`를 정확한 Orca owner tuple에 결합하고 host·instance·revision 변경 시 재검증한다. 선행: TW-00C + TW-01.
-- [ ] **TW-07F (M5 fixture):** 기존 sidebar에 읽기 전용 Projects/Tickets tree를 구현한다. mutation 동작을 숨기고, workspace 이동은 TW-02가 확인한 ID만 허용한다. 선행: TW-06F + TW-02.
+- [x] **다음 병렬 경계 확정:** 독립 Sol이 [fixture 표시 DTO·owner 매칭·세 필드 이동 요청의 분리](./task-graph.md)를 검토했다. 공개 `snapshot.full`은 화면 표시에는 유효하지만 repository/ref가 달라 owner 매칭의 실패 사례다. 실제 매칭 성공 사례는 Orca 측에서 별도로 만든다.
+- [ ] **TW-02F (owner workstream):** 검증된 fixture의 `WorkspaceRef`를 순수 매핑한 뒤 기존 Orca binder로 정확히 매칭하고, 이동 클릭 시 main에서 다시 확인한다. `src/main/runtime/` 신규 모듈·테스트만 소유한다.
+- [ ] **TW-06F (main/preload workstream, M4 fixture):** 승인된 계약으로 main/preload에서 검증하고 ticket/workspace 표시 행만 투영한다. fixture service·IPC/preload·표시 DTO만 소유하며 owner 매칭은 넣지 않는다.
+- [ ] **TW-07F (M5 fixture):** TW-02F와 TW-06F를 통합한 뒤 기존 sidebar에 읽기 전용 Projects/Tickets tree를 구현한다. mutation 동작을 숨기고, 이동은 클릭 시 재확인된 Orca ID만 허용한다.
 
 Fixture 완료는 live `current`, 외부 효과 또는 공개 `clear`를 뜻하지 않는다.
 
 ## M1 완료까지 별도로 남은 일
 
 - [ ] Profile/catalog CLI의 provenance 기반 설치·업데이트·rollback을 구현한다.
-- [ ] TW-02의 정확한 owner mapping 뒤 worktree, agent, test, lease, host, ownership **6종 관측**의 소유자 API·완전성·freshness를 증명한다. 외부 자원 관측은 TW-04 계열의 계약과 제공자에 의존한다.
+- [ ] **TW-02L과 6종 owner 관측:** 인증된 live source·TW-01 Git capture를 결합한 뒤 worktree, agent, test, lease, host, ownership의 소유자 API·완전성·freshness를 증명한다. TW-02F fixture 매칭만으로는 이 항목이 완료되지 않는다. 외부 자원 관측은 TW-04 계열 계약과 제공자에 의존한다.
 - [ ] **TW-03:** 여섯 관측을 ticket `plan`에 연결하고 실제 상태에 대한 end-to-end 읽기 전용 결과를 검증한다. 현재 공개 CLI는 관측 provider가 없어 의도적으로 `incomplete`를 반환한다. 모든 근거가 갖춰지기 전에는 `clear`를 내지 않는다.
 
 ## 후속 경로
