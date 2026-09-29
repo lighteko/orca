@@ -9,13 +9,13 @@
 - [x] **M1 기반:** ticket schema/catalog, ledger CAS, 설정 읽기, `doctor`, `status`, fixture 기반 `plan` 투영을 구현했다. 이는 실제 owner 관측을 연결한 완료 상태는 아니다.
 - [x] **TW-01:** Orca 내부 local-native Git 관측의 freshness 경계를 구현하고 독립 리뷰를 통과했다.
 
-## 지금 진행 중
+## 이번 단계 완료
 
-- [ ] **TW-00N — 비공개 snapshot 전용 후보:** 기존 Luna contract/fixture 세션이 source-owned 추출, 누락된 거부 사례, 결정적 패키징, 기존 `/v1`과 Node/preload 결과 일치를 구현·검증한다. 이후 새 Sol이 검토한다. 전체 `/v1` 비공개 후보는 검증된 대안으로 유지한다. 이 작업은 공개 배포 승인이 아니다.
+- [x] **TW-00N — 비공개 snapshot 전용 후보:** 기존 Luna contract/fixture 세션이 source-owned 추출, 누락된 거부 사례, 결정적 패키징, 기존 `/v1`과 22건 Node/preload 형태 결과 일치를 검증했다. 새 Sol이 SSH 메타데이터 수정을 요구한 뒤 승인했다. 현재 후보는 25개 파일·14,364바이트 압축이며 공개 배포 승인은 없다.
 
 ## 다음 순서: 읽기 전용 M4/M5 검증 지점
 
-- [ ] **TW-00C + TW-00F:** TW-00N 결과를 검토해 정확한 contract 범위를 정하고, semantic validator와 수정된 fixture IPC/corpus를 fresh clone 및 공개 PR CI에서 재현 가능하게 전달한다. 공개 저장소에 복사할 **정확한 바이트와 권한은 별도 사용자 승인**을 받는다.
+- [ ] **TW-00C + TW-00F:** 검토된 좁은 후보를 입력으로 정확한 공개 전달 바이트와 CI 재생 경로를 **비공개로 준비**하고, 최신 52-case source에 맞춰 fixture IPC/corpus를 정정한다. 이 구현 배정은 사용자 승인 대기 중이다. 공개 저장소에 복사할 **정확한 바이트와 권한은 준비 결과를 보고한 뒤 별도 사용자 승인**을 받는다.
 - [ ] **TW-06F (M4 fixture):** 전달된 contract 전체 의미 검증을 사용하는 Orca main/preload 읽기 전용 경계를 구현하고 fixture corpus로 검증한다. 선행: TW-00C + TW-00F.
 - [ ] **TW-02:** ticket `WorkspaceRef`를 정확한 Orca owner tuple에 결합하고 host·instance·revision 변경 시 재검증한다. 선행: TW-00C + TW-01.
 - [ ] **TW-07F (M5 fixture):** 기존 sidebar에 읽기 전용 Projects/Tickets tree를 구현한다. mutation 동작을 숨기고, workspace 이동은 TW-02가 확인한 ID만 허용한다. 선행: TW-06F + TW-02.
