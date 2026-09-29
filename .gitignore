@@ -115,6 +115,7 @@ docs/**
 !docs/reference/ticket-workspace-state/workspace-owner-boundary.md
 !docs/reference/ticket-workspace-state/resident-ticket-transport.md
 !docs/reference/ticket-workspace-state/coordinator-root-authority.md
+!docs/reference/ticket-workspace-state/external-resource-contract.md
 !docs/agent-skill-sharing-implementation-checklist.md
 !docs/mobile-terminal-shortcut-bar.md
 !docs/reference/
