@@ -22,6 +22,7 @@
 - [x] **다음 병렬 경계 확정:** 독립 Sol이 [fixture 표시 DTO·owner 매칭·세 필드 이동 요청의 분리](./task-graph.md)를 검토했다. 공개 `snapshot.full`은 화면 표시에는 유효하지만 repository/ref가 달라 owner 매칭의 실패 사례다. 실제 매칭 성공 사례는 Orca 측에서 별도로 만든다.
 - [x] **TW-02F (owner workstream):** 검증된 fixture의 `WorkspaceRef`를 기존 Orca binder에 정확히 매핑하고, 이동 클릭 시 main에서 세 필드 selector로 다시 확인한다. 독립·통합 Sol 리뷰와 집중 테스트를 통과했다. Live owner 증거는 TW-02L에 남는다.
 - [x] **TW-06F (main/preload workstream, M4 fixture):** 승인된 계약으로 main/preload에서 검증하고 action·target 없는 ticket/workspace 표시 행만 투영한다. 실제 preload 번들의 22개 corpus 사례와 거부된 IPC fallback, 전체 타입 검사, 통합 Sol 리뷰를 통과했다. 화면 연결은 TW-07F에 남는다.
+- [x] **이번 통합 CI:** Orca `ace464328`의 [PR #1 검사](https://github.com/lighteko/orca/actions/runs/36585804116)는 31개 성공·8개 건너뜀·실패 0개다. Linux 패키지 작업에서 실제 preload 검증이 통과했고, 레지스트리 접속 실패로 끝난 Ubuntu native-smoke는 [재실행 2회차](https://github.com/lighteko/orca/actions/runs/36585803350)에서 성공했다.
 - [ ] **TW-07F (M5 fixture, 미착수):** TW-02F와 TW-06F를 기존 sidebar에 연결해 읽기 전용 Projects/Tickets tree를 구현한다. mutation 동작을 숨기고, 이동은 클릭 시 재확인된 Orca ID와 고정된 local execution host만 사용한다. 구현 배정은 별도 다음 단계 검증 후 결정한다.
 
 Fixture 완료는 live `current`, 외부 효과 또는 공개 `clear`를 뜻하지 않는다.
