@@ -5,12 +5,14 @@ Snapshot: 2026-09-29. This graph refines the [master milestones](./master-plan.m
 ## Dependency graph
 
 ```text
-M0 (verified Orca seams) ──> TW-01 ──> TW-02 ──> TW-03 ───────────────┐
-TW-00 (source/contracts) ─> TW-02, TW-04A, TW-05, TW-06T            │
-TW-04A + TW-05G ──> TW-04B ──> TW-03, TW-04C                        ├─> TW-09 ─> TW-10
-TW-05 ──> TW-05G ──> TW-04B, TW-08                                    │
-TW-06T ──> TW-06 ──> TW-07 ──> TW-08 ──> TW-04C ──────────────────────┘
-TW-02 + TW-04B + other owner-source contracts ──> TW-03
+M0 ──> TW-01 ──> TW-02 ──> TW-03 ────────────────────────────────┐
+TW-00 ──> TW-00C + TW-04A + TW-05 + TW-06P + TW-06T           │
+TW-00C + TW-01 ──> TW-02; TW-00C + TW-06P + TW-06T ──> TW-06  │
+TW-05 ──> TW-05G ──> TW-04B + TW-08                             │
+TW-04A + TW-05G ──> TW-04B ──> TW-03 + TW-04C                  ├─> TW-09 ─> TW-10
+TW-06P + TW-06T ──> TW-06 ──> TW-07 ──> TW-08 ──> TW-04C       │
+TW-02 + TW-04B + other owner-source contracts ──> TW-03        │
+TW-03 + TW-04C + TW-05 + TW-06 + TW-08 ────────────────────────┘
 ```
 
 TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independent review; TW-00's private publication, fresh-clone hashes, isolated Linux test replay, and Orca submodule integration passed. The submodule is pinned in local Orca commit `d1f86d608`. Implementation of TW-02 through TW-08 is gated by the specific contracts below. M2 effects, role mutation, and Tickets actions must not start from fixture-only evidence.
@@ -33,6 +35,21 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **PARALLELIZATION SAFETY:** Safe beside TW-01 while read-only; contract publication must finish before dependent work.
 - **POTENTIAL CONFLICTS:** The source checkout is now clean, but local ignored documents may diverge from the package; M4/M5 fixtures are not tracked in Orca. Private submodule access and future ticket CI policy remain separate integration constraints.
 
+### TW-00C — Deliver the ticket-owned semantic contract to Orca
+
+- **GOAL:** Make the canonical ticket `WorkspaceRefV1` and navigator snapshot types, runtime semantic validator, and corpus reproducibly consumable by Orca main and sandboxed preload without a handwritten second schema owner.
+- **DEPENDENCIES:** TW-00 published the pinned private source and corpus. Decide the delivery channel and any public distribution scope before publishing contract bytes into the public Orca repository.
+- **OWNERSHIP:** Ticket-contract worker owns source-derived build/artifact generation; Orca integration worker owns consumption and CI wiring after one reviewed artifact contract. Sol Orchestrator owns the distribution approval and cross-repository pin.
+- **FILES / MODULES LIKELY INVOLVED:** Private `packages/contracts` exports/generator/tests; Orca contract artifact/verification, package or bundler wiring, main/preload boundary tests, public PR CI configuration.
+- **INPUT CONTRACT:** Pinned ticket commit and full semantic rules, including duplicate identities, SSH presentation, canonical UTF-8 cap, and snapshot digest. The current generated JSON Schema alone is insufficient.
+- **OUTPUT CONTRACT:** A source-pinned, digest-verified runtime contract that passes the same corpus in Orca main and sandboxed preload, or an explicitly gated alternative delivery path with equivalent provenance and CI coverage.
+- **CONSTRAINTS:** Public Orca PR CI cannot require private submodule credentials. The current ticket validator imports Node `buffer`/`crypto`; a preload-safe implementation must preserve exact canonical semantics. The private source's public redistribution scope remains undecided.
+- **DO_NOT_TOUCH:** Ticket CLI lifecycle, external effects, renderer UI, or public release of private protocol bytes before the reviewed distribution decision.
+- **ACCEPTANCE CRITERIA:** Reproducible source/digest pin, full corpus parity in main and sandboxed preload, fail-closed unknown version/digest, and untrusted public PR CI that does not expose private credentials. Document exactly which contract bytes are public.
+- **VERIFICATION:** Source-to-artifact reproducibility check, main/preload runtime tests, build/bundle test, corpus parity, changed-code quality, and independent privacy/semantic review.
+- **PARALLELIZATION SAFETY:** Private contract generation can proceed beside TW-04A/TW-05/TW-06P in disjoint files after schema scope is frozen; Orca consumer wiring follows the accepted artifact and is serial with TW-02/TW-06 boundary edits.
+- **POTENTIAL CONFLICTS:** A private package link would break ordinary public PR CI without scoped access; generated JSON Schema misses runtime checks; a public vendored artifact needs a distribution decision.
+
 ### TW-01 — Add owner freshness to internal local-native Git capture
 
 - **GOAL:** Give each exact local-native status/marker capture a unique owner observation ID, immutable start time, same-owner monotonic freshness, and an overall 30-second deadline.
@@ -51,7 +68,7 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 ### TW-02 — Bind ticket `WorkspaceRef` to the exact Orca owner tuple
 
 - **GOAL:** Define and implement the authoritative ticket-to-Orca local workspace join without path-only or cached-row identity.
-- **DEPENDENCIES:** TW-00 published `WorkspaceRefV1` and catalog source tuple; TW-01 owner evidence; M0 identity and execution-host contracts. Freeze the validated cross-repository data boundary before a live adapter.
+- **DEPENDENCIES:** TW-00 published `WorkspaceRefV1` and catalog source tuple; TW-01 owner evidence; TW-00C delivers the canonical runtime contract for Orca implementation; M0 identity and execution-host contracts. Pure mapping design remains independent of live transport; freeze the validated cross-repository data boundary before a live adapter.
 - **OWNERSHIP:** One worker for the cross-boundary contract; implementation ownership split only after the DTO is frozen.
 - **FILES / MODULES LIKELY INVOLVED:** Ticket-domain `WorkspaceRefV1` and owner mapping; Orca worktree catalog binding and host-qualified workspace references.
 - **INPUT CONTRACT:** Published `WorkspaceRefV1`, catalog authority/epoch/revision/ticket/repository tuple, and a join that explicitly requires `workspaceRef.repoId === repository.repositoryId` because the catalog validator does not enforce it. The `git-worktree` ref supplies the exact five Orca binding-request fields.
@@ -83,15 +100,15 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **GOAL:** Define `discover/plan/provision/inspect/teardown`, resource ownership, evidence, preview, and retry semantics before effects.
 - **DEPENDENCIES:** TW-00 verifies canonical schema/CAS and contract repository.
 - **OWNERSHIP:** Fresh Luna worker in the ticket-domain repository; no Orca runtime edits.
-- **FILES / MODULES LIKELY INVOLVED:** Ticket-domain adapter interfaces and fixtures for Docker, IIS, dev server, and test leases.
-- **INPUT CONTRACT:** Ticket authority/epoch/revision, repository role, execution domain, and target-bound resource identity.
+- **FILES / MODULES LIKELY INVOLVED:** Canonical ticket `/v1` resource envelope, Docker/IIS typed intent and observation variants, generated artifact and corpus; dev server and test lease remain later resource families.
+- **INPUT CONTRACT:** Ticket authority/epoch/revision, repository role, execution domain, target-bound resource identity, and reviewed adapter discriminator/host/evidence semantics. The current `/v1` catalog is generic; the older default export is not its schema source.
 - **OUTPUT CONTRACT:** Strict adapter DTO/fixture corpus with partial-failure and ownership proof semantics.
 - **CONSTRAINTS:** `referenced` repositories remain read-only; effects belong only to `isolated` resources; Orca receipts cannot stand in for external evidence.
 - **DO_NOT_TOUCH:** Live Docker/IIS resources, Orca worktree mutations, renderer actions.
-- **ACCEPTANCE CRITERIA:** Unsupported/mismatched/unverifiable resource states fail closed; teardown plans preserve unowned resources.
+- **ACCEPTANCE CRITERIA:** Supported Docker/IIS variants use strict typed intent and observation within the existing `/v1` envelope; unsupported/mismatched/unverifiable resource states fail closed; teardown plans preserve unowned resources. Do not freeze normative typed fixtures before discriminator and identity/ownership evidence are settled.
 - **VERIFICATION:** Contract tests and failure fixtures; cross-platform/host-domain review.
 - **PARALLELIZATION SAFETY:** Safe beside TW-01 after TW-00; serial with TW-04B.
-- **POTENTIAL CONFLICTS:** Shared role/schema fields and resource-universe semantics affect TW-03 and TW-04B.
+- **POTENTIAL CONFLICTS:** Shared role/schema fields and resource-universe semantics affect TW-03 and TW-04B. The older package default model has incompatible typed Docker/IIS contracts; copying it would create a second authority.
 
 ### TW-04B — Implement external adapters under the root gateway
 
@@ -129,11 +146,11 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **DEPENDENCIES:** TW-00 published the catalog schema; M0 Run ownership. TW-05 must first freeze coordinator artifact/document, enrollment, and root-authority handoff contracts; the published source has only shallow coordinator and artifact references.
 - **OWNERSHIP:** Ticket-domain worker for catalog/artifacts; Orca changes only through an agreed seam.
 - **FILES / MODULES LIKELY INVOLVED:** Ticket-domain coordinator folder, artifact revision/retention, first-run enrollment.
-- **INPUT CONTRACT:** Validated ticket identity, explicit user choice, and attested Orca root Run/pane.
-- **OUTPUT CONTRACT:** Durable folder/document references and recoverable ticket-to-Run correlation.
+- **INPUT CONTRACT:** Validated ticket identity, explicit user choice, and a newly specified strict Orca caller/root attestation seam. Existing `runCreate`/`runUse` can fall back to a request-supplied terminal `from` handle when evidence is absent, then resolve its pane.
+- **OUTPUT CONTRACT:** Durable folder/document references and recoverable ticket-to-Run correlation. A complete host-qualified folder identity must be proven; current `folderWorkspace.create` does not always populate a host stamp.
 - **CONSTRAINTS:** External ticket process never impersonates a coordinator; enrollment failure after Run creation must preserve and retry safely.
 - **DO_NOT_TOUCH:** Orca agent-status or terminal ownership, unrelated workspace focus.
-- **ACCEPTANCE CRITERIA:** Freeze the document set, revision/retention, explicit folder ownership, idempotent Run enrollment, and recovery contract before implementation. Resume/rebind and local documents then survive partial failure with no duplicate root Run enrollment.
+- **ACCEPTANCE CRITERIA:** Freeze the document set, revision/retention, explicit folder ownership, strict server-side caller attestation, host-qualified folder identity, idempotent Run enrollment, and recovery contract before implementation. Resume/rebind and local documents then survive partial failure with no duplicate root Run enrollment.
 - **VERIFICATION:** Command-authority fixtures, resume/failure tests, focused E2E on isolated display or CI if UI is involved.
 - **PARALLELIZATION SAFETY:** Can proceed beside TW-04A after schema freeze; TW-04B must wait for TW-05G, which depends on this task.
 - **POTENTIAL CONFLICTS:** First-run enrollment recovery and artifact retention policy are not closed.
@@ -144,21 +161,36 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **DEPENDENCIES:** TW-05 durable ticket-to-Run correlation; freeze the one-use token, server-side root attestation, and durable binding-fence contract before effect-gateway implementation. TW-00 did not supply that protocol.
 - **OWNERSHIP:** One gateway worker; Orchestrator freezes the cross-repository token and Run-binding contract first.
 - **FILES / MODULES LIKELY INVOLVED:** Ticket-domain command authority/enrollment, Orca Run attestation and binding fence seam.
-- **INPUT CONTRACT:** One-use five-minute target-bound plan token, ticket/authority/ledger revision, and server-derived root Run/pane identity.
+- **INPUT CONTRACT:** Proposed one-use, five-minute target-bound plan capability (TTL not ratified), ticket/authority/ledger revision, and newly proven strict server-derived root Run/pane identity.
 - **OUTPUT CONTRACT:** Admission proof tied to a durable binding fence, revalidated immediately before each effect, or an explicit unavailable/blocked result.
-- **CONSTRAINTS:** Serialize with Run use/create/bind/unbind; no external process impersonation, cached root context, or adapter effect on ambiguous authority.
+- **CONSTRAINTS:** Serialize with every Run binding mutation and `orchestration.reset --all`/Run deletion; preserve any durable in-flight exclusion across reset and restart. No external process impersonation, cached root context, or adapter effect on ambiguous authority.
 - **DO_NOT_TOUCH:** Parallel coordinator/Run owner, agent-status store, renderer-created authority tokens.
-- **ACCEPTANCE CRITERIA:** Changed Run, token reuse/expiry, lost contact, changed ledger or target, and fence failure prevent effects.
+- **ACCEPTANCE CRITERIA:** Changed Run, token reuse/expiry, lost contact, changed ledger or target, and fence failure prevent effects. Reset/delete during an effect cannot erase the exclusion or authorize a replacement root.
 - **VERIFICATION:** Command-authority fixtures, concurrency/replay tests, host attestation review.
 - **PARALLELIZATION SAFETY:** Serial with TW-05 identity and shared token contract; blocks live TW-04B and TW-08.
 - **POTENTIAL CONFLICTS:** Run binding generation and ticket ledger revision may change between preview and effect.
 
+### TW-06P — Produce a bounded ticket navigator snapshot
+
+- **GOAL:** Project one validated, current ticket catalog read into an immutable `TicketNavigatorSnapshotV1` without claiming an Orca owner match.
+- **DEPENDENCIES:** TW-00 publishes the canonical catalog/snapshot contracts; freeze the shared producer/transport protocol and catalog-to-snapshot projection rules before implementation.
+- **OWNERSHIP:** One ticket-domain worker owns the producer and service-side response in the private ticket repository; no Orca runtime edits.
+- **FILES / MODULES LIKELY INVOLVED:** Ticket contracts, catalog reader, navigator projector, and resident service-side protocol tests.
+- **INPUT CONTRACT:** A request bound to the configured profile, authority, epoch, and authenticated resident connection; one fresh validated catalog read per request or an independently reviewed source-currentness proof.
+- **OUTPUT CONTRACT:** Exact UTF-8 bytes of one strictly validated, digest-checked ticket-owned snapshot, or a typed unavailable result. The snapshot is immutable after publication; Orca owner matches use a separate result tied to `snapshotRevision`.
+- **CONSTRAINTS:** The producer never starts a CLI/coordinator for a read, queries Orca owner state, or claims `matched`. SSH refs project as `unsupported` under the canonical validator; other unverified refs remain `unavailable`.
+- **DO_NOT_TOUCH:** Orca catalog binding, agent-status store, main/preload IPC, renderer, external effects.
+- **ACCEPTANCE CRITERIA:** Mixed local/SSH targets project conservatively; missing/untrusted catalog, revision/digest equivocation, and a valid catalog whose projection exceeds 2 MiB return unavailable with no partial snapshot. Repeated fresh reads, source ordering, and clock/TTL semantics are explicit.
+- **VERIFICATION:** Contract corpus, projector and service-side tests, byte-exact artifact checks, typecheck, and independent semantic review.
+- **PARALLELIZATION SAFETY:** May run beside TW-06T only after the shared wire/projection contract is frozen; files and owners are separate.
+- **POTENTIAL CONFLICTS:** The catalog has no ticket `availability` field; projection and same-revision sequence rules must be decided before implementation.
+
 ### TW-06T — Establish the resident no-start ticket transport
 
 - **GOAL:** Establish and own an authenticated resident ticket endpoint/connection lifecycle during explicit setup, then provide a no-start transport from Orca main during snapshot reads.
-- **DEPENDENCIES:** TW-00 published the strict navigator snapshot DTO/corpus; M0 host ownership seams. TW-06T must first freeze the production snapshot producer, authenticated endpoint protocol, explicit setup owner, and resident lifecycle before transport implementation.
+- **DEPENDENCIES:** TW-00 published the strict navigator snapshot DTO/corpus; M0 host ownership seams. TW-06P and TW-06T share a frozen producer/transport protocol; endpoint technology, authenticated setup owner, and resident lifecycle must be decided before transport implementation.
 - **OWNERSHIP:** One Orca main transport worker after cross-repository protocol ownership is fixed.
-- **FILES / MODULES LIKELY INVOLVED:** Orca main local integration service and ticket-domain snapshot producer/transport boundary.
+- **FILES / MODULES LIKELY INVOLVED:** Orca main local integration service and resident client; the ticket-domain producer belongs to TW-06P.
 - **INPUT CONTRACT:** Configured coordinator/authority/profile binding, explicit setup authority, and a separately reviewed versioned endpoint protocol; no resident endpoint or production snapshot producer is present in the pinned source.
 - **OUTPUT CONTRACT:** Owned resident endpoint/connection lifecycle plus bounded snapshot byte stream with authenticated source/provenance, or unavailable during disconnected reads.
 - **CONSTRAINTS:** Snapshot reads never launch WSL, CLI, or coordinator; connection setup requires its separate explicit authority. No path/secret exposure, new state owner, or silent local fallback.
@@ -166,21 +198,21 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **ACCEPTANCE CRITERIA:** Disconnected, wrong authority/profile, oversized, partial, or untrusted endpoint fails closed without starting a process.
 - **VERIFICATION:** No-start, auth binding, stream bound, cancellation and reconnect tests; independent transport review.
 - **PARALLELIZATION SAFETY:** Serial with TW-06 main handler integration; fixture-only schema work can proceed after TW-00 in disjoint files.
-- **POTENTIAL CONFLICTS:** No live resident ticket transport or package-side navigator producer currently exists. The CLI `status` report is a different one-shot DTO and cannot satisfy the no-start snapshot read.
+- **POTENTIAL CONFLICTS:** No live resident ticket transport or package-side navigator producer currently exists. The CLI `status` report is a different one-shot DTO and cannot satisfy the no-start snapshot read. Authenticated response correlation alone does not establish a fresh source observation.
 
 ### TW-06 — Thin Orca snapshot boundary
 
 - **GOAL:** Transport and validate one bounded ticket snapshot across main/preload with no new state owner.
-- **DEPENDENCIES:** TW-00 publishes canonical DTO/fixture corpus; TW-06T delivers the resident no-start transport.
+- **DEPENDENCIES:** TW-00C delivers the full runtime semantic contract to main/preload; TW-06P delivers the producer and TW-06T delivers the resident no-start transport. TW-02 owns the exact Orca match result when workspace status is exposed.
 - **OWNERSHIP:** One Orca main/preload worker; renderer is read-only consumer in TW-07.
 - **FILES / MODULES LIKELY INVOLVED:** Shared Zod schema, main IPC handler/cache, preload bridge, ticket snapshot boundary fixtures.
-- **INPUT CONTRACT:** Authenticated resident transport, strict zero-argument request, canonical ticket snapshot, profile/authority/epoch provenance.
+- **INPUT CONTRACT:** Authenticated resident transport, strict zero-argument request, immutable canonical ticket snapshot, profile/authority/epoch provenance, and a separate Orca-owned match result tied to `snapshotRevision` when owner status is shown.
 - **OUTPUT CONTRACT:** `current`, `last-verified-stale`, or Tickets-only `unavailable` result under 2 MiB UTF-8 cap.
 - **CONSTRAINTS:** No distro/CLI startup, no raw path/token exposure, main and preload both validate; stale snapshots disable actions.
 - **DO_NOT_TOUCH:** Existing Projects/runtime state, renderer ownership, mutation authority, unnegotiated remote wire opcodes.
-- **ACCEPTANCE CRITERIA:** Fixture parity, invalid response isolation, cache partition, byte bounds, no focus/state disruption.
+- **ACCEPTANCE CRITERIA:** Full ticket-owned runtime semantic validation in main and preload, including duplicate identities and canonical digest; separate bounded Orca match-result validation; fixture parity, invalid response isolation, cache partition, byte bounds, and no focus/state disruption. A generated JSON Schema alone is insufficient.
 - **VERIFICATION:** Main/preload contract tests, generated fixture parity, changed-code quality and mixed-version review.
-- **PARALLELIZATION SAFETY:** Fixture-only schema and validation tests may start after TW-00 in disjoint files; live handler completion is serial after TW-06T.
+- **PARALLELIZATION SAFETY:** Fixture-only schema and validation tests may start after TW-00 in disjoint files; live handler completion is serial after TW-06P and TW-06T.
 - **POTENTIAL CONFLICTS:** Local IPC contract and fixture corpus are currently ignored/untracked and unavailable to fresh clones.
 
 ### TW-07 — Read-only Projects/Tickets tree
@@ -243,8 +275,8 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **PARALLELIZATION SAFETY:** Release gate follows integration; platform checks may run in parallel on isolated runners.
 - **POTENTIAL CONFLICTS:** Private ticket submodule access, native toolchains, fork/upstream compatibility.
 
-## First execution cycle result and next allocation
+## Execution checkpoint and next allocation
 
-1. **TW-01:** user authorized the slice. A fresh Luna xhigh worker implemented it exclusively in the runtime capture seam; the first fresh Sol xhigh review found a pre-attestation deadline gap, the worker corrected it, and a second fresh Sol xhigh review passed. The implementation is committed locally at `0c4b53ac2`. Focused tests passed 12/12; the reviewer ran 27 related tests; Node typecheck and changed-code quality passed. The previous main Luna session remains historical evidence only.
-2. **TW-00:** a separate fresh Luna xhigh worker recorded [ticket-source-audit.md](./ticket-source-audit.md) and the prepublication manifest, then prepared the exact 128-file source candidate. A worker committed/pushed it to private `lighteko/ticket-workspace`; fresh clone, [published hashes](./ticket-published-source.sha256), 32 test files (314 passed, one skipped), and typecheck passed. A separate worker added the user-approved Orca submodule gitlink; fresh Sol review passed, and the integration was committed locally at `d1f86d608`. The original dirty source state is preserved in the audit record; the current source checkout is clean.
-3. **Next allocation:** use the pinned source for bounded TW-02 owner-mapping, TW-05 command-authority, and TW-06T resident-transport contract discovery in parallel with disjoint read-only ownership. TW-04A contract fixtures may start after shared role/resource semantics are frozen. TW-06T requires an authenticated resident transport protocol and owner lifecycle contract, not merely source availability. Public `clear` remains blocked on all live owner evidence.
+1. **TW-01 and TW-00 complete:** Fresh Luna workers implemented the internal owner-freshness capture and published the full 128-file private ticket source. Fresh Sol reviews passed after corrections. The source is pinned as the Orca submodule at `2045808`; source hashes, 314 tests with one skipped, and typecheck passed. Orca's TW-01 and submodule commits were pushed; PR checks at `e3705c5db` completed with 31 successes, eight skips, and no failures. The previous main Luna session remains historical evidence only.
+2. **Contract discovery:** [TW-02 owner boundary](./workspace-owner-boundary.md) and [TW-06P/TW-06T resident contract](./resident-ticket-transport.md) passed fresh Sol re-review after the immutable-snapshot, source-currentness, full-validator, and ownership corrections. [TW-05/TW-05G coordinator/root contract](./coordinator-root-authority.md) passed its correction review after adding strict caller attestation, reset-safe exclusion, and folder host proof. These documents are decision drafts; their listed endpoint, clock, artifact, token, and lifecycle choices remain open. TW-04A's canonical schema surface is `/v1`, but Docker/IIS discriminator and evidence semantics are not frozen.
+3. **Next allocation:** TW-00C private-source validator portability preparation may run in parallel with the separate TW-04A adapter-identity and TW-05 document/enrollment contract decisions. TW-02 Orca code waits for TW-00C delivery; TW-06P and TW-06T implementation wait for their shared protocol/setup decisions. TW-05G external effects wait for the strict root attestation and durable exclusion contracts. Public `clear` remains blocked on all live owner evidence.

@@ -1,6 +1,6 @@
 # Ticket Workspace — Master Plan
 
-- Status: Active; the next implementation task is not authorized yet.
+- Status: Active; the user authorized parallel worker execution, subject to each task's contract and dependency gates.
 - Snapshot date: 2026-09-29
 - Shared execution state: [project-state.md](./project-state.md)
 - Active invariants and review constraints: [review-findings.md](./review-findings.md)
@@ -67,4 +67,4 @@ The separate ticket checkout has a bounded [source audit](./ticket-source-audit.
 
 The Orca-main local-native evidence source's internal freshness envelope (TW-01) is implemented and passed a fresh Sol review. It gives each capture a unique owner observation ID, an immutable `ownerReadStartedAt` stamped before status I/O, same-owner monotonic freshness with a 30-second maximum and an overall deadline that includes pre-attestation, and conservative cancellation/timeout failure. This is a prerequisite only; ticket `WorkspaceRef` mapping, provider/CLI/IPC/UI wiring, cross-machine clock transfer, and public `clear` remain open.
 
-The next contract gates are TW-02's validated ticket-to-Orca join and data boundary, TW-05's coordinator/artifact and root command-authority semantics, and TW-06T's navigator producer plus authenticated resident no-start transport. The published package contains the catalog and snapshot DTOs, but it does not implement those live boundaries. Their contract work can be investigated independently while shared `WorkspaceRef` field ownership is coordinated; live effects and public `clear` remain downstream.
+The next contract gates are TW-00C's full semantic-contract delivery into Orca main and sandboxed preload, TW-02's validated ticket-to-Orca join, TW-05's coordinator/artifact and root command-authority semantics, TW-06P's ticket-owned navigator producer, and TW-06T's authenticated resident no-start transport. The published package contains the catalog and snapshot DTOs, but it does not implement those live boundaries. The immutable ticket snapshot and separate Orca-owned match result require a reviewed main/preload handoff. Their contract work can be investigated independently while shared `WorkspaceRef` field ownership is coordinated; live effects and public `clear` remain downstream.

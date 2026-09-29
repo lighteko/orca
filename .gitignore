@@ -112,6 +112,9 @@ docs/**
 !docs/reference/ticket-workspace-state/ticket-source-files.sha256
 !docs/reference/ticket-workspace-state/ticket-published-source.sha256
 !docs/reference/ticket-workspace-state/ticket-publication-candidate.md
+!docs/reference/ticket-workspace-state/workspace-owner-boundary.md
+!docs/reference/ticket-workspace-state/resident-ticket-transport.md
+!docs/reference/ticket-workspace-state/coordinator-root-authority.md
 !docs/agent-skill-sharing-implementation-checklist.md
 !docs/mobile-terminal-shortcut-bar.md
 !docs/reference/
