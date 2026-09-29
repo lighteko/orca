@@ -24,17 +24,24 @@
 - [x] **TW-06F (main/preload workstream, M4 fixture):** 승인된 계약으로 main/preload에서 검증하고 action·target 없는 ticket/workspace 표시 행만 투영한다. 실제 preload 번들의 22개 corpus 사례와 거부된 IPC fallback, 전체 타입 검사, 통합 Sol 리뷰를 통과했다. 화면 연결은 TW-07F에 남는다.
 - [x] **이번 통합 CI:** 최신 검토 구현 커밋 `8ba6d003e`의 [PR #1 검사](https://github.com/lighteko/orca/actions/runs/36587099645)는 31개 성공·8개 건너뜀·실패 0개다. Linux 패키지 작업에서 실제 preload 검증이 통과했다.
 - [x] **TW-07F 다음 단계 독립 리뷰:** M5 fixture tree가 다음 핵심 경로임을 확인했지만 기존 패킷은 수정 필요로 판정했다. 클릭 재매칭 IPC가 아직 없고, fixture는 실제 coordinator·agent·이슈 링크를 증명하지 않는다. [Task DAG의 수정 패킷](./task-graph.md)을 구현 전 검증한다.
-- [ ] **TW-07F (M5 fixture, 미착수):** selector 전용 main/preload 연결 → 기존 workspaces body 안의 읽기 전용 Projects/Tickets tree → 정확한 Orca ID 이동·상태 연결을 직렬로 진행한다. 배송된 fixture의 owner mismatch는 실패 사례이고, 성공 이동은 합성 Orca 소유 fixture로만 검증한다. worker 배정은 수정 패킷 검증과 승인 범위를 확인한 뒤 결정한다.
+- [x] **TW-07F selector bridge:** main/preload의 정확한 match·click 재결합 계약을 구현하고 독립 Sol 재리뷰를 통과했다. 실제 preload 번들은 다른 revision·ticket·repository 응답을 거부하며, 배송된 fixture의 owner mismatch는 실패 사례로 유지한다.
+- [ ] **TW-07F M5 화면:** Phase A 구현은 집중 테스트를 통과했지만 독립 Sol 리뷰가 100개 이후 행의 접근 불가, unavailable/error의 Projects 복귀 누락, 탭/패널 접근성 연결 누락을 발견했다. 같은 Luna renderer workstream이 이를 수정 중이다. 그 다음 정확한 Orca ID 이동·검증 가능한 상태 연결을 수행하고 M5 통합 리뷰를 받는다.
 
 ## 지금 병렬로 준비할 수 있는 작업 축
 
 TW-07F만 다음 작업인 것은 아니다. [전체 병렬 작업 경계](./task-graph.md#full-parallel-frontier-at-this-checkpoint)의 다음 항목은 서로 다른 소유 영역에서 계약·증거를 준비할 수 있다. 코드 구현 가능 시점은 각 선행 조건을 따른다.
 
-- [ ] **TW-06P/T:** live snapshot producer·resident transport의 공동 프로토콜과 인증·freshness 계약을 확정한다. 이후 private producer와 Orca transport를 분리 구현할 수 있다.
-- [ ] **TW-05/05G:** coordinator 폴더·문서·Run 등록의 소유 경계를 조사하고, 문서 allowlist·기존 pointer 이전 등 소유자가 확정할 결정안을 준비한다. root gateway의 caller attestation·binding fence도 조사한다. 효과 코드는 아직 대기한다.
-- [ ] **TW-04A 후속:** Docker와 IIS의 실제 endpoint, 물리 ID, owner marker, 완전한 조회 범위, clock 증거를 각각 조사한다. 생산용 adapter와 효과는 아직 대기한다.
-- [ ] **TW-03 사전 조사:** agent, test/lease, ownership/host 관측의 소유 API·완전성·clock 계약을 권한별로 확인한다. 최종 `plan` provider 구현은 선행 작업 뒤에 한다.
-- [ ] **M1 profile 전달:** CLI/catalog 배포물의 provenance 기반 설치·업데이트·rollback 계약과 profile 버전 결합을 정한다. 아직 별도 구현 패킷이 없다.
+- [x] **TW-06T 전송 후보 조사:** Orca `spawnProcess`와 기존 WSL hook relay의 범위를 독립 Sol 리뷰로 확인했다. pinned WSL stdio는 주입형 테스트 후보이며 ticket용 인증·수명·clock 계약과 생산 endpoint는 아직 확정되지 않았다.
+- [ ] **TW-06P/T 공동 프로토콜:** producer·resident transport의 setup·인증·identity·freshness·framing 계약을 확정한다. [검토된 결정 초안](./resident-ticket-transport.md)은 아직 frozen protocol이 아니다. 생산 setup은 TW-M1P 기본 runtime과 TW-06P service artifact를 모두 기다린다.
+- [x] **TW-05/05G 계약 조사:** 현재 Orca·ticket 소스와 대조한 결정 매트릭스가 독립 리뷰를 통과했다. 일반 Run 호출은 ticket용 엄격한 caller attestation이 아니며, v1 catalog·folder host proof·reset fence에도 빈틈이 있다.
+- [ ] **TW-05/05G 소유자 결정:** 문서 allowlist·기존 pointer 이전·catalog version·Orca folder/Run 증명을 확정한 뒤 구현한다. 효과 코드는 계속 대기한다.
+- [x] **TW-04A 생산 증거 조사:** Docker와 IIS 모두 현재 소스에서 실제 endpoint·물리 ID·owner marker·완전 조회 범위·clock handoff를 증명하지 못했다.
+- [ ] **TW-04A 생산 소유자 증거:** 각 adapter 소유자가 위 증거를 제공하기 전에는 typed production fixture·adapter·효과를 구현하지 않는다.
+- [x] **TW-03 사전 조사:** 독립 Sol 리뷰로 여섯 행의 구조적 admission은 완전 조회·clock handoff 증명이 아님을 확인했다. 현재 CLI는 provider 없이 `incomplete`/`blocked`만 내며 공개 `clear` 누출은 없다. host status store와 renderer 필터를 구분했고, `/v1`의 generic `test-lease` 허용과 구형 typed intent의 누락을 구분했다.
+- [ ] **TW-03 소유자 계약:** agent의 정확한 host/workspace 결합과 완전 조회, test-lease의 ledger/adapter 범위, ownership/host 증명, source clock handoff를 확정한다. 최종 `plan` provider 구현은 TW-02L·TW-04B와 이 계약 뒤에 한다.
+- [x] **TW-M1P 사전 조사:** 기존 오프라인 CLI 설치 검증은 Linux Node와 profile의 실제 배포·업데이트·rollback을 증명하지 않음을 확인했다. Node 배포자, 비공개 패키지 채널, 해시·host 결합, 복구 결정이 남아 있다.
+- [x] **TW-M1P 계약 후보:** [profile/base-runtime 전달 초안](./profile-delivery.md)은 unbound 설치→별도 authority issue/adopt→명시적 bind, 단일 ext4 활성 기록, rollback 복구, 검증된 패키지 폐쇄성을 분리했고 독립 Sol 리뷰를 통과했다. Node 22.23.3과 Ubuntu WSL2 x64는 후보이지 승인된 배포 대상이 아니다.
+- [ ] **TW-M1P profile 전달:** publisher·비공개 채널·외부 신뢰점·profile 소유자·host binding threat model·초기 대상의 owner 결정을 얻고, 격리된 Node/npm tarball 폐쇄성 replay를 먼저 수행한다. 생산 설치·업데이트·rollback 코드는 frozen packet 뒤에 배정한다. TW-06T 생산 setup은 이 기본 Linux runtime과 별도의 TW-06P service artifact를 모두 기다린다.
 
 TW-06 live cache와 TW-08 action/receipt 경계도 읽기 전용으로 미리 검토할 수 있다. 두 구현은 각각의 live·root 권한 선행 조건 뒤에 둔다. 병렬 작업 축의 존재가 worker 자동 배정을 뜻하지 않는다.
 
