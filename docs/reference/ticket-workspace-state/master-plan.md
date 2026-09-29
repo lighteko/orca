@@ -22,6 +22,10 @@ An external ticket process does not impersonate the stable coordinator pane. The
 
 The MVP described by the plan is one developer PC using Windows Orca with local Windows/WSL execution. Existing Orca folder/SSH support must not regress, but SSH, paired remote runtime, relay, `orca serve`, and mobile Tickets UI are not part of this MVP. The current Git evidence implementation is narrower still: local-native Git worktrees only.
 
+## Agent workstream continuity
+
+Keep one Luna xhigh session per broad implementation workstream and reuse it for related follow-on tasks. The contract/fixture workstream owns TW-00C then TW-00F; an owner-mapping workstream owns TW-02 after its contract-delivery gate; later main/preload, renderer, and external-resource workstreams each retain their own context. Resume an existing workstream session when available. Create one successor only when the prior session is unavailable, then retain that successor across tasks. The former main Luna session is historical evidence only. Sol owns the DAG and coordinates approval gates; the user grants approvals. Fresh Sol reviewers remain independent at semantic checkpoints. Worker memory is supporting context, while these shared documents and repository evidence remain authoritative.
+
 ## Global invariants
 
 - Reuse Orca's existing worktree, folder, terminal, agent-status, orchestration, Sleep/resume, and mutation-receipt authorities.
