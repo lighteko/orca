@@ -16,8 +16,8 @@
 
 ## 다음 순서: 읽기 전용 M4/M5 검증 지점
 
-- [ ] **공개 파일 후보 구성:** 위 archive와 별도 private fixture 입력을 Orca에서 사용할 경로·파일 집합으로 비공개 staging하고 파일별 해시와 재생 명령을 고정한다.
-- [ ] **공개 전달 결정:** 완성된 파일 집합의 공개 범위·권한을 사용자에게 정확한 바이트 기준으로 승인받는다. 승인 전에는 Orca 공개 파일, package/lockfile, CI에 복사하지 않는다.
+- [x] **공개 파일 후보 구성:** [정확한 7개 파일·87,199바이트 제안](./public-redistribution-proposal.md)을 비공개 staging하고 파일별 해시·재생을 새 Sol이 검증했다.
+- [ ] **공개 전달 결정:** ticket 계약 archive와 여섯 fixture 파일의 공개 범위·권한을 각각 사용자에게 승인받는다. 승인 전에는 Orca 공개 파일, package/lockfile, CI에 복사하지 않는다.
 - [ ] **TW-06F (M4 fixture):** 전달된 contract 전체 의미 검증을 사용하는 Orca main/preload 읽기 전용 경계를 구현하고 fixture corpus로 검증한다. 선행: TW-00C + TW-00F.
 - [ ] **TW-02:** ticket `WorkspaceRef`를 정확한 Orca owner tuple에 결합하고 host·instance·revision 변경 시 재검증한다. 선행: TW-00C + TW-01.
 - [ ] **TW-07F (M5 fixture):** 기존 sidebar에 읽기 전용 Projects/Tickets tree를 구현한다. mutation 동작을 숨기고, workspace 이동은 TW-02가 확인한 ID만 허용한다. 선행: TW-06F + TW-02.
