@@ -135,28 +135,53 @@ function operationMarkerCapture(
   }
 }
 
+function testClock(startAt = 1_000, monotonicAt = 10) {
+  return {
+    wall: startAt,
+    monotonic: monotonicAt,
+    wallNow() {
+      return this.wall
+    },
+    monotonicNow() {
+      return this.monotonic
+    }
+  }
+}
+
 describe('RuntimeGitStatusRecordCaptureCommands', () => {
-  it('re-attests the same subject around the read and preserves incomplete accounting', async () => {
+  it('stamps a frozen owner observation immediately before fresh source reads', async () => {
     const binding = await createBinding()
     const subject = registrationIdentity()
+    const clock = testClock()
     const attestSubject = vi.fn(async () => ({ binding, effectiveSubject: subject }))
-    const readStatusRecords = vi.fn(async () => statusCapture())
-    const readOperationMarkers = vi.fn(async () => operationMarkerCapture())
-    const commands = new RuntimeGitStatusRecordCaptureCommands({
-      attestSubject,
-      readStatusRecords,
-      readOperationMarkers
+    const readStatusRecords = vi.fn(async () => {
+      expect(clock.wall).toBe(1_000)
+      return statusCapture()
     })
+    const readOperationMarkers = vi.fn(async () => operationMarkerCapture())
+    const commands = new RuntimeGitStatusRecordCaptureCommands(
+      {
+        attestSubject,
+        readStatusRecords,
+        readOperationMarkers
+      },
+      clock
+    )
 
-    await expect(commands.captureExactLocalNativeGitStatusRecords(binding)).resolves.toEqual({
+    const result = await commands.captureExactLocalNativeGitStatusRecords(binding)
+
+    expect(result).toMatchObject({
       binding,
       effectiveSubject: subject,
       status: statusCapture(),
-      operationMarkers: operationMarkerCapture()
+      operationMarkers: operationMarkerCapture(),
+      observationId: expect.any(String),
+      ownerReadStartedAt: 1_000
     })
+    expect(Object.isFrozen(result)).toBe(true)
     expect(attestSubject).toHaveBeenCalledTimes(2)
     expect(readStatusRecords).toHaveBeenCalledOnce()
-    expect(readOperationMarkers).toHaveBeenCalledWith(subject, undefined)
+    expect(readOperationMarkers).toHaveBeenCalledWith(subject, expect.any(AbortSignal))
   })
 
   it('rejects a subject change or unavailable status instead of returning a partial capture', async () => {
@@ -193,6 +218,7 @@ describe('RuntimeGitStatusRecordCaptureCommands', () => {
   it('runs two overlapping calls as two independent status reads', async () => {
     const binding = await createBinding()
     const subject = registrationIdentity()
+    const clock = testClock()
     let releaseReads: (() => void) | undefined
     const bothStarted = new Promise<void>((resolve) => {
       releaseReads = resolve
@@ -206,11 +232,14 @@ describe('RuntimeGitStatusRecordCaptureCommands', () => {
       return statusCapture({ complete: true, unsupportedRecordCount: 0, representedRecordCount: 1 })
     })
     const readOperationMarkers = vi.fn(async () => operationMarkerCapture())
-    const commands = new RuntimeGitStatusRecordCaptureCommands({
-      attestSubject,
-      readStatusRecords,
-      readOperationMarkers
-    })
+    const commands = new RuntimeGitStatusRecordCaptureCommands(
+      {
+        attestSubject,
+        readStatusRecords,
+        readOperationMarkers
+      },
+      clock
+    )
 
     const results = await Promise.all([
       commands.captureExactLocalNativeGitStatusRecords(binding),
@@ -220,6 +249,180 @@ describe('RuntimeGitStatusRecordCaptureCommands', () => {
     expect(readStatusRecords).toHaveBeenCalledTimes(2)
     expect(attestSubject).toHaveBeenCalledTimes(4)
     expect(results).toHaveLength(2)
+    expect(results[0]?.observationId).not.toBe(results[1]?.observationId)
+    expect(results.map((result) => result.ownerReadStartedAt)).toEqual([1_000, 1_000])
+    expect(results.every((result) => result.binding === binding)).toBe(true)
+  })
+
+  it('rejects evidence older than 30 seconds or with a future owner timestamp', async () => {
+    const binding = await createBinding()
+    const subject = registrationIdentity()
+
+    for (const elapsed of [30_001, -1]) {
+      const clock = testClock()
+      const commands = new RuntimeGitStatusRecordCaptureCommands(
+        {
+          attestSubject: async () => ({ binding, effectiveSubject: subject }),
+          readStatusRecords: async () => {
+            clock.wall += elapsed
+            clock.monotonic += Math.max(elapsed, 0)
+            return statusCapture()
+          },
+          readOperationMarkers: async () => operationMarkerCapture()
+        },
+        clock
+      )
+
+      await expect(
+        commands.captureExactLocalNativeGitStatusRecords(binding)
+      ).rejects.toBeInstanceOf(RuntimeGitStatusRecordCaptureUnavailableError)
+    }
+  })
+
+  it('rejects wall-clock jumps and a backwards monotonic clock', async () => {
+    const binding = await createBinding()
+    const subject = registrationIdentity()
+
+    for (const change of [
+      (clock: ReturnType<typeof testClock>) => {
+        clock.wall -= 2_000
+      },
+      (clock: ReturnType<typeof testClock>) => {
+        clock.monotonic -= 1
+      }
+    ]) {
+      const clock = testClock()
+      const commands = new RuntimeGitStatusRecordCaptureCommands(
+        {
+          attestSubject: async () => ({ binding, effectiveSubject: subject }),
+          readStatusRecords: async () => {
+            change(clock)
+            return statusCapture()
+          },
+          readOperationMarkers: async () => operationMarkerCapture()
+        },
+        clock
+      )
+
+      await expect(
+        commands.captureExactLocalNativeGitStatusRecords(binding)
+      ).rejects.toBeInstanceOf(RuntimeGitStatusRecordCaptureUnavailableError)
+    }
+  })
+
+  it('aborts at the overall deadline and holds the source call until it settles', async () => {
+    vi.useFakeTimers()
+    try {
+      const binding = await createBinding()
+      const subject = registrationIdentity()
+      let releaseStatus: (() => void) | undefined
+      let sourceSignal: AbortSignal | undefined
+      const readStatusRecords = vi.fn((_binding: typeof binding, signal?: AbortSignal) => {
+        sourceSignal = signal
+        return new Promise<NativeGitWorktreeStatusRecordCapture>((resolve) => {
+          releaseStatus = () => resolve(statusCapture())
+        })
+      })
+      const readOperationMarkers = vi.fn(async () => operationMarkerCapture())
+      const commands = new RuntimeGitStatusRecordCaptureCommands({
+        attestSubject: async () => ({ binding, effectiveSubject: subject }),
+        readStatusRecords,
+        readOperationMarkers
+      })
+      const capture = commands.captureExactLocalNativeGitStatusRecords(binding)
+      const captureFailure = expect(capture).rejects.toBeInstanceOf(
+        RuntimeGitStatusRecordCaptureUnavailableError
+      )
+
+      await vi.advanceTimersByTimeAsync(30_000)
+
+      await captureFailure
+      expect(sourceSignal?.aborted).toBe(true)
+      expect(readOperationMarkers).not.toHaveBeenCalled()
+
+      releaseStatus?.()
+      await Promise.resolve()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('applies the overall deadline to the first subject attestation', async () => {
+    const binding = await createBinding()
+    vi.useFakeTimers()
+    try {
+      const subject = registrationIdentity()
+      let releaseAttestation:
+        | ((value: { binding: typeof binding; effectiveSubject: typeof subject }) => void)
+        | undefined
+      let attestationSignal: AbortSignal | undefined
+      const attestSubject = vi.fn((_binding: typeof binding, signal?: AbortSignal) => {
+        attestationSignal = signal
+        return new Promise<{ binding: typeof binding; effectiveSubject: typeof subject }>(
+          (resolve) => {
+            releaseAttestation = resolve
+          }
+        )
+      })
+      const readStatusRecords = vi.fn(async () => statusCapture())
+      const readOperationMarkers = vi.fn(async () => operationMarkerCapture())
+      const commands = new RuntimeGitStatusRecordCaptureCommands({
+        attestSubject,
+        readStatusRecords,
+        readOperationMarkers
+      })
+      const capture = commands.captureExactLocalNativeGitStatusRecords(binding)
+      const captureFailure = expect(capture).rejects.toBeInstanceOf(
+        RuntimeGitStatusRecordCaptureUnavailableError
+      )
+
+      await Promise.resolve()
+      expect(attestSubject).toHaveBeenCalledOnce()
+      await vi.advanceTimersByTimeAsync(30_000)
+
+      await captureFailure
+      expect(attestationSignal?.aborted).toBe(true)
+      expect(readStatusRecords).not.toHaveBeenCalled()
+      expect(readOperationMarkers).not.toHaveBeenCalled()
+
+      releaseAttestation?.({ binding, effectiveSubject: subject })
+      await Promise.resolve()
+      await Promise.resolve()
+      expect(readStatusRecords).not.toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('cancels an owner read without admitting late source evidence', async () => {
+    const binding = await createBinding()
+    const subject = registrationIdentity()
+    const controller = new AbortController()
+    let releaseStatus: (() => void) | undefined
+    let sourceSignal: AbortSignal | undefined
+    const readStatusRecords = vi.fn((_binding: typeof binding, signal?: AbortSignal) => {
+      sourceSignal = signal
+      return new Promise<NativeGitWorktreeStatusRecordCapture>((resolve) => {
+        releaseStatus = () => resolve(statusCapture())
+      })
+    })
+    const readOperationMarkers = vi.fn(async () => operationMarkerCapture())
+    const commands = new RuntimeGitStatusRecordCaptureCommands({
+      attestSubject: async () => ({ binding, effectiveSubject: subject }),
+      readStatusRecords,
+      readOperationMarkers
+    })
+    const capture = commands.captureExactLocalNativeGitStatusRecords(binding, controller.signal)
+
+    await vi.waitFor(() => expect(readStatusRecords).toHaveBeenCalledOnce())
+    controller.abort()
+
+    await expect(capture).rejects.toBeInstanceOf(RuntimeGitStatusRecordCaptureUnavailableError)
+    expect(sourceSignal?.aborted).toBe(true)
+    expect(readOperationMarkers).not.toHaveBeenCalled()
+
+    releaseStatus?.()
+    await Promise.resolve()
   })
 
   it('does not give an empty complete record scan a clear verdict', async () => {
