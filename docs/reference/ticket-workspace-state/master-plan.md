@@ -3,6 +3,7 @@
 - Status: Active; fixture/live sequencing was corrected after an off-track audit. The user approved one continuing Luna contract/fixture audit cycle, which is complete. New implementation allocations require independent next-step review and explicit user approval.
 - Snapshot date: 2026-09-29
 - Shared execution state: [project-state.md](./project-state.md)
+- Readable current checklist: [current-todo.md](./current-todo.md)
 - Active invariants and review constraints: [review-findings.md](./review-findings.md)
 - Recovery-verified task DAG and first-cycle allocation: [task-graph.md](./task-graph.md)
 
