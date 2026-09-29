@@ -26,6 +26,18 @@
 - [x] **TW-07F 다음 단계 독립 리뷰:** M5 fixture tree가 다음 핵심 경로임을 확인했지만 기존 패킷은 수정 필요로 판정했다. 클릭 재매칭 IPC가 아직 없고, fixture는 실제 coordinator·agent·이슈 링크를 증명하지 않는다. [Task DAG의 수정 패킷](./task-graph.md)을 구현 전 검증한다.
 - [ ] **TW-07F (M5 fixture, 미착수):** selector 전용 main/preload 연결 → 기존 workspaces body 안의 읽기 전용 Projects/Tickets tree → 정확한 Orca ID 이동·상태 연결을 직렬로 진행한다. 배송된 fixture의 owner mismatch는 실패 사례이고, 성공 이동은 합성 Orca 소유 fixture로만 검증한다. worker 배정은 수정 패킷 검증과 승인 범위를 확인한 뒤 결정한다.
 
+## 지금 병렬로 준비할 수 있는 작업 축
+
+TW-07F만 다음 작업인 것은 아니다. [전체 병렬 작업 경계](./task-graph.md#full-parallel-frontier-at-this-checkpoint)의 다음 항목은 서로 다른 소유 영역에서 계약·증거를 준비할 수 있다. 코드 구현 가능 시점은 각 선행 조건을 따른다.
+
+- [ ] **TW-06P/T:** live snapshot producer·resident transport의 공동 프로토콜과 인증·freshness 계약을 확정한다. 이후 private producer와 Orca transport를 분리 구현할 수 있다.
+- [ ] **TW-05/05G:** coordinator 폴더·문서·Run 등록의 소유 경계를 조사하고, 문서 allowlist·기존 pointer 이전 등 소유자가 확정할 결정안을 준비한다. root gateway의 caller attestation·binding fence도 조사한다. 효과 코드는 아직 대기한다.
+- [ ] **TW-04A 후속:** Docker와 IIS의 실제 endpoint, 물리 ID, owner marker, 완전한 조회 범위, clock 증거를 각각 조사한다. 생산용 adapter와 효과는 아직 대기한다.
+- [ ] **TW-03 사전 조사:** agent, test/lease, ownership/host 관측의 소유 API·완전성·clock 계약을 권한별로 확인한다. 최종 `plan` provider 구현은 선행 작업 뒤에 한다.
+- [ ] **M1 profile 전달:** CLI/catalog 배포물의 provenance 기반 설치·업데이트·rollback 계약과 profile 버전 결합을 정한다. 아직 별도 구현 패킷이 없다.
+
+TW-06 live cache와 TW-08 action/receipt 경계도 읽기 전용으로 미리 검토할 수 있다. 두 구현은 각각의 live·root 권한 선행 조건 뒤에 둔다. 병렬 작업 축의 존재가 worker 자동 배정을 뜻하지 않는다.
+
 Fixture 완료는 live `current`, 외부 효과 또는 공개 `clear`를 뜻하지 않는다.
 
 ## M1 완료까지 별도로 남은 일
