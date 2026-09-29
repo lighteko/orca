@@ -144,6 +144,7 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 
 ### TW-05 — Coordinator folder and local artifacts
 
+- **STATUS:** Folder/artifact/enrollment decision draft passed independent review. No production creation, publication, or enrollment code exists. Folder host/storage identity, document allowlist, migration only for a nonempty opaque legacy artifact pointer, strict Run caller attestation, and compatible catalog versioning are implementation gates.
 - **GOAL:** Create the ticket coordinator folder/document lifecycle using the existing Orca Run root agent.
 - **DEPENDENCIES:** TW-00 published the catalog schema; M0 Run ownership. TW-05 must first freeze coordinator artifact/document, enrollment, and root-authority handoff contracts; the published source has only shallow coordinator and artifact references.
 - **OWNERSHIP:** Ticket-domain worker for catalog/artifacts; Orca changes only through an agreed seam.
@@ -155,7 +156,7 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **ACCEPTANCE CRITERIA:** Freeze the document set, revision/retention, explicit folder ownership, strict server-side caller attestation, host-qualified folder identity, idempotent Run enrollment, and recovery contract before implementation. Resume/rebind and local documents then survive partial failure with no duplicate root Run enrollment.
 - **VERIFICATION:** Command-authority fixtures, resume/failure tests, focused E2E on isolated display or CI if UI is involved.
 - **PARALLELIZATION SAFETY:** Can proceed beside TW-04A after schema freeze; TW-04B must wait for TW-05G, which depends on this task.
-- **POTENTIAL CONFLICTS:** First-run enrollment recovery and artifact retention policy are not closed. `repo.add` host-unaware path deduplication can return a row from another host and is not ticket ownership or WSL route proof; `folderWorkspace.create` has no Repo ID for the ticket folder ref.
+- **POTENTIAL CONFLICTS:** `repo.add` host-unaware path deduplication can return a row from another host; `folderWorkspace.create` has no Repo ID. An opaque nonempty legacy `artifact.revision` blocks publication until migration preserves its sole reference and defines the initial manifest revision. Document choices and retention remain open; folder-only setup must be a separate operation when artifact publication is blocked.
 
 ### TW-05G — Enforce the root coordinator gateway for effects
 
