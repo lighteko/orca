@@ -669,8 +669,8 @@ jobs:
 
     steps:
       # Why fetch-depth 0: the harness extracts the newest release tag to skew
-      # current code against it. The default shallow clone has no tags, which is
-      # why this cannot ride along in the sharded `test` job.
+      # current code against it. The fork has no release tags, so the next step
+      # imports the source repository's stable release refs and objects.
       - name: Checkout
         uses: actions/checkout@v6
         with:
@@ -680,6 +680,73 @@ jobs:
           fetch-depth: 0
           filter: blob:none
           persist-credentials: false
+
+      - name: Fetch upstream stable release tags
+        env:
+          CROSS_VERSION_UPSTREAM: https://github.com/stablyai/orca.git
+        run: |
+          set -euo pipefail
+          git remote add cross-version-source "$CROSS_VERSION_UPSTREAM"
+          git config remote.cross-version-source.promisor true
+          git config remote.cross-version-source.partialclonefilter blob:none
+
+          advertised_tags="$(git ls-remote --refs "$CROSS_VERSION_UPSTREAM" 'refs/tags/v*')"
+          declare -A remote_tag_objects=()
+          release_tags=()
+          while IFS=$'\t' read -r object_id ref; do
+            [[ "$ref" =~ ^refs/tags/(v[0-9]+\.[0-9]+\.[0-9]+)$ ]] || continue
+            tag="${BASH_REMATCH[1]}"
+            remote_tag_objects["$tag"]="$object_id"
+            release_tags+=("$tag")
+          done <<< "$advertised_tags"
+
+          if [[ "${#release_tags[@]}" -eq 0 ]]; then
+            echo "::error::No stable desktop release tags were advertised by $CROSS_VERSION_UPSTREAM."
+            exit 1
+          fi
+
+          local_tags="$(git tag --list 'v[0-9]*')"
+          while IFS= read -r local_tag; do
+            [[ "$local_tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || continue
+            if [[ -z "${remote_tag_objects[$local_tag]:-}" ]]; then
+              echo "::error::Local stable tag $local_tag is not advertised by upstream."
+              exit 1
+            fi
+            local_object="$(git show-ref --hash --verify -- "refs/tags/$local_tag")"
+            if [[ "$local_object" != "${remote_tag_objects[$local_tag]}" ]]; then
+              echo "::error::Local stable tag $local_tag conflicts with the upstream object."
+              exit 1
+            fi
+          done <<< "$local_tags"
+
+          refspecs=()
+          for tag in "${release_tags[@]}"; do
+            if [[ -z "${remote_tag_objects[$tag]:-}" ]]; then
+              echo "::error::Upstream release tag $tag has no advertised object."
+              exit 1
+            fi
+            refspecs+=("refs/tags/$tag:refs/tags/$tag")
+          done
+
+          for tag in v1.4.184 v1.4.190; do
+            if [[ -z "${remote_tag_objects[$tag]:-}" ]]; then
+              echo "::error::Required historical release tag $tag is missing upstream."
+              exit 1
+            fi
+          done
+
+          # No force refspec: an unexpected tag collision must fail closed.
+          git fetch --quiet --filter=blob:none --no-tags cross-version-source "${refspecs[@]}"
+
+          for tag in "${release_tags[@]}"; do
+            local_object="$(git show-ref --hash --verify -- "refs/tags/$tag")"
+            if [[ "$local_object" != "${remote_tag_objects[$tag]}" ]]; then
+              echo "::error::Fetched release tag $tag does not match the upstream object."
+              exit 1
+            fi
+            git rev-parse --verify "$tag^{commit}" >/dev/null
+          done
+          echo "Imported ${#release_tags[@]} stable upstream release tags."
 
       - uses: ./.github/actions/install-node-dependencies
         with:

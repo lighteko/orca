@@ -186,6 +186,7 @@ describe('PR workflow parallelism', () => {
 
   it('keeps every real-zsh test in the dedicated shell lane', () => {
     const discoveredFiles = globSync(testFilePatterns)
+      .map((testFile) => testFile.replaceAll('\\', '/'))
       // Why this file is excluded: it carries the detector pattern as a literal
       // and would otherwise match itself.
       .filter((testFile) => testFile !== 'config/scripts/pr-workflow-parallelism.test.mjs')
@@ -450,6 +451,38 @@ describe('PR workflow parallelism', () => {
     for (const checkout of fullHistoryCheckouts) {
       expect(checkout.with.filter).toBe('blob:none')
     }
+  })
+
+  it('fetches authentic upstream release tags without forcing local refs', () => {
+    const steps = workflow.jobs['cross-version-wire'].steps
+    const fetchStep = steps.find((step) => step.name === 'Fetch upstream stable release tags')
+    const testStep = steps.find(
+      (step) => step.name === 'Old/new client and server compatibility journeys'
+    )
+
+    expect(fetchStep).toBeDefined()
+    expect(testStep).toBeDefined()
+    if (!fetchStep || !testStep) {
+      throw new Error('Cross-version release-tag preparation must precede its test suite.')
+    }
+
+    expect(steps.indexOf(fetchStep)).toBeLessThan(steps.indexOf(testStep))
+    expect(fetchStep.env.CROSS_VERSION_UPSTREAM).toBe('https://github.com/stablyai/orca.git')
+    expect(fetchStep.run).toContain('git ls-remote --refs "$CROSS_VERSION_UPSTREAM"')
+    expect(fetchStep.run).toContain('^refs/tags/(v[0-9]+\\.[0-9]+\\.[0-9]+)$')
+    expect(fetchStep.run).toContain("while IFS=$'\\t' read -r")
+    expect(fetchStep.run).toContain('local_tags="$(git tag --list \'v[0-9]*\')"')
+    expect(fetchStep.run).toContain('done <<< "$local_tags"')
+    expect(fetchStep.run).toContain('Local stable tag $local_tag is not advertised by upstream.')
+    expect(fetchStep.run).toContain(
+      'Local stable tag $local_tag conflicts with the upstream object.'
+    )
+    expect(fetchStep.run).toContain('for tag in v1.4.184 v1.4.190')
+    expect(fetchStep.run).toContain('git fetch --quiet --filter=blob:none --no-tags')
+    expect(fetchStep.run).toContain('does not match the upstream object')
+    expect(fetchStep.run).toContain('git rev-parse --verify "$tag^{commit}"')
+    expect(fetchStep.run).not.toContain('+refs/tags/')
+    expect(fetchStep.run).not.toMatch(/git fetch[^\n]*--force/)
   })
 
   it('keeps verify as the aggregate required check', () => {
