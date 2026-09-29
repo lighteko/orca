@@ -70,3 +70,9 @@ The published content must be checked from a fresh clone or extraction against a
 - **OPEN_CONCERNS:** Source is mostly untracked/dirty; M1 live observations/providers and other listed open slices remain incomplete; tests are not reproduced.
 - **CROSS_WORKSTREAM_IMPACT:** TW-02, TW-04A, TW-05 and TW-06T must consume a published full source revision/archive. No downstream task should treat the base HEAD or historical pass counts as the current reproducible source.
 - **RECOMMENDED_STATE_UPDATE:** Keep TW-00 open until the source owner publishes the complete tree and a fresh retrieval verifies its contents.
+
+## Publication follow-up
+
+The audited content was committed with a README provenance update as `2045808ffdb6baead2e659855cefb02f7b36491c` (tree `50d168f58db92c98b8e70cc32ed1dfbc1c5736a2`) and pushed to private `lighteko/ticket-workspace`. A fresh clone matched the commit, tree, all 128 paths, and file hashes. [ticket-published-source.sha256](./ticket-published-source.sha256) covers the exact published tree; the earlier manifest above remains the prepublication audit record. The source checkout is clean.
+
+An isolated Linux replay of the audited source passed with Node 22.23.2 and pnpm 12.0.0: 32 test files, 314 tests passed, one skipped, and `pnpm typecheck` passed. The container needed a WSL ext4-backed `TMPDIR` and `WSL_DISTRO_NAME=Ubuntu-24.04`; its initial overlay/distro-unset failures were environment setup failures. Only the README changed after the tested copy was made. This verifies the bounded M1 source/test baseline, while live owner-provider and public verdict work remain open.

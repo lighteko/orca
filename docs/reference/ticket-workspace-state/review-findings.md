@@ -28,12 +28,13 @@ Snapshot date: 2026-09-29. This is a concise carry-forward of valid reviewer con
 - **Tag-list shell failure:** process substitution does not propagate a failed producer through `set -e`. The workflow captures `git tag --list` in a checked assignment before the here-string loop.
 - **Git archive partial clone:** the second promisor remote supplies omitted blobs lazily. Disposable WSL execution imported 401 tags and extracted latest `v1.4.216` in 14.1 seconds against 45 seconds; remote cross-version job also passed.
 - **TW-01 overall deadline:** the first implementation started its 30-second timer after pre-attestation. The reviewed correction starts the overall timer before scheduling that attestation, stamps the owner read separately immediately before status I/O, and rejects late results. Focused tests, Node typecheck, and changed-code quality passed; retain the pre-attestation stall test.
+- **Ticket source portability:** the initial WSL checkout had seven modified tracked paths and 90 untracked files; its base HEAD was not a reproducible M1 revision. Private commit `2045808ffdb6baead2e659855cefb02f7b36491c` now contains the complete 128-file tree. A fresh clone and all published file hashes matched; isolated Linux tests passed 314/315 with one skipped plus typecheck. Keep the published commit/tree pinned in downstream work.
 
 ## Unresolved / deferred findings
 
 - The internal local-native source now owns the observation ID, immutable `ownerReadStartedAt`, and 30-second deadline. Ticket mapping, cross-process clock admission, production composition, and public verdicts remain open; never use adapter receipt time to make old evidence fresh.
 - The ticket `WorkspaceRef` → exact Orca catalog tuple mapping and production composition port remain unimplemented in this checkout.
-- The ticket-domain source exists in an unregistered WSL checkout, but most current M1 files/tests are untracked. A bounded SHA-256 manifest is recorded in [ticket-source-files.sha256](./ticket-source-files.sha256); its HEAD is still not portable provenance. Publish a retrievable tracked/archived revision before downstream allocation.
+- The private ticket source is portable, but authorized access is required to initialize its submodule from the public Orca fork. Ordinary Orca CI does not fetch submodules; a future ticket-package CI job needs scoped private access and an untrusted-PR policy.
 - Exact-workspace agent status, production test/lease/ownership sources, external-resource universe/host binding, and their complete-read semantics remain unresolved. Local owner survey exists only in ignored notes.
 - WSL no-start route proof for status and cross-process clock admission are not delivered. SSH/paired remote targets are outside the first evidence slice.
 - A concurrent hostile filesystem replacement after identity preflight cannot currently be excluded atomically. Read evidence is not transactional authorization for a later mutation.

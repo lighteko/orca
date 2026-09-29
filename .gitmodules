@@ -1,0 +1,3 @@
+[submodule "ticket-workspace"]
+	path = ticket-workspace
+	url = https://github.com/lighteko/ticket-workspace.git

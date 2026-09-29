@@ -4,7 +4,9 @@
 - Source: `/home/sellmate/ticket-workspace` on Ubuntu-24.04
 - Candidate base: `main` at `cf184eaa588f9155636dec036f624595c3d46532`
 - Current state: 7 modified tracked paths and 90 non-ignored untracked paths; no remote is configured.
-- Status: the current source tree has an exact staging recipe. Resolve the README wording concern below before publishing; any source edit requires rerunning the inventory and hash check.
+- Status at audit: exact staging recipe prepared; README wording and hash recheck were publication gates.
+
+This section records the prepublication candidate. The README wording was updated and the exact 128-file tree was published at `2045808ffdb6baead2e659855cefb02f7b36491c` to private `lighteko/ticket-workspace`. The fresh clone matched its tree and every file hash. See [ticket-published-source.sha256](./ticket-published-source.sha256) for the published-byte manifest.
 
 ## Exact content to publish
 
@@ -62,11 +64,11 @@ Run package tests and typecheck from the fresh clone in Linux with Node `>=22.13
 
 ## Proposed Orca submodule integration
 
-The user's proposed submodule preserves the ticket package as a separate repository while pinning an exact source commit from Orca. The concrete candidate is a new private `lighteko/ticket-workspace` GitHub repository and an Orca gitlink at `ticket-workspace/` with its HTTPS remote in `.gitmodules`. That repository does not exist yet. The Orca fork is public, so the submodule URL and pinned commit ID would be public metadata, while cloning the private source requires separate access.
+At proposal time, the user's suggested submodule would preserve the ticket package as a separate repository while pinning an exact source commit from Orca. The candidate was a new private `lighteko/ticket-workspace` GitHub repository and an Orca gitlink at `ticket-workspace/` with its HTTPS remote in `.gitmodules`; that repository did not exist at the time. It has since been created privately, and the gitlink is staged. The Orca fork is public, so the submodule URL and pinned commit ID are public metadata, while cloning the private source requires separate access.
 
 The root `pnpm-workspace.yaml` lists only two native packages explicitly, so the submodule would not become part of Orca's pnpm workspace by placement alone. Existing Orca GitHub workflows use `actions/checkout` without `submodules: true`; their ordinary Orca checks would not fetch the private source. Any new ticket-package CI job would need a private-repository credential with narrowly scoped read access and a policy for untrusted pull requests. Do not enable authenticated submodule checkout in public PR jobs by default. Verify a clean authorized clone with `git submodule update --init ticket-workspace` and compare the checked-out gitlink with the published ticket commit before assigning downstream tasks.
 
-## Required report fields
+## Historical candidate report fields
 
 - **TASK_ID:** TW-00-PUBLICATION-PREP
 - **STATUS:** Candidate inventory and staging recipe complete; source remains unpublished and unchanged.

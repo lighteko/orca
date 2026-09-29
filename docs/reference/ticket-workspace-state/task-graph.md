@@ -1,6 +1,6 @@
 # Ticket Workspace — Recovery-Verified Task DAG
 
-Snapshot: 2026-09-29. This graph refines the [master milestones](./master-plan.md) using the current Orca checkout and a read-only check of the separate WSL ticket checkout. Its current M1 source is mostly untracked, so TW-00 must establish portable content provenance before downstream allocation. Task IDs describe deliverables, not automatic authorization to implement them.
+Snapshot: 2026-09-29. This graph refines the [master milestones](./master-plan.md) using the current Orca checkout and the separately published private ticket source. TW-00's source provenance/test gate has passed; task-specific contracts still govern downstream allocation. Task IDs describe deliverables, not automatic authorization to implement them.
 
 ## Dependency graph
 
@@ -13,24 +13,25 @@ TW-06T ──> TW-06 ──> TW-07 ──> TW-08 ──> TW-04C ─────�
 TW-02 + TW-04B + other owner-source contracts ──> TW-03
 ```
 
-TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independent review; TW-00 still needs portable source publication and current test verification. Implementation of TW-02 through TW-08 is gated by the specific contracts below. M2 effects, role mutation, and Tickets actions must not start from fixture-only evidence.
+TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independent review; TW-00's private publication, fresh-clone hashes, and isolated Linux test replay passed. The Orca submodule integration is staged for review. Implementation of TW-02 through TW-08 is gated by the specific contracts below. M2 effects, role mutation, and Tickets actions must not start from fixture-only evidence.
 
 ## Tasks
 
 ### TW-00 — Verify the ticket-domain source and publish its contracts
 
+- **STATUS:** Source publication and test gate passed. Private commit `2045808ffdb6baead2e659855cefb02f7b36491c` (tree `50d168f58db92c98b8e70cc32ed1dfbc1c5736a2`) was fresh-cloned and its 128 file hashes matched [the published manifest](./ticket-published-source.sha256). Isolated Linux tests passed 314 with one skipped, plus typecheck. The user-approved Orca submodule gitlink is staged separately for integration review.
 - **GOAL:** Verify the located WSL ticket checkout's M1 contract, ledger/CAS, doctor/status/plan, and fixture claims against its current source and tests, then make their content provenance portable.
 - **DEPENDENCIES:** None; historical plan and current Orca checkout are inputs.
 - **OWNERSHIP:** Sol Orchestrator for source identification and shared-state update; a fresh Luna worker may perform bounded read-only inventory once the source is identified.
 - **FILES / MODULES LIKELY INVOLVED:** Ticket-domain package/CLI in its own checkout; `docs/ticket-workspace-*` and `docs/contracts/`, `docs/fixtures/` here; these shared-state documents.
-- **INPUT CONTRACT:** Historical M1 checklist is a claim. Source is `/home/sellmate/ticket-workspace` on Ubuntu-24.04 at Git HEAD `cf184eaa`, but most M1 source/tests are untracked, so HEAD is not their content revision.
+- **INPUT CONTRACT:** Historical M1 checklist was a claim. The recovery baseline was `/home/sellmate/ticket-workspace` on Ubuntu-24.04 at `cf184eaa` with 90 untracked source/test files; published commit `2045808` now captures that content with an updated README.
 - **OUTPUT CONTRACT:** Bounded content manifest **and** retrievable tracked/archived source plus fixtures, verified versus missing M1 slices, portable contract location, and corrected dependencies in shared state. Until the archive/revision exists, a manifest supports only local audit, not fresh-clone allocation.
 - **CONSTRAINTS:** Read-only until ownership and repository boundary are established; preserve user changes and worktree isolation.
 - **DO_NOT_TOUCH:** Ticket product code, external resources, Orca runtime/UI, and unrelated repositories during inventory.
 - **ACCEPTANCE CRITERIA:** Every M1 completion claim needed by TW-02/TW-04A/TW-05/TW-06T has content provenance and a current test or is explicitly unresolved; fresh workers can access the required source and contracts without depending on the old Luna session.
-- **VERIFICATION:** `git ls-files` and untracked inventory, bounded source inspection, package tests in an available Linux Node environment, fixture provenance/hash checks, shared-state review. The present WSL shell cannot run its Windows-resolved `corepack` shim.
+- **VERIFICATION:** Fresh clone commit/tree and 128 hashes matched; exact audited source replay passed 32 test files, 314 passed/one skipped, and typecheck under Node 22.23.2/pnpm 12.0.0 in an ext4-backed Linux container. The WSL shell itself lacks Linux Node.
 - **PARALLELIZATION SAFETY:** Safe beside TW-01 while read-only; contract publication must finish before dependent work.
-- **POTENTIAL CONFLICTS:** The WSL checkout has many untracked M1 files and seven modified tracked files; preserve that dirty state. Local ignored documents may diverge from the package; M4/M5 fixtures are not tracked in Orca.
+- **POTENTIAL CONFLICTS:** The source checkout is now clean, but local ignored documents may diverge from the package; M4/M5 fixtures are not tracked in Orca. Private submodule access and future ticket CI policy remain separate integration constraints.
 
 ### TW-01 — Add owner freshness to internal local-native Git capture
 
@@ -240,10 +241,10 @@ TW-01 and TW-00's read-only source audit ran in parallel. TW-01 passed independe
 - **ACCEPTANCE CRITERIA:** Clean-machine pilot, rollback, packaging, and update scenarios pass on supported platforms.
 - **VERIFICATION:** Release CI, clean-machine smoke, native module checks, documented rollback drill.
 - **PARALLELIZATION SAFETY:** Release gate follows integration; platform checks may run in parallel on isolated runners.
-- **POTENTIAL CONFLICTS:** Untracked standalone package content, native toolchains, fork/upstream compatibility.
+- **POTENTIAL CONFLICTS:** Private ticket submodule access, native toolchains, fork/upstream compatibility.
 
 ## First execution cycle result and next allocation
 
 1. **TW-01:** user authorized the slice. A fresh Luna xhigh worker implemented it exclusively in the runtime capture seam; the first fresh Sol xhigh review found a pre-attestation deadline gap, the worker corrected it, and a second fresh Sol xhigh review passed. The implementation is committed locally at `0c4b53ac2`. Focused tests passed 12/12; the reviewer ran 27 related tests; Node typecheck and changed-code quality passed. The previous main Luna session remains historical evidence only.
-2. **TW-00 audit:** a separate fresh Luna xhigh worker recorded [ticket-source-audit.md](./ticket-source-audit.md) and [ticket-source-files.sha256](./ticket-source-files.sha256). The manifest was checked against the WSL checkout. No ticket-package tests ran because Linux Node is absent. TW-00 remains open.
-3. **Next allocation:** prepare a source publication candidate, then publish the complete ticket checkout to a retrievable private revision and verify it from a fresh retrieval with Linux Node/pnpm. The user proposed pinning that separate repository as an Orca submodule; assess public-fork clone/CI access before integrating the gitlink. TW-02, TW-04A, TW-05, and TW-06T remain gated on TW-00.
+2. **TW-00:** a separate fresh Luna xhigh worker recorded [ticket-source-audit.md](./ticket-source-audit.md) and the prepublication manifest, then prepared the exact 128-file source candidate. A worker committed/pushed it to private `lighteko/ticket-workspace`; fresh clone, [published hashes](./ticket-published-source.sha256), 32 test files (314 passed, one skipped), and typecheck passed. A separate worker staged the user-approved Orca submodule gitlink at that commit. The original dirty source state is preserved in the audit record; the current source checkout is clean.
+3. **Next allocation:** review and commit the Orca submodule integration, then use the pinned source for bounded TW-02 owner-mapping and TW-05 command-authority contract discovery in parallel with disjoint read-only ownership. TW-04A contract fixtures may start after shared role/resource semantics are frozen. TW-06T requires an authenticated resident transport protocol and owner lifecycle contract, not merely source availability. Public `clear` remains blocked on all live owner evidence.
