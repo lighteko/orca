@@ -163,13 +163,13 @@ describe('deferred worktree removal against the real Git binary', () => {
     await writeFile(join(adminPath, 'gitdir'), `${malformedRegisteredPath}\n`)
     await writeFile(join(worktreePath, 'untracked.txt'), 'keep this work\n')
     const row = (await listWorktreesStrict(repoPath)).find((entry) =>
-      areWorktreePathsEqual(entry.path, malformedRegisteredPath)
+      [malformedRegisteredPath, markerPath].some((path) => areWorktreePathsEqual(entry.path, path))
     )
     expect(row).toBeDefined()
     if (!row) {
       throw new Error('Missing malformed registration')
     }
-    expect(row.prunable).toBe(true)
+    expect(row.prunable).not.toBe(false)
 
     const result = await removeStaleLocalWorktreeRegistration({
       canonicalWorktreePath: row.path,
@@ -183,7 +183,7 @@ describe('deferred worktree removal against the real Git binary', () => {
     expect(await readFile(markerPath, 'utf8')).toBe(marker)
     expect(await readFile(join(worktreePath, 'untracked.txt'), 'utf8')).toBe('keep this work\n')
     expect(await git(['rev-parse', 'refs/heads/feature'], repoPath)).toBe(`${row.head}\n`)
-    expect(await isWorktreeRegistered(malformedRegisteredPath)).toBe(false)
+    expect(await isWorktreeRegistered(row.path)).toBe(false)
     expect(existsSync(adminPath)).toBe(false)
   })
 

@@ -1,8 +1,9 @@
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, realpathSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { runProcess } from '../../shared/child-process/run-process'
+import { removeTreeSync } from '../../shared/windows-transient-lock-removal'
 import { readNativeGitEffectiveWorktreeSubject } from './native-worktree-subject-attestation'
 import { readNativeGitOperationMarkers } from './native-git-operation-marker-capture'
 
@@ -10,7 +11,7 @@ let scratchDirectory = ''
 
 afterEach(() => {
   if (scratchDirectory) {
-    rmSync(scratchDirectory, { recursive: true, force: true })
+    removeTreeSync(scratchDirectory)
     scratchDirectory = ''
   }
 })

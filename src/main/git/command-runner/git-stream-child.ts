@@ -1,6 +1,7 @@
-import { spawn, type ChildProcess, type SpawnOptions } from 'node:child_process'
 import { performance } from 'node:perf_hooks'
 import { StringDecoder } from 'node:string_decoder'
+import { spawnProcess } from '../../../shared/child-process/run-process'
+import type { ProcessSpec } from '../../../shared/child-process/process-spec'
 import { recordSubprocessSpawn } from '../../diagnostics/main-thread-churn-probe'
 import { createAbortError } from './abort-error'
 import { killSpawnedCommandTree } from './spawned-command-tree-kill'
@@ -30,7 +31,7 @@ export function streamGitChild(
       reject(createAbortError())
       return
     }
-    const stdio: SpawnOptions['stdio'] = ['ignore', 'pipe', 'pipe']
+    const stdio: ProcessSpec['stdio'] = ['ignore', 'pipe', 'pipe']
     const spawnOptions = {
       cwd: options.cwd,
       env: nonInteractiveGitEnv(gitOptions.env),
@@ -38,15 +39,16 @@ export function streamGitChild(
       wslDistro: options.wslDistro,
       windowsHide: true
     }
-    let child: ChildProcess
+    let child: ReturnType<typeof gitSpawn>
     if (command.wslMode === 'direct-git') {
       observeSpawnRoute(command)
       const spawnStartedAt = performance.now()
-      child = spawn(command.binary, command.args, {
+      child = spawnProcess({
+        program: command.binary,
+        args: command.args,
         cwd: command.cwd,
         env: untranslatedGitOutputEnv(spawnOptions.env),
-        stdio: spawnOptions.stdio,
-        windowsHide: true
+        stdio: spawnOptions.stdio
       })
       recordSubprocessSpawn(command.binary, command.args, performance.now() - spawnStartedAt)
     } else {
