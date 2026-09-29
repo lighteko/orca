@@ -1,9 +1,9 @@
 # TW-00 published ticket-source content manifest
 # Captured: 2026-09-29
 # Repository: private lighteko/ticket-workspace (main)
-# Commit: 0b5ac0fbe34adfc4537be3f10ee0227807c0cccc
-# Tree: 5831ae7ab972284316a5d406fe3a89db4abef440
-# Git state at capture: clean; 132 tracked regular files.
+# Commit: 59714baa36e7573d910db907e94e21987fbd5fa9
+# Tree: bd753ba33a42d969124fd2dc1299805d295fd213
+# Git state at capture: clean; 133 tracked regular files.
 # Scope: every tracked regular file in the pinned commit, including contracts, CLI, fixtures, docs, lockfile, and spikes.
 # Excludes: .git metadata, node_modules, generated dist/build outputs, caches/temp, and ignored local data.
 # Format: sha256sum digest followed by checkout-relative path. Hashes are computed from Git blob bytes.
@@ -92,7 +92,8 @@ c0d0a35b89b33a93cc947cc952ceb1444d1a00e31d81897cba9edce08a058a80  packages/cli/t
 2bd25a9265077729522fbb4a7deecde55544ee5e061f0c431f0b843be0cfa130  packages/contracts/artifacts/ticket-workspace-contract-v1.json
 ad7a982a99a3cb184caded94f441a25311fec192697f8e1f35b6ae416057be76  packages/contracts/fixtures/ticket-repository-plan-evidence-v1.corpus.json
 e083a1838d3cea35f1cc0a67c08d5422d203d4266069725da0bb1c139bff7801  packages/contracts/fixtures/ticket-workspace-schema-v1.corpus.json
-1d9623eb8cd1772f417d7410dcb23979ec3a162dd11a4db6b12a7b9e057afabf  packages/contracts/package.json
+f9c83d7f8ad17fdacd00afd7041d6894a8a81a8fdb0044fa1764661ee427db1e  packages/contracts/package.json
+10139407bc955d038605c557f2c6b21da5dd54237cbb59d28d58463bc6feb0de  packages/contracts/scripts/clean-contract-dist.mjs
 bd7f560c2d1920b6bc73479ecc3eecea19a2618930ae966815b0f6788e884be2  packages/contracts/src/canonical-json-v1.ts
 bb3e6a7c13e7f4492d62c4d15835ca65513e319da2f62e23736be7c5c3d17da5  packages/contracts/src/generate-ticket-contract-artifact-v1.ts
 ae4f84dd2b731732da135666dbf0cf04e4fab89d148a8f2f21389ca1ad9788c9  packages/contracts/src/sha256-utf8-v1.ts
