@@ -36,7 +36,7 @@ Evidence labels: **FACT** is confirmed in this checkout or by recorded test/CI o
 
 - TW-01 is implemented, reviewed and pushed. Its blocking pre-attestation deadline finding was corrected; focused tests passed (12/12), Node typecheck and changed-code quality passed.
 - TW-00's bounded source audit, private publication, fresh-clone hash verification, and initial-revision package replay are complete. The current private source at `ec2dc67` has a 148-blob manifest, 51 focused contract tests/typecheck and an independently reviewed TW-00N candidate. See [ticket-source-audit.md](./ticket-source-audit.md) and [ticket-published-source.sha256](./ticket-published-source.sha256).
-- Read-only TW-02, TW-05, and TW-06T contract discovery found source/owner gaps. The next TW-00C/TW-00F delivery-preparation allocation awaits user approval; no live provider, effect gateway, resident transport, or public contract copy is authorized by source publication alone.
+- Read-only TW-02, TW-05, and TW-06T contract discovery found source/owner gaps. The user approved TW-00C/TW-00F private delivery preparation in the continuing Luna session; no live provider, effect gateway, resident transport, or public contract copy is authorized by that approval.
 
 ## Current Repository State
 
@@ -146,7 +146,7 @@ DECISION: The ticket domain owns canonical ticket/role/external-resource state; 
 
 TW-01 implementation and independent review are complete. Remaining dependency order:
 
-1. TW-00N passed its private candidate, parity, size, pin and independent review gates. If the next allocation is approved, prepare TW-00C's narrow semantic validator delivery and TW-00F's reconciled fixture IPC/corpus in the continuing Luna contract/fixture session. Prove exact publishable bytes and ordinary-public-CI-safe replay before requesting separate rights approval for public copying. Keep the historical full-`/v1` candidate as fallback.
+1. TW-00N passed its private candidate, parity, size, pin and independent review gates. The user approved preparation of TW-00C's narrow semantic validator delivery and TW-00F's reconciled fixture IPC/corpus in the continuing Luna contract/fixture session; work is in progress. Prove exact proposed distribution bytes and ordinary-public-CI-safe replay before requesting separate rights approval for public copying. Keep the historical full-`/v1` candidate as fallback.
 2. Build and independently validate TW-06F fixture main/preload boundary and TW-02 exact owner mapping before TW-07F fixture Tickets tree. These restore original M4/M5 read-only acceptance; no fixture can claim live `current` or authorize ticket mutation/effects. Existing workspace navigation requires exact TW-02 revalidation.
 3. In separate live branches, freeze TW-06P/TW-06T producer/resident protocol, TW-05G root authority and TW-04A resource universe. Cut over TW-06/TW-07 only after their predecessors; compose TW-03 production evidence only after every owner source is proven. Public `clear` remains prohibited until all completeness/freshness contracts are joined.
 
