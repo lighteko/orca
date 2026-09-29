@@ -4,7 +4,7 @@
 - Repository: `lighteko/orca`, branch `feature/ticket-workspace-orca-seams`
 - Product-code baseline: `d500f2d474e6cde2c86b2808f26088b858ce760e` (`Fix cross-version upstream release tag fetch`); recovery documents were committed locally afterward.
 - PR: [#1](https://github.com/lighteko/orca/pull/1)
-- Status: TW-01 owner freshness was committed locally at `0c4b53ac2f9c1711c3915ae550b45baef4c5d5dd` and passed independent Sol review. The ticket source is published privately; its Orca submodule gitlink is staged for integration. The local Orca branch remains ahead of the remote branch.
+- Status: TW-01 owner freshness was committed locally at `0c4b53ac2f9c1711c3915ae550b45baef4c5d5dd` and passed independent Sol review. The ticket source is published privately and pinned as an Orca submodule in local commit `d1f86d608`. The local Orca branch remains ahead of the remote branch.
 - Authority for global sequencing: Sol Orchestrator. This file is implementation evidence, not a task scheduler.
 - Recovery-verified execution dependencies and allocation: [task-graph.md](./task-graph.md).
 
@@ -28,14 +28,15 @@ Evidence labels: **FACT** is confirmed in this checkout or by recorded test/CI o
 
 ### FACT — checkout boundary
 
-- This is the Orca repository. Its root pnpm workspace does not own the standalone ticket-domain packages; the separate private repository is pinned as a staged `ticket-workspace/` submodule. Orca's recent implementation remains host-side runtime/native code plus tests and CI.
+- This is the Orca repository. Its root pnpm workspace does not own the standalone ticket-domain packages; the separate private repository is pinned as the `ticket-workspace/` submodule. Orca's recent implementation remains host-side runtime/native code plus tests and CI.
 - The detailed `docs/ticket-workspace-work-plan.md`, implementation spec, and evidence-provider notes remain locally ignored because `.gitignore` excludes `docs/**`. Their M1 completion checklist is historical context; the bounded M1 source and package tests can now be independently verified from the pinned private submodule. Do not make unpublished local notes a hidden dependency for fresh-clone workers.
 - The GitHub fork `lighteko/orca` has no stable release tags. Its parent/source is `stablyai/orca`; fetching authentic stable refs from that source is required for the cross-version CI lane.
 
 ## In Progress
 
 - TW-01 is implemented and committed locally. It passed a fresh Sol review after a blocking pre-attestation deadline finding was corrected; focused tests passed (12/12), Node typecheck and changed-code quality passed.
-- TW-00's bounded source audit, private publication, fresh-clone hash verification, and current package test/typecheck replay are complete. The Orca submodule gitlink is staged and awaiting integration review/commit. See [ticket-source-audit.md](./ticket-source-audit.md) and [ticket-published-source.sha256](./ticket-published-source.sha256).
+- TW-00's bounded source audit, private publication, fresh-clone hash verification, and current package test/typecheck replay are complete. The Orca submodule gitlink passed fresh Sol review and was committed locally at `d1f86d608`. See [ticket-source-audit.md](./ticket-source-audit.md) and [ticket-published-source.sha256](./ticket-published-source.sha256).
+- Parallel read-only TW-02, TW-05, and TW-06T contract discovery found source/owner gaps. Implementation allocation is being revalidated; no live provider, effect gateway, or resident transport is authorized by source publication alone.
 
 ## Current Repository State
 
@@ -54,6 +55,14 @@ DECISION: The ticket domain owns canonical ticket/role/external-resource state; 
 - **FACT:** The standard `pnpm test` entrypoint stopped in native-runtime preflight before Vitest because local patched Windows native modules are missing and this PC has no MSVC C++ toolchain. This is a local verification limit, not a product-test failure; the recorded CI evidence covers native build/load on baseline `d500f2d47`.
 - **FACT:** The WSL shell itself has no Linux Node, so a disposable `node:22` container replayed the exact audited 128-file copy. With Node 22.23.2, pnpm 12.0.0, WSL ext4 `TMPDIR`, and `WSL_DISTRO_NAME=Ubuntu-24.04`, the current package test run passed 314 tests with one skipped across 32 files; typecheck passed. Initial failures on overlay `/tmp` with no distro identity were environment setup failures, not reproduced source defects.
 - **RISK:** Source presence and test replay do not establish live owner observations, authenticated resident transport, root command authority, or all task-specific contracts. Do not release those implementations solely because TW-00 source publication passed.
+
+### Contract discovery checkpoint, 2026-09-29
+
+- **FACT:** Ticket `WorkspaceRefV1` git-worktree fields map to Orca's five-field `WorktreeCatalogBindingRequest`; the ticket repository ID must equal `workspaceRef.repoId` at the join because the catalog validator does not enforce it. The ticket authority's WSL host and the workspace execution host are represented separately and cannot be inferred equal. Orca's native binder independently checks host, instance, alias, route, registration, and catalog currentness. The published ticket source is in a separate package graph, and Orca has no ticket-contract dependency or validated ticket-to-owner transport today.
+- **FACT:** The ticket catalog stores only optional coordinator location/reference and a shallow artifact schema/revision; orchestration correlation has Run/dispatch/request IDs but no pane or binding generation. Orca owns Run binding and increments `consumer_generation`, but the inspected binding transactions do not fence an external ticket effect.
+- **FACT:** The ticket package defines a strict 2 MiB navigator snapshot DTO and fixtures but has no production snapshot producer, authenticated resident protocol, or endpoint lifecycle. Its `status` CLI emits a different one-shot report. Invoking WSL/CLI on a snapshot read would violate the no-start contract.
+- **DECISION:** Keep the ticket source/subject tuple and `WorkspaceRef` ticket-owned, and keep Orca catalog tokens, Run/pane evidence, and TW-01 observation fields owner-internal. Freeze shared field/provenance rules before parallel implementation; this does not add a TW-02 implementation dependency to TW-05 or TW-06T.
+- **OPEN:** Choose how validated ticket protocol data reaches Orca without importing lifecycle code or creating a second schema owner. Freeze TW-05 coordinator/artifact and root command-authority contracts, and TW-06T producer/authenticated transport/setup contracts, before their respective implementation slices. Do not treat fixture admission's `mutationAllowed` flag as live effect authorization.
 
 ### Plan versus repository reality
 
@@ -113,9 +122,8 @@ DECISION: The ticket domain owns canonical ticket/role/external-resource state; 
 
 TW-01 implementation and independent review are complete. Remaining dependency order:
 
-1. Integrate and review the staged Orca gitlink to the verified private ticket source. Public Orca exposes the submodule URL and commit ID; authorized developers initialize it separately, and ordinary CI does not fetch it by default.
-2. Freeze the ticket `WorkspaceRef` to Orca owner mapping using the published contract and the TW-01 internal capture (TW-02). In parallel, investigate disjoint external-resource, command-authority, and resident-transport contract gaps before assigning their implementation.
-3. Resolve root gateway, resident transport, external-resource and other owner-source contracts on their DAG branches, then compose the conservative production provider and plan projection. Public `clear` remains prohibited until every source completeness/freshness contract is joined.
+1. Freeze the ticket `WorkspaceRef` to Orca owner mapping using the published contract and the TW-01 internal capture (TW-02). Read-only contract discovery can run in parallel with disjoint command-authority (TW-05) and resident-transport (TW-06T) investigation; implementation follows contract decisions.
+2. Resolve root gateway, resident transport, external-resource and other owner-source contracts on their DAG branches, then compose the conservative production provider and plan projection. Public `clear` remains prohibited until every source completeness/freshness contract is joined.
 
 ## Parallel work and allocation
 
