@@ -103,6 +103,11 @@ docs/**
 !docs/readme/
 !docs/readme/**
 !docs/STYLEGUIDE.md
+!docs/reference/ticket-workspace-state/
+!docs/reference/ticket-workspace-state/master-plan.md
+!docs/reference/ticket-workspace-state/project-state.md
+!docs/reference/ticket-workspace-state/review-findings.md
+!docs/reference/ticket-workspace-state/task-graph.md
 !docs/agent-skill-sharing-implementation-checklist.md
 !docs/mobile-terminal-shortcut-bar.md
 !docs/reference/
