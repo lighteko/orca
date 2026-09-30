@@ -13,6 +13,7 @@
     "config/ticket-workspace-fixture-v1/fixture-ipc-corpus-v1.json",
     "config/ticket-workspace-fixture-v1/historical-orca-ipc-boundary-v1.corpus.json",
     "config/ticket-workspace-fixture-v1/preload-entry.mjs",
-    "config/ticket-workspace-fixture-v1/replay.mjs"
+    "config/ticket-workspace-fixture-v1/replay.mjs",
+    "docs/reference/ticket-workspace-state/resident-ticket-transport-v1-golden-vectors.json"
   ]
 }

@@ -49,3 +49,6 @@
 /config/ticket-workspace-fixture-v1/preload-entry.mjs text eol=lf
 /config/ticket-workspace-fixture-v1/replay.mjs text eol=lf
 /config/ticket-workspace-contracts-v1/lighteko-ticket-workspace-contracts-1.0.0.tgz -text
+# Reviewed resident vectors are approved as exact Git bytes.
+/docs/reference/ticket-workspace-state/resident-ticket-transport-v1-golden-vectors.json text eol=lf
+/docs/reference/ticket-workspace-state/resident-ticket-projection-vectors.md text eol=lf
