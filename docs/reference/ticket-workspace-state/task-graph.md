@@ -9,7 +9,9 @@ TW-00 ──> TW-00C + TW-00F; TW-00 ──> TW-00N ──> TW-00C (optional nar
 TW-00C + TW-00F ──> TW-06F; TW-06F + TW-02F ──> TW-07F (original M4/M5 fixture checkpoint)
 M0 ──> TW-01; TW-00C + TW-01 ──> TW-02F
 TW-00 + reviewed logical-v1 protocol and vectors ──> TW-06P injected projector/handler
-TW-06P injected tests + approved vector bytes ──> TW-06P-F1 private fixture portability ──> TW-00-R1 Windows test isolation ──> current-pin standalone CLI replay
+TW-06P injected tests + approved vector bytes ──> TW-06P-F1 private fixture portability ──> TW-00-R1 Windows test isolation ──> TW-00-R2 clean-Linux CI
+TW-00-R2 first native-Linux run ──> TW-00-R3A SQLite test boundary + TW-00-R3B state-root test boundary ──> native-Linux full-suite rerun
+TW-00-R3A + TW-00-R3B ──> separate disposable real-WSL success-path replay
 TW-00 ──> TW-M1P base runtime/profile delivery
 reviewed logical-v1 protocol and vectors ──> TW-06T fake-duplex client; TW-M1P + TW-06P service artifact + production host/key/endpoint proofs ──> TW-06T production setup
 TW-02F + production TW-06P service/TW-06T authenticated lease + P4/P5 owner eligibility ──> TW-02L (authenticated live owner composition)
@@ -45,7 +47,7 @@ TW-01, TW-02F and TW-06F passed independent review; TW-00's private publication,
 
 ### TW-00 — Verify the ticket-domain source and publish its contracts
 
-- **STATUS:** Complete. Initial private commit `2045808ffdb6baead2e659855cefb02f7b36491c` (128 files) was fresh-cloned and hash-verified; isolated Linux tests passed 314 with one skipped, plus typecheck. The later snapshot-delivery commit `31b3768e8043b6aeef66f0fe0fe648439ba80b2b` (tree `150b23c5c7380f255c86d229a04e8f97c3366987`; 157 files) is covered by [the published Git-blob manifest](./ticket-published-source.sha256) and passed 51 contract tests plus source/fixture VM replay. Private pin `54477c2371094f1cbc438845fdfde0ca3584e2aa` added the reviewed TW-04A common contract; its contract package passed 53 tests and typecheck. Private `f0b3181` added reviewed injected producer code; published `f7d66d1` adds its source-local test fixture, and reviewed local `9f10125` isolates a Windows preflight test. The 23 focused resident tests passed in an isolated source checkout; the full Windows CLI suite at the local successor passed 250 with 41 skipped and typecheck passed. Clean dependency installation and the full Linux/ext4 CLI suite remain open. The user-approved Orca submodule gitlink was initially committed at `d1f86d608`, advanced to `f0b3181` in PR code HEAD `a29bc2169`, and then to `f7d66d1` in PR HEAD `1ed22dd12`; the local parent candidate advances to `9f10125`.
+- **STATUS:** Complete within its bounded publication scope. Initial private commit `2045808ffdb6baead2e659855cefb02f7b36491c` (128 files) was fresh-cloned and hash-verified; isolated Linux tests passed 314 with one skipped, plus typecheck. The later snapshot-delivery commit `31b3768e8043b6aeef66f0fe0fe648439ba80b2b` (tree `150b23c5c7380f255c86d229a04e8f97c3366987`; 157 files) is covered by [the published Git-blob manifest](./ticket-published-source.sha256) and passed 51 contract tests plus source/fixture VM replay. Private pin `54477c2371094f1cbc438845fdfde0ca3584e2aa` added the reviewed TW-04A common contract; its contract package passed 53 tests and typecheck. Private `f0b3181` added reviewed injected producer code; `f7d66d1` added its source-local test fixture; `9f10125` isolated a Windows preflight test and passed 250 Windows CLI tests with 41 skipped plus typecheck. Orca PR HEAD `c4e87fa3b` pins `9f10125` and passed 31 checks with eight skipped. Private `8322dbf` added clean-Ubuntu CI: installation, build, typecheck and ext4 checks passed, while the full CLI suite found 12 WSL-assumption test failures. The full native-Linux and actual-WSL replay gates remain open.
 - **GOAL:** Verify the located WSL ticket checkout's M1 contract, ledger/CAS, doctor/status/plan, and fixture claims against its current source and tests, then make their content provenance portable.
 - **DEPENDENCIES:** None; historical plan and current Orca checkout are inputs.
 - **OWNERSHIP:** Sol Orchestrator for source identification and shared-state update; a fresh Luna worker may perform bounded read-only inventory once the source is identified.
@@ -61,7 +63,7 @@ TW-01, TW-02F and TW-06F passed independent review; TW-00's private publication,
 
 ### TW-00-R1 — Isolate the Windows missing-ledger preflight test
 
-- **STATUS:** The user approved a one-file test correction; continuing Luna implemented it in local private commit `9f10125366f878cab66a9912d6b5b88b8f86c942`, and fresh Sol independently approved the diff. The Windows CLI suite passed 250 tests with 41 skipped, CLI typecheck passed, and the independent preflight run passed 34/34. This local commit is not yet published. Clean-install Linux/ext4 replay remains open.
+- **STATUS:** The user approved a one-file test correction; continuing Luna implemented it in published private commit `9f10125366f878cab66a9912d6b5b88b8f86c942`, and fresh Sol independently approved the diff. The Windows CLI suite passed 250 tests with 41 skipped, CLI typecheck passed, and the independent preflight run passed 34/34. Orca PR HEAD `c4e87fa3b` pins it and passed 31 checks with eight skipped after a Windows package job rerun. Clean native-Linux full-suite replay remains open.
 - **GOAL:** Make the missing-ledger classification test independent of the host filesystem and UID while preserving production fail-closed behavior.
 - **DEPENDENCIES:** Published private `f7d66d1`, the reproduced Windows-only test failure, a reviewed one-file fix and explicit user approval.
 - **OWNERSHIP:** Continuing Luna ticket producer workstream, restricted to the private preflight test; Sol owns cross-repository publication and state.
@@ -70,10 +72,58 @@ TW-01, TW-02F and TW-06F passed independent review; TW-00's private publication,
 - **OUTPUT CONTRACT:** Deterministic absent-discovery result for that case only; unchanged production preflight and all original verdict/reason/no-write assertions.
 - **CONSTRAINTS:** No platform skip, weakened assertion, production behavior change, or alternate schema owner.
 - **DO_NOT_TOUCH:** Private `packages/cli/src/`, other tests, lockfiles, Orca code/UI, active WSL/Docker state.
-- **ACCEPTANCE CRITERIA:** One-file diff; focused Windows preflight and full filtered CLI suite plus CLI typecheck pass; independent review approves. Publication and clean Linux/ext4 replay remain separately tracked.
+- **ACCEPTANCE CRITERIA:** One-file diff; focused Windows preflight and full filtered CLI suite plus CLI typecheck pass; independent review approves. Publication is complete; clean Linux/ext4 replay remains separately tracked.
 - **VERIFICATION:** Worker focused case 1/1, full CLI 250 passed/41 skipped and typecheck; fresh Sol preflight 34/34 and diff review; `git diff --check` passed.
 - **PARALLELIZATION SAFETY:** Test-only path is disjoint from Orca runtime/contract research; serialize private test edits and publication with the current-pin replay baseline.
 - **POTENTIAL CONFLICTS:** The corrected unit test no longer exercises real filesystem discovery; its production fail-closed cases remain in separate tests. Windows inherited dependencies do not prove a clean Linux install or full Linux/ext4 CLI suite.
+
+### TW-00-R2 — Verify a clean native-Linux CLI installation and full suite
+
+- **STATUS:** Private workflow `verify-linux-cli.yml` was independently reviewed and published at `8322dbf`. Its first fresh Ubuntu 24.04 run passed ext4, exact Node/pnpm, frozen install, build and typecheck. Contracts passed 53/53; CLI tests passed 264, skipped 15 and failed 12 in two WSL-assumption test files. This gate remains open.
+- **GOAL:** Prove the current private source can be installed and exercised from a clean native Linux/ext4 checkout, with explicit skip and failure counts.
+- **DEPENDENCIES:** The first run used the published TW-00-R1 pin and a fresh hosted runner. Closure depends on TW-00-R3A and TW-00-R3B corrections before rerun.
+- **OWNERSHIP:** Private CI workflow is owned by the M1P delivery workstream; the two test files have separate existing Luna workstream owners. Sol owns integration, publication and evidence claims.
+- **FILES / MODULES LIKELY INVOLVED:** `ticket-workspace/.github/workflows/verify-linux-cli.yml`; two test files specified below. No Orca product code.
+- **INPUT CONTRACT:** Fresh Ubuntu 24.04 VM, Node 22.23.2, pnpm 12.0.0, ext4 checkout and Node temporary path, exact checkout SHA, frozen lockfile.
+- **OUTPUT CONTRACT:** Reproducible build/typecheck/full native-Linux test result. This output does not attest actual WSL, offline Node/npm artifact closure, profile delivery or resident setup.
+- **CONSTRAINTS:** No dependency cache, secrets, submodules, WSL spoofing in CI, production WSL-guard bypass or lockfile policy relaxation.
+- **DO_NOT_TOUCH:** Production CLI/runtime behavior, user's active WSL distro, stopped Docker engine, Orca UI and live ticket seams.
+- **ACCEPTANCE CRITERIA:** Clean frozen install, build and typecheck pass; full native-Linux suite reaches zero failures with reported native and WSL-only skips; a separate genuine WSL run remains required for positive WSL setup flows.
+- **VERIFICATION:** [First CI run](https://github.com/lighteko/ticket-workspace/actions/runs/36680256035) records the 12-test failure baseline. Rerun the same workflow after both test packets, inspect exact SHA, toolchain, ext4 and per-package counts; fresh Sol reviews the integrated test diff.
+- **PARALLELIZATION SAFETY:** R3A/R3B edits are disjoint and may run in parallel; serialize shared local build/test and integrate before the CI rerun.
+- **POTENTIAL CONFLICTS:** Native Ubuntu correctly fails the production WSL kernel gate. A green native run cannot be presented as actual WSL coverage.
+
+### TW-00-R3A — Isolate the SQLite coordination tests' WSL host witness
+
+- **STATUS:** Fresh Sol validated a one-file test-only candidate after the first TW-00-R2 run; user approval for implementation is pending.
+- **GOAL:** Exercise real SQLite/ext4 contention and identity behavior on native Linux while separately proving that the real host guard rejects native Ubuntu.
+- **DEPENDENCIES:** TW-00-R2 failure baseline and explicit user approval.
+- **OWNERSHIP:** Existing Luna authority/fence workstream; `ticket-workspace/packages/cli/test/sqlite-process-fence.test.ts` only.
+- **FILES / MODULES LIKELY INVOLVED:** That test file only.
+- **INPUT CONTRACT:** Exact-path test witness for `/proc/sys/kernel/osrelease` only during six coordination cases; real SQLite, statfs and temporary ext4 roots.
+- **OUTPUT CONTRACT:** Coordination cases execute their intended lock behavior; an unmocked native rejection and missing-root assertion cover the distinct fail-closed cases.
+- **CONSTRAINTS:** No production override, broad `/proc` mock, hidden platform skip, altered lock implementation or assertion weakening.
+- **DO_NOT_TOUCH:** Production source, state-root preparation test, workflow, Orca repository files.
+- **ACCEPTANCE CRITERIA:** Six coordination cases pass on native ext4; native forged-WSL descriptor rejects before root creation; missing/mismatched distro and missing-root behavior remain explicit. Real WSL acceptance remains separate.
+- **VERIFICATION:** Focused test, typecheck, then combined clean CI and fresh Sol semantic review.
+- **PARALLELIZATION SAFETY:** File ownership is disjoint from R3B; serialize shared build/test execution.
+- **POTENTIAL CONFLICTS:** Mock interception of Node's imported file read must be exact and restored; otherwise prefer a reviewed test-only seam, never a production caller bypass.
+
+### TW-00-R3B — Gate state-root preparation success cases on actual WSL
+
+- **STATUS:** Fresh Sol validated a one-file test-only candidate after the first TW-00-R2 run; user approval for implementation is pending.
+- **GOAL:** Retain native preview and negative coverage while running WSL setup and CLI success expectations only on a real WSL host.
+- **DEPENDENCIES:** TW-00-R2 failure baseline and explicit user approval.
+- **OWNERSHIP:** Existing Luna M1P delivery workstream; `ticket-workspace/packages/cli/test/ticket-workspace-state-root-preparation-v1.test.ts` only.
+- **FILES / MODULES LIKELY INVOLVED:** That test file only.
+- **INPUT CONTRACT:** Actual Microsoft kernel signature plus matching WSL distro evidence for six confirmation-dependent cases.
+- **OUTPUT CONTRACT:** Native Linux retains preview/early rejection cases and asserts child CLI blocks forged WSL_DISTRO_NAME without creating state root; six positive cases run on genuine WSL.
+- **CONSTRAINTS:** No production host-guard bypass, injected child-CLI backdoor, broad file skip or assertion weakening.
+- **DO_NOT_TOUCH:** Production source, SQLite fence test, workflow, Orca repository files.
+- **ACCEPTANCE CRITERIA:** Native job has no false WSL-positive expectation; positive preparation and CLI cases execute on genuine WSL; production default still fails closed on native Linux.
+- **VERIFICATION:** Focused test, typecheck, then combined clean CI, separate disposable WSL run and fresh Sol review.
+- **PARALLELIZATION SAFETY:** File ownership is disjoint from R3A; serialize shared build/test execution.
+- **POTENTIAL CONFLICTS:** Checking only `process.platform` or setting WSL_DISTRO_NAME is insufficient; a native green job does not verify successful real WSL confirmation.
 
 ### TW-00C — Deliver the ticket-owned semantic contract to Orca
 
@@ -442,6 +492,6 @@ The accepted fixture M5 is a completed prerequisite. The nine rows below name pr
 | TW-M1P profile delivery | The reviewed base-runtime/profile proposal is ready for publisher, channel, trust-root, host-binding and target decisions; isolated Node/npm closure replay may run when a disposable Linux harness exists. | Production install/update/rollback code remains gated. TW-06T production setup consumes this verified base together with the separate TW-06P service artifact. |
 | TW-06 live cache/overlay contract | The source survey and independent Sol review are complete; the Orchestrator can draft cache partition, high-water/restart, clock/current/stale, mixed unsupported, producer-policy and overlay rules beside other contract work. | Freeze the overlapping rules together with TW-06P/T's source/transport protocol. Live cache/IPC code waits for TW-06P/T; matched-overlay publication additionally waits for TW-02L. Keep the reviewed TW-07F fixture IPC/sidebar boundary intact. TW-09/TW-10 remain downstream. |
 
-These nine rows record the complete audited **production preparation** frontier, not nine code-ready feature workers. TW-07F fixture M5 is accepted and CI-verified, the TW-08 matrix passed review, and the logical-v1 TW-06P/T injected protocol and implementation passed independent review. Production P1–P8 proofs remain open. TW-02L, TW-05, TW-04A, TW-03 and TW-M1P need their named owner evidence or delivery choices before production code. Docker and IIS owner evidence can be collected independently within TW-04A. TW-06P-F1 is published at private `f7d66d1`; TW-00-R1 is an independently reviewed local test-fix candidate at `9f10125`. A clean full private CLI replay should target the published successor pin in a disposable Linux/ext4 environment. TW-06T production setup remains downstream of the verified base runtime/profile and producer service artifact. TW-05 enrollment and TW-04A typed resources share one strict catalog-compatibility decision before either modifies v1 readers or CAS.
+These nine rows record the complete audited **production preparation** frontier, not nine code-ready feature workers. TW-07F fixture M5 is accepted and CI-verified, the TW-08 matrix passed review, and the logical-v1 TW-06P/T injected protocol and implementation passed independent review. Production P1–P8 proofs remain open. TW-02L, TW-05, TW-04A, TW-03 and TW-M1P need their named owner evidence or delivery choices before production code. Docker and IIS owner evidence can be collected independently within TW-04A. TW-06P-F1 is published at private `f7d66d1`; TW-00-R1 is published at `9f10125` and pinned by Orca PR HEAD `c4e87fa3b`, whose CI passed 31 checks with eight skipped after one Windows job rerun. The reviewed private workflow at `8322dbf` proved clean native ext4 installation, build and typecheck, but its full CLI run found 12 WSL-assumption test failures. R3A/R3B are disjoint test-only candidates awaiting approval; genuine WSL success and TW-M1P offline artifact closure remain separate gates. TW-06T production setup remains downstream of the verified base runtime/profile and producer service artifact. TW-05 enrollment and TW-04A typed resources share one strict catalog-compatibility decision before either modifies v1 readers or CAS.
 
 The 2026-09-30 post-publication fresh Sol audit found **zero additional production feature workers** ready; its one bounded code-ready verification fix, TW-06P-F1, is complete. The next production review gate is a setup packet covering TW-M1P target/publisher/receipt, TW-06P service manifest/entrypoint, and TW-06T endpoint/key/host proofs, in parallel with a P3/P6 high-water/currentness/IPC contract and a P4 same-read TW-02L owner-admission contract. Contract and evidence research may overlap across the nine rows; private catalog/profile/ledger edits, Orca main handler integration, fixture sidebar IPC, and action/effect authority remain serialized at their shared ownership seams.
