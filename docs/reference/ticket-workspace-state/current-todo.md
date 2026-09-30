@@ -21,7 +21,7 @@
 - [x] **TW-00C/F 공개 전달 통합:** 승인된 7개 파일, 고정 `file:` 의존성·잠금 파일·공개 PR 재생 단계를 넣었다. 로컬 검증·독립 Sol 리뷰와 [PR #1의 `cde43160f` 검사](https://github.com/lighteko/orca/actions/runs/36565823569)(31개 성공, 8개 건너뜀, 실패 0개)를 확인했다. 실제 main/preload 연결은 TW-06F다.
 - [x] **다음 병렬 경계 확정:** 독립 Sol이 [fixture 표시 DTO·owner 매칭·세 필드 이동 요청의 분리](./task-graph.md)를 검토했다. 공개 `snapshot.full`은 화면 표시에는 유효하지만 repository/ref가 달라 owner 매칭의 실패 사례다. 실제 매칭 성공 사례는 Orca 측에서 별도로 만든다.
 - [x] **TW-02F (owner workstream):** 검증된 fixture의 `WorkspaceRef`를 기존 Orca binder에 정확히 매핑하고, 이동 클릭 시 main에서 세 필드 selector로 다시 확인한다. 독립·통합 Sol 리뷰와 집중 테스트를 통과했다. Live owner 증거는 TW-02L에 남는다.
-- [x] **TW-06F (main/preload workstream, M4 fixture):** 승인된 계약으로 main/preload에서 검증하고 action·target 없는 ticket/workspace 표시 행만 투영한다. 실제 preload 번들의 22개 corpus 사례와 거부된 IPC fallback, 전체 타입 검사, 통합 Sol 리뷰를 통과했다. 화면 연결은 TW-07F에 남는다.
+- [x] **TW-06F (main/preload workstream, M4 fixture):** 승인된 계약으로 main/preload에서 검증하고 action·target 없는 ticket/workspace 표시 행만 투영한다. 실제 preload 번들의 22개 corpus 사례와 거부된 IPC fallback, 전체 타입 검사, 통합 Sol 리뷰를 통과했다. 화면 연결은 완료된 TW-07F에서 검증했다.
 - [x] **이번 통합 CI:** 최신 검토 구현 커밋 `8ba6d003e`의 [PR #1 검사](https://github.com/lighteko/orca/actions/runs/36587099645)는 31개 성공·8개 건너뜀·실패 0개다. Linux 패키지 작업에서 실제 preload 검증이 통과했다.
 - [x] **TW-07F 다음 단계 독립 리뷰:** M5 fixture tree가 다음 핵심 경로임을 확인했지만 기존 패킷은 수정 필요로 판정했다. 클릭 재매칭 IPC가 아직 없고, fixture는 실제 coordinator·agent·이슈 링크를 증명하지 않는다. [Task DAG의 수정 패킷](./task-graph.md)을 구현 전 검증한다.
 - [x] **TW-07F selector bridge:** main/preload의 정확한 match·click 재결합 계약을 구현하고 독립 Sol 재리뷰를 통과했다. 실제 preload 번들은 다른 revision·ticket·repository 응답을 거부하며, 배송된 fixture의 owner mismatch는 실패 사례로 유지한다.
