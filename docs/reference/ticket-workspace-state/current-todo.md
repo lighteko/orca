@@ -25,7 +25,7 @@
 - [x] **이번 통합 CI:** 최신 검토 구현 커밋 `8ba6d003e`의 [PR #1 검사](https://github.com/lighteko/orca/actions/runs/36587099645)는 31개 성공·8개 건너뜀·실패 0개다. Linux 패키지 작업에서 실제 preload 검증이 통과했다.
 - [x] **TW-07F 다음 단계 독립 리뷰:** M5 fixture tree가 다음 핵심 경로임을 확인했지만 기존 패킷은 수정 필요로 판정했다. 클릭 재매칭 IPC가 아직 없고, fixture는 실제 coordinator·agent·이슈 링크를 증명하지 않는다. [Task DAG의 수정 패킷](./task-graph.md)을 구현 전 검증한다.
 - [x] **TW-07F selector bridge:** main/preload의 정확한 match·click 재결합 계약을 구현하고 독립 Sol 재리뷰를 통과했다. 실제 preload 번들은 다른 revision·ticket·repository 응답을 거부하며, 배송된 fixture의 owner mismatch는 실패 사례로 유지한다.
-- [ ] **TW-07F M5 화면:** Phase A의 전체 행 접근, unavailable/error의 Projects 복귀, 탭/패널 연결과 폴더 드롭·Workspace board·Setup Script 설정 저장 경로를 수정하고 28개 집중 테스트를 통과했다. fresh Sol 재리뷰가 밝은 테마의 보이지 않는 키보드 선택/포커스, sidebar 밖 탭 색, fixture 상태 접근성 이름을 발견해 같은 Luna가 수정 중이다. 승인 뒤 정확한 Orca ID 이동·검증 가능한 상태 연결을 수행하고 M5 통합 리뷰를 받는다.
+- [ ] **TW-07F M5 화면:** Phase A의 전체 행 접근, Projects 복귀, 탭/패널 접근성, 폴더 드롭·Workspace board·Setup Script 차단, 틴트 대비를 수정했고 fresh Sol 리뷰를 통과했다. 같은 Luna가 Phase B의 selector 전용 클릭 재결합과 검증된 Orca ID 이동을 구현 중이다. 숨겨진 렌더러 E2E spec은 추가됐지만 스크린샷 실행, 긍정 합성 owner 이동, 최종 M5 통합 리뷰가 남았다.
 
 ## 지금 병렬로 준비할 수 있는 작업 축
 
