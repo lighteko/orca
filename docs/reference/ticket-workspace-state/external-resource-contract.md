@@ -1,6 +1,6 @@
 # TW-04A External Resource Identity and Evidence Contract
 
-**Status:** Decision draft. It proposes a common DTO and fixture semantics; it does not change schemas, implement adapters, authorize effects, or claim a live Docker/IIS route exists.
+**Status:** The common versioned DTO, semantic rules and synthetic fixture corpus were implemented and independently reviewed at private `54477c2`. Production Docker/IIS adapter identities, routes, owner proofs, complete discovery and effects remain open.
 
 **Source pin:** Ticket source commit `0b5ac0fbe34adfc4537be3f10ee0227807c0cccc`, tree `5831ae7ab972284316a5d406fe3a89db4abef440`. The current `/v1` contracts below are read from that pin. The older package-default contract is historical evidence only. A later private commit `59714baa36e7573d910db907e94e21987fbd5fa9` changes package build metadata and a clean script only; the resource-contract observations remain pinned to `0b5ac0fbe34adfc4537be3f10ee0227807c0cccc`.
 
@@ -8,7 +8,7 @@
 
 Keep the pinned `/v1` catalog as the current ledger and preserve it unchanged. Its `kind` is a resource category; its generic `intent.adapterId` and `intent.adapterVersion` are strings, not proof that an adapter exists. For any future typed row, use the closed discriminator tuple `(kind, adapterId, adapterVersion)` and require an exact ratified mapping to one typed intent and observation variant. Keep a resource-universe observation as a separate versioned result: one resource row observation does not prove discovery completeness.
 
-Evidence does not establish a production Docker or IIS adapter identity, physical resource decomposition, query route, owner marker, or complete inventory API. Therefore this draft does **not** ratify a production Docker/IIS pair or positive production fixture. Docker and IIS remain unsupported for typed discovery, clean-universe claims, or cleanup until their adapter owners provide the evidence in [Open owner decisions](#open-owner-decisions). The common DTO and synthetic validator fixtures below can be implemented without inventing those adapter details.
+Evidence does not establish a production Docker or IIS adapter identity, physical resource decomposition, query route, owner marker, or complete inventory API. Therefore this contract does **not** ratify a production Docker/IIS pair or positive production fixture. Docker and IIS remain unsupported for typed discovery, clean-universe claims, or cleanup until their adapter owners provide the evidence in [Open owner decisions](#open-owner-decisions). The implemented common DTO and synthetic validator fixtures do not supply those adapter details.
 
 ## Facts from the current source
 
@@ -206,7 +206,7 @@ The closed typed registry applies only to owner-ratified `(kind, adapterId, adap
 
 Common universe-envelope tests may use an injected, test-only adapter profile so they validate the shared DTO and rules without claiming that a production adapter exists. That profile is not part of the production registry and its IDs must not be copied into the catalog corpus. Do not add positive production Docker/IIS fixtures until their owners ratify the specific pair and query/identity variants.
 
-### Common DTO fixtures that can be implemented now
+### Reviewed common DTO synthetic fixture matrix
 
 - Complete one-page inventory with one ledger-linked item and one foreign/unmarked collision item; prove all items remain visible.
 - Complete multi-page inventory with exhausted continuation and stable snapshot/continuation evidence; preserve deterministic item ordering/digest.
@@ -239,10 +239,10 @@ Cleanup fixtures must keep foreign/shared/unmarked/changed/unlisted items residu
 
 Until the owner supplies this evidence and tests it against non-cooperating writers, the adapter remains unsupported for typed discovery, complete clean-universe claims, and cleanup. An explicitly narrower read can be reported only as exact-scope evidence; it cannot be promoted to a whole-authority result.
 
-## Bounded next implementation packet
+## Completed common packet and remaining production gates
 
-TW-04A may implement the common versioned universe DTO, its semantic rules, and the test-only injected-profile fixtures above in the ticket contract package. It may ratify a Docker or IIS typed pair only after its owner provides the corresponding evidence. Keep product effects, Orca runtime/schema changes, and live resource operations outside this packet.
+TW-04A implemented and independently reviewed the common versioned universe DTO, its semantic rules, and test-only injected-profile fixtures in the ticket contract package at private `54477c2`. A Docker or IIS typed pair may be ratified only after its owner provides the corresponding evidence. Product effects, Orca runtime/schema changes, and live resource operations remain outside this completed common packet.
 
-**Acceptance:** strict versioned universe DTO; exact source/ledger/adapter/route/scope/capture binding; independent completeness and freshness outcomes; fail-closed partial/permission/truncation/duplicate/clock behavior; complete-zero semantics; same physical identity across present discovery and read-back; generic v1 preservation and explicit catalog-v2 compatibility path; synthetic common fixture matrix passes. No positive production Docker/IIS identity fixture until an owner-ratified pair and query contract exist. If that input is missing, both adapters are explicitly unavailable for typed discovery/cleanup.
+**Accepted common scope:** strict versioned universe DTO; exact source/ledger/adapter/route/scope/capture binding; independent completeness and freshness outcomes; fail-closed partial/permission/truncation/duplicate/clock behavior; complete-zero semantics; same physical identity across synthetic present discovery and read-back; generic v1 preservation; synthetic common fixture matrix. Catalog-v2 compatibility and positive production Docker/IIS identity fixtures still require owner-ratified pairs and query contracts. Until then both adapters are unavailable for typed production discovery/cleanup.
 
 **DAG:** Keep TW-00 -> TW-04A; TW-04A + TW-05G -> TW-04B; TW-04B -> TW-03/TW-04C. TW-03 requires complete external universe coverage for each required scope in addition to per-resource evidence; missing or partial coverage stays unavailable/incomplete. No new cross-task edge is needed while the universe DTO remains in TW-04A. Adapter-owner evidence, actual route proof, clock handoff, and compatibility are TW-04A internal gates; a gated adapter cannot be admitted into TW-04B.

@@ -32,12 +32,14 @@
 
 TW-07F만 다음 작업인 것은 아니다. [전체 병렬 작업 경계](./task-graph.md#full-parallel-frontier-at-this-checkpoint)의 다음 항목은 서로 다른 소유 영역에서 계약·증거를 준비할 수 있다. 코드 구현 가능 시점은 각 선행 조건을 따른다.
 
-- [x] **TW-06T 전송 후보 조사:** Orca `spawnProcess`와 기존 WSL hook relay의 범위를 독립 Sol 리뷰로 확인했다. pinned WSL stdio는 주입형 테스트 후보이며 ticket용 인증·수명·clock 계약과 생산 endpoint는 아직 확정되지 않았다.
-- [x] **TW-06P projection 소스 조사:** catalog→snapshot direct 필드 매핑은 확인했지만 producer build ID, pruning/pruned/excluded target, SSH 혼합 상태, 같은 revision의 digest 충돌, clock currentness는 독립 Sol 리뷰에서 미결정으로 판정했다. 생산 projector/service는 아직 없다.
-- [x] **TW-06P 생산자 규칙 재검토:** 한 번의 bound catalog 읽기, 검증된 catalog의 canonical digest, catalog 전용 sequence 0, 실제 role, action/match 부재, 최종 직렬화 2 MiB 제한을 v1 기계적 기준으로 채택했다. 독립 Sol이 모든 pending transition ref를 일괄 제거하는 안을 거부했다. 대상 표시/클릭 억제와 SSH·high-water·clock 정책은 아직 열려 있다.
+- [x] **TW-06T 전송 후보 조사:** Orca `spawnProcess`와 기존 WSL hook relay의 범위를 독립 Sol 리뷰로 확인했다. pinned WSL stdio는 운영 endpoint 후보이며 주입형 클라이언트는 fake duplex에서만 검증됐다. 실제 endpoint·키 전달·호스트 수명 증명은 열려 있다.
+- [x] **TW-06P projection 소스 조사:** 초기 조사에서 catalog→snapshot 직접 필드와 build ID·대상 억제·SSH·high-water·clock 공백을 확인했다. 이후 P4/P5 주입형 projector는 구현·리뷰됐지만 운영 서비스 산출물과 currentness는 없다.
+- [x] **TW-06P 생산자 규칙 재검토:** 한 번의 bound catalog 읽기, 검증된 catalog의 canonical digest, catalog 전용 sequence 0, 실제 role, action/match 부재, 최종 직렬화 2 MiB 제한을 v1 기계적 기준으로 채택했다. 독립 Sol이 모든 pending transition ref를 일괄 제거하는 안을 거부했다. 이후 P4/P5 주입형 억제·SSH 정책이 검토됐으며 운영 host 매핑·high-water·clock 증명은 열려 있다.
 - [x] **TW-06P/T 주입형 논리 v1 계약:** 정확한 메시지·인증·투영 정책과 [공유 벡터](./resident-ticket-transport.md)가 2026-09-30 fresh Sol 독립 리뷰를 통과했다. 이 범위의 병렬 코드 작업과 새 벡터 파일 두 개의 공개 게시를 사용자가 각각 승인했다. 실제 WSL endpoint·자격증명·호스트 매핑·current/high-water의 운영 P1–P8 증명은 계속 열려 있다.
 - [x] **TW-06P 주입형 생산자:** 기존 Luna 티켓 소스 workstream이 순수 projector와 주입형 server/handler를 구현하고 비공개 `f0b3181`로 게시했다. source 검증·T1–T12·정확한 2 MiB·골든 프레임·시간 제한/취소를 포함한 집중 테스트 23개와 CLI 타입 검사가 통과했고 독립 Sol 코드 리뷰가 승인했다. 운영 서비스 실행과 current 게시는 범위 밖이다.
 - [x] **TW-06P-F1 비공개 테스트 이식성:** `f7d66d1`에 승인된 41,713바이트 골든 벡터를 비공개 test fixture로 고정하고 경로와 LF 속성을 수정했다. 단독 소스 checkout에서 로컬 의존성 junction을 사용해 집중 테스트 23개·CLI 타입 검사·해시를 확인했고 독립 Sol 리뷰를 통과했다. 깨끗한 새 clone의 의존성 설치와 현재 핀 기준 Linux/ext4 전체 CLI 재실행은 별도 검증으로 남아 있다.
+- [x] **TW-00-R1 Windows preflight 테스트 격리:** 승인된 테스트 한 파일 수정이 비공개 로컬 `9f10125`에 커밋됐고 독립 Sol 리뷰를 통과했다. Windows 전체 CLI 250개 통과·41개 건너뜀, 타입 검사 통과. 비공개 원격 게시와 Orca 서브모듈 갱신은 아직 하지 않았다.
+- [ ] **현재 비공개 핀 재현 검증:** 게시될 `9f10125`를 격리된 Linux/ext4에서 깨끗한 의존성 설치부터 전체 CLI 테스트·타입 검사까지 재실행한다. 현재 머신의 유일한 Ubuntu distro는 사용 중이고 Docker 엔진은 중지돼 있어 격리 runner가 필요하다.
 - [x] **TW-06T 가짜 duplex 클라이언트:** 기존 Luna Orca 전송 workstream이 인증 프레임·경계·취소·no-start를 별도 모듈로 구현했다. 집중 테스트 30개, 변경 코드 품질 검사, Node 타입 검사, 독립 Sol 코드 리뷰를 통과했다. 두 구현의 메모리 스트림 통합 검증도 정상 읽기와 epoch 변경 거부를 확인했다. 실제 WSL 시작과 UI/IPC 연결은 범위 밖이다.
 - [x] **TW-06 live cache/overlay 조사:** fixture 서비스는 late-result 격리만 제공하고 live cache는 아니다. 독립 Sol이 host·profile·authority·epoch 파티션, digest high-water, source clock, stale 수명, 혼합 SSH `unsupported`, 별도 overlay의 TW-02L 선행 조건을 확인했다. 스키마가 허용하는 producer `matched`·action 행도 초기 생산 정책에서 별도로 거부해야 한다.
 - [ ] **TW-06 live 경계 계약:** 위 캐시·실패·overlay·producer-policy·구형 peer 규칙을 freeze한 뒤 main/preload 구현을 배정한다. TW-07F와 공유 IPC/preload 파일 수정은 직렬화한다.
@@ -52,11 +54,12 @@ TW-07F만 다음 작업인 것은 아니다. [전체 병렬 작업 경계](./tas
 - [x] **TW-M1P 사전 조사:** 기존 오프라인 CLI 설치 검증은 Linux Node와 profile의 실제 배포·업데이트·rollback을 증명하지 않음을 확인했다. Node 배포자, 비공개 패키지 채널, 해시·host 결합, 복구 결정이 남아 있다.
 - [x] **TW-M1P 계약 후보:** [profile/base-runtime 전달 초안](./profile-delivery.md)은 unbound 설치→별도 authority issue/adopt→명시적 bind, 단일 ext4 활성 기록, rollback 복구, 검증된 패키지 폐쇄성을 분리했고 독립 Sol 리뷰를 통과했다. Node 22.23.3과 Ubuntu WSL2 x64는 후보이지 승인된 배포 대상이 아니다.
 - [ ] **TW-M1P profile 전달:** publisher·비공개 채널·외부 신뢰점·profile 소유자·host binding threat model·초기 대상의 owner 결정을 얻고, 격리된 Node/npm tarball 폐쇄성 replay를 먼저 수행한다. 생산 설치·업데이트·rollback 코드는 frozen packet 뒤에 배정한다. TW-06T 생산 setup은 이 기본 Linux runtime과 별도의 TW-06P service artifact를 모두 기다린다.
+- [ ] **TW-M1P 산출물 폐쇄성 replay:** 현재 pin의 검증된 Linux Node archive·패키지 tarball과 격리 Linux/ext4 runner를 준비해 offline 잠금 설치를 검증한다. 이는 위 비공개 전체 CLI 재현과 다른 검증이며 현재 후보 Node/npm 아카이브와 runner가 없어 아직 실행하지 못했다.
 - [x] **TW-08 액션 경계 조사:** 기존 삭제 UI는 id·instanceId·host를 확인하지만 제거 RPC에는 instanceId가 전달되지 않는다. 일반 확인 대화상자와 Orca 영수증은 ticket의 one-use 승인·adapter 영수증을 증명하지 않는다. 독립 Sol이 이를 소스에서 확인했고 일반 UI 삭제 결함으로 확대하지 말라고 판정했다.
 - [x] **TW-08 액션 계약표:** [액션별 권한·확인·영수증 행렬](./action-authority-matrix.md)을 같은 Luna workstream이 작성하고 fresh Sol 재리뷰를 통과했다. 이는 읽기 전용 계약 조사이며 액션 구현 승인이 아니다.
 - [ ] **TW-08 효과 구현:** 정확한 M6 액션 목록과 액션별 preview·one-use 권한·재시도/중단 계약을 확정한다. 효과 코드는 M3·TW-05G·TW-02L·live TW-06/TW-07과 액션별 증명 뒤에 한다.
 
-TW-06 live cache와 TW-08 action/receipt 경계도 읽기 전용으로 미리 검토할 수 있다. 두 구현은 각각의 live·root 권한 선행 조건 뒤에 둔다. 병렬 작업 축의 존재가 worker 자동 배정을 뜻하지 않는다.
+TW-06 currentness와 TW-02L 같은 읽기 기반 owner 계약, TW-08 action/receipt 경계의 읽기 전용 후보가 검토됐다. 세 구현 영역은 각각의 live·root 권한 선행 조건 뒤에 둔다. 병렬 준비 축의 존재가 구현 worker 자동 배정을 뜻하지 않는다.
 
 Fixture 완료는 live `current`, 외부 효과 또는 공개 `clear`를 뜻하지 않는다.
 
