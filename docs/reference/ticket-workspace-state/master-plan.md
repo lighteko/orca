@@ -1,6 +1,6 @@
 # Ticket Workspace — Master Plan
 
-- Status: Active. TW-02F fixture binding, TW-06F M4 boundary, TW-07F fixture M5, TW-04A common contract, and injected-only TW-06P/T passed independent review. Orca PR HEAD `c4e87fa3b` pins private `9f10125` and passed CI with 31 successes and eight skips after one Windows job rerun. Private `8322dbf` adds independently reviewed clean-Ubuntu CI; its first run passed frozen install, build, typecheck and ext4 checks, then found 12 WSL-assumption test failures. Full native-Linux and real-WSL replay remain open, as do production P1-P8 host/key/endpoint/artifact/currentness gates.
+- Status: Active. TW-02F fixture binding, TW-06F M4 boundary, TW-07F fixture M5, TW-04A common contract, and injected-only TW-06P/T passed independent review. Historical Orca PR HEAD `c4e87fa3b` pins private `9f10125` and passed 31 checks with eight skipped after one Windows job rerun. This Orca branch advances the submodule pin to private `14c69a1`; its exact-main fresh Ubuntu 24.04/ext4 CI passed frozen install, build, typecheck, 53 contract tests and 274 CLI tests with 21 skipped. Real-WSL replay, TW-M1P offline artifact closure and production P1-P8 host/key/endpoint/artifact/currentness gates remain open.
 - Snapshot date: 2026-09-30
 - Shared execution state: [project-state.md](./project-state.md)
 - Readable current checklist: [current-todo.md](./current-todo.md)
