@@ -1,7 +1,7 @@
 # TW-06P Producer / TW-06T Resident Transport Contract
 
-- **Status:** Logical v1 independently reviewed for injected-only TW-06P/T implementation. Private producer code is published at `f0b3181`, and the separately approved public vectors and Orca client passed PR CI at code HEAD `a29bc2169` (31 successes, eight skips). Production setup, current/high-water, owner match and effects remain gated.
-- **Source pin for this recheck:** `ticket-workspace` commit `54477c2371094f1cbc438845fdfde0ca3584e2aa`. The original protocol draft inspected `2045808ffdb6baead2e659855cefb02f7b36491c`; later TW-04A common-contract work did not deliver a live producer or endpoint.
+- **Status:** Logical v1 independently reviewed for injected-only TW-06P/T implementation. Private `f0b3181` published producer code; current `f7d66d1` pins a self-contained resident test fixture and passed 23 focused tests plus CLI typecheck in an isolated source checkout with local dependency junctions. The separately approved public vectors and Orca client passed historical PR CI at `a29bc2169` and `af074c45d` (31 successes, eight skips each). Clean fresh-clone installation, full current-pin CLI replay, production setup, current/high-water, owner match and effects remain gated.
+- **Historical protocol review source pin:** `ticket-workspace` commit `54477c2371094f1cbc438845fdfde0ca3584e2aa`. The original protocol draft inspected `2045808ffdb6baead2e659855cefb02f7b36491c`; later TW-04A common-contract work did not deliver a live producer or endpoint. The current injected producer and source-local test fixture are pinned above.
 - **Reviewed injected protocol:** `ticket.navigator.resident`, version 1.
 - **Scope:** One Orca desktop and its configured local WSL coordinator. SSH, paired runtime, relay, `orca serve`, and mobile clients remain outside this first slice.
 
