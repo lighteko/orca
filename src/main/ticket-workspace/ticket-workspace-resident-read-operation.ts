@@ -1,8 +1,10 @@
-import type { TicketResidentUnavailableReason } from './ticket-workspace-resident-client-contract'
+import type {
+  TicketResidentSnapshotResult,
+  TicketResidentUnavailableReason
+} from './ticket-workspace-resident-client-contract'
 import type { TicketResidentServerMessage } from './ticket-workspace-resident-protocol'
 import type { TicketResidentReceivedMessage } from './ticket-workspace-resident-protected-channel'
 import type { TicketResidentSnapshotResponse } from './ticket-workspace-resident-snapshot-response'
-import type { TicketResidentSnapshotResult } from './ticket-workspace-resident-client-contract'
 
 type ReadTerminal = Extract<
   TicketResidentServerMessage,
