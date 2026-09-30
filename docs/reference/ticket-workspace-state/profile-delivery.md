@@ -1,6 +1,6 @@
 # TW-M1P — Ticket profile and base runtime delivery
 
-Status: **proposal for independent review**, 2026-09-30. This packet refines [TW-M1P in the Task DAG](./task-graph.md); it does not authorize installation or select a publisher. The TW-06P resident service artifact is a separate output. TW-06T production setup needs both artifacts.
+Status: **independently reviewed contract candidate**, 2026-09-30. This packet refines [TW-M1P in the Task DAG](./task-graph.md); it does not authorize installation or select a publisher. The TW-06P resident service artifact is a separate output. TW-06T production setup needs both artifacts.
 
 ## Verified source boundary
 
