@@ -25,7 +25,7 @@
 - [x] **이번 통합 CI:** 최신 검토 구현 커밋 `8ba6d003e`의 [PR #1 검사](https://github.com/lighteko/orca/actions/runs/36587099645)는 31개 성공·8개 건너뜀·실패 0개다. Linux 패키지 작업에서 실제 preload 검증이 통과했다.
 - [x] **TW-07F 다음 단계 독립 리뷰:** M5 fixture tree가 다음 핵심 경로임을 확인했지만 기존 패킷은 수정 필요로 판정했다. 클릭 재매칭 IPC가 아직 없고, fixture는 실제 coordinator·agent·이슈 링크를 증명하지 않는다. [Task DAG의 수정 패킷](./task-graph.md)을 구현 전 검증한다.
 - [x] **TW-07F selector bridge:** main/preload의 정확한 match·click 재결합 계약을 구현하고 독립 Sol 재리뷰를 통과했다. 실제 preload 번들은 다른 revision·ticket·repository 응답을 거부하며, 배송된 fixture의 owner mismatch는 실패 사례로 유지한다.
-- [ ] **TW-07F M5 화면:** Phase A의 전체 행 접근, Projects 복귀, 탭/패널 접근성, 폴더 드롭·Workspace board·Setup Script 차단, 틴트 대비를 수정했고 fresh Sol 리뷰를 통과했다. 같은 Luna가 Phase B의 selector 전용 클릭 재결합과 검증된 Orca ID 이동을 구현 중이다. 숨겨진 렌더러 E2E spec은 추가됐지만 스크린샷 실행, 긍정 합성 owner 이동, 최종 M5 통합 리뷰가 남았다.
+- [x] **TW-07F M5 fixture 화면:** Phase A의 전체 행 접근·Projects 복귀·접근성·변경 제어 차단·틴트 대비와 Phase B의 selector 전용 클릭 재결합을 구현하고 각각 fresh Sol 리뷰를 통과했다. 실제 main/preload 통합의 긍정 합성 이동과 배포 fixture의 owner 불일치 차단을 검증했다. 숨겨진 Electron CDP E2E 1건이 창을 표시하지 않고 통과해 스크린샷을 남겼다. 이는 live 상태·액션·`clear` 완료가 아니다.
 
 ## 지금 병렬로 준비할 수 있는 작업 축
 
@@ -34,7 +34,7 @@ TW-07F만 다음 작업인 것은 아니다. [전체 병렬 작업 경계](./tas
 - [x] **TW-06T 전송 후보 조사:** Orca `spawnProcess`와 기존 WSL hook relay의 범위를 독립 Sol 리뷰로 확인했다. pinned WSL stdio는 주입형 테스트 후보이며 ticket용 인증·수명·clock 계약과 생산 endpoint는 아직 확정되지 않았다.
 - [x] **TW-06P projection 소스 조사:** catalog→snapshot direct 필드 매핑은 확인했지만 producer build ID, pruning/pruned/excluded target, SSH 혼합 상태, 같은 revision의 digest 충돌, clock currentness는 독립 Sol 리뷰에서 미결정으로 판정했다. 생산 projector/service는 아직 없다.
 - [x] **TW-06P 생산자 규칙 재검토:** 한 번의 bound catalog 읽기, 검증된 catalog의 canonical digest, catalog 전용 sequence 0, 실제 role, action/match 부재, 최종 직렬화 2 MiB 제한을 v1 기계적 기준으로 채택했다. 독립 Sol이 모든 pending transition ref를 일괄 제거하는 안을 거부했다. 대상 표시/클릭 억제와 SSH·high-water·clock 정책은 아직 열려 있다.
-- [ ] **TW-06P/T 공동 프로토콜:** producer·resident transport의 setup·인증·identity·freshness·framing 계약을 확정한다. [검토된 결정 초안](./resident-ticket-transport.md)은 아직 frozen protocol이 아니다. 생산 setup은 TW-M1P 기본 runtime과 TW-06P service artifact를 모두 기다린다.
+- [ ] **TW-06P/T 공동 프로토콜:** producer·resident transport의 setup·인증·identity·freshness·framing [계약 후보](./resident-ticket-transport.md)가 fresh Sol 리뷰를 통과했다. P1–P8의 소유자 결정을 받아 freeze해야 하며, 아직 구현 승인이 아니다. 생산 setup은 TW-M1P 기본 runtime과 TW-06P service artifact를 모두 기다린다.
 - [x] **TW-06 live cache/overlay 조사:** fixture 서비스는 late-result 격리만 제공하고 live cache는 아니다. 독립 Sol이 host·profile·authority·epoch 파티션, digest high-water, source clock, stale 수명, 혼합 SSH `unsupported`, 별도 overlay의 TW-02L 선행 조건을 확인했다. 스키마가 허용하는 producer `matched`·action 행도 초기 생산 정책에서 별도로 거부해야 한다.
 - [ ] **TW-06 live 경계 계약:** 위 캐시·실패·overlay·producer-policy·구형 peer 규칙을 freeze한 뒤 main/preload 구현을 배정한다. TW-07F와 공유 IPC/preload 파일 수정은 직렬화한다.
 - [x] **TW-02L live owner 사전 조사:** 별도 Luna가 fresh source tuple·WorkspaceRef와 Orca owner/host·완전 조회·clock 조건을 확인했고 독립 Sol이 기본 재읽기·5필드 결합을 검증했다. snapshot에는 pruning/pruned disposition이 없어 retained ref의 live match/click 억제 신호가 별도로 필요하다는 누락을 찾았다.
