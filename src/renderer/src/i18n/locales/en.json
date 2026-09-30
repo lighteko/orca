@@ -17903,5 +17903,32 @@
   },
   "common": {
     "retry": "Retry"
+  },
+  "ticketWorkspace": {
+    "sidebar": {
+      "preview": "Ticket preview",
+      "fixtureLifecycle": "Fixture lifecycle",
+      "fixtureAvailability": "Fixture availability",
+      "coordinator": "Coordinator",
+      "coordinatorDeclared": "Target declared in fixture; no Run is verified.",
+      "coordinatorMissing": "No coordinator target declared in this fixture.",
+      "workspaceRecords": "Workspace records",
+      "noWorkspaceRecords": "No workspace records in this fixture.",
+      "matchChecking": "Checking for an exact Orca workspace match…",
+      "matchAvailable": "Orca confirmed an exact workspace match.",
+      "matchUnavailable": "No exact Orca workspace match is available.",
+      "loading": "Loading ticket fixture…",
+      "unavailable": "Ticket snapshot unavailable.",
+      "fixtureRegion": "Ticket fixture",
+      "fixtureCase": "Historical fixture · {{caseId}}",
+      "historicalNotice": "It does not show current workspace status.",
+      "empty": "No tickets in this fixture snapshot.",
+      "ticketList": "Tickets",
+      "selectTicket": "Select {{ticketKey}}: {{label}}",
+      "fixtureState": "Fixture state: {{state}}",
+      "mode": "Workspace view",
+      "projects": "Projects",
+      "tickets": "Tickets"
+    }
   }
 }
