@@ -14,10 +14,12 @@ import { FolderPlus, Loader2 } from 'lucide-react'
 import { ActivityThreadCollapseContext } from '@/components/activity/activity-thread-collapse-context'
 import { useSidebarProjectDrop } from './useSidebarProjectDrop'
 import { useWorkspaceBoardPanel } from './useWorkspaceBoardPanel'
-import { useWorkspaceRevealBodyRedirect } from './use-workspace-reveal-body-redirect'
 import { resolveLeftSidebarStyleVariables } from '@/lib/left-sidebar-appearance'
 import { useSystemPrefersDark } from '@/components/terminal-pane/use-system-prefers-dark'
 import { lazyWithRetry } from '@/lib/lazy-with-retry'
+import { WorkspaceSubmodeTabs } from './WorkspaceSubmodeTabs'
+import TicketWorkspaceFixtureView from './TicketWorkspaceFixtureView'
+import { useSidebarWorkspaceSubmode } from './use-sidebar-workspace-submode'
 
 // Why lazy: the Agents list pulls the whole activity pipeline (virtualizer, markdown
 // previews, thread derivation); users on the workspace view should not load or render any of it.
@@ -55,6 +57,13 @@ function Sidebar({
   const startupWorktreeRefreshCompleted = useAppStore((s) => s.startupWorktreeRefreshCompleted)
   const settings = useAppStore((s) => s.settings)
   const sidebarBody = useAppStore((s) => s.sidebarBody ?? 'workspaces')
+  const {
+    mode: workspaceSubmode,
+    setMode: setWorkspaceSubmode,
+    unavailableNotice: ticketSnapshotUnavailable,
+    showUnavailable: showTicketSnapshotUnavailable
+  } = useSidebarWorkspaceSubmode()
+  const ticketsActive = sidebarBody === 'workspaces' && workspaceSubmode === 'tickets'
   const showAgentDashboard = settings?.experimentalAgentDashboardPopout === true
   const agentDashboardDrawerOpen = useAppStore((s) => s.agentDashboardDrawerOpen)
   const setAgentDashboardDrawerOpen = useAppStore((s) => s.setAgentDashboardDrawerOpen)
@@ -94,7 +103,7 @@ function Sidebar({
     () => resolveLeftSidebarStyleVariables(settings, systemPrefersDark),
     [settings, systemPrefersDark]
   ) as React.CSSProperties | undefined
-  const { nativeDropTarget, dropHandlers, affordance } = useSidebarProjectDrop()
+  const { nativeDropTarget, dropHandlers, affordance } = useSidebarProjectDrop(!ticketsActive)
   const {
     workspaceBoardOpen,
     workspaceBoardRenderedOpen,
@@ -125,10 +134,16 @@ function Sidebar({
   }, [repoCount, startupWorktreeRefreshCompleted, fetchAllWorktrees])
 
   useEffect(() => {
-    if (!sidebarOpen && workspaceBoardRenderedOpen) {
+    if ((!sidebarOpen || ticketsActive) && (workspaceBoardRenderedOpen || workspaceBoardMenuOpen)) {
       closeWorkspaceBoard()
     }
-  }, [closeWorkspaceBoard, sidebarOpen, workspaceBoardRenderedOpen])
+  }, [
+    closeWorkspaceBoard,
+    sidebarOpen,
+    ticketsActive,
+    workspaceBoardMenuOpen,
+    workspaceBoardRenderedOpen
+  ])
 
   useEffect(() => {
     if (!showAgentDashboard && agentDashboardDrawerOpen) {
@@ -146,26 +161,43 @@ function Sidebar({
     onDraftWidthChange: setLiveSidebarWidth
   })
 
-  useWorkspaceRevealBodyRedirect(sidebarOpen && sidebarBody === 'agents')
-
   return (
     <TooltipProvider delayDuration={400}>
       <div
         ref={containerRef}
-        data-native-file-drop-target={sidebarOpen ? nativeDropTarget : undefined}
+        data-native-file-drop-target={sidebarOpen && !ticketsActive ? nativeDropTarget : undefined}
         className="relative min-h-0 flex-shrink-0 bg-worktree-sidebar flex flex-col overflow-hidden scrollbar-sleek-parent"
         style={leftSidebarStyle}
-        {...dropHandlers}
+        {...(!ticketsActive ? dropHandlers : {})}
       >
         {sidebarOpen && (
           <>
-            {/* Fixed controls */}
             <SidebarNav />
             <SidebarHeader
               onWorkspaceBoardMenuOpenChange={setWorkspaceBoardMenuOpen}
               activityOptionsTarget={setAgentOptionsTarget}
+              ticketsViewActive={ticketsActive}
             />
-            {sidebarBody === 'agents' ? (
+            {sidebarBody === 'workspaces' ? (
+              <WorkspaceSubmodeTabs
+                value={workspaceSubmode}
+                onChange={setWorkspaceSubmode}
+                ticketSnapshotUnavailable={ticketSnapshotUnavailable}
+                projects={
+                  <WorktreeList
+                    scrollOffsetRef={worktreeScrollOffsetRef}
+                    scrollAnchorRef={worktreeScrollAnchorRef}
+                    workspaceBoardOpen={workspaceBoardOpen}
+                    onWorkspaceBoardDragPreviewStart={previewWorkspaceBoardFromDrag}
+                    onWorkspaceBoardDragPreviewCommit={solidifyWorkspaceBoardFromDrag}
+                    onWorkspaceBoardDragPreviewCancel={cancelWorkspaceBoardDragPreview}
+                  />
+                }
+                tickets={
+                  <TicketWorkspaceFixtureView onUnavailable={showTicketSnapshotUnavailable} />
+                }
+              />
+            ) : sidebarBody === 'agents' ? (
               <React.Suspense fallback={<div className="min-h-0 flex-1" />}>
                 <ActivityThreadCollapseContext.Provider value={agentsCollapseState}>
                   <SidebarAgentsList
@@ -180,31 +212,22 @@ function Sidebar({
                   />
                 </ActivityThreadCollapseContext.Provider>
               </React.Suspense>
-            ) : (
-              <WorktreeList
-                scrollOffsetRef={worktreeScrollOffsetRef}
-                scrollAnchorRef={worktreeScrollAnchorRef}
-                workspaceBoardOpen={workspaceBoardOpen}
-                onWorkspaceBoardDragPreviewStart={previewWorkspaceBoardFromDrag}
-                onWorkspaceBoardDragPreviewCommit={solidifyWorkspaceBoardFromDrag}
-                onWorkspaceBoardDragPreviewCancel={cancelWorkspaceBoardDragPreview}
-              />
-            )}
+            ) : null}
 
             <div className="relative shrink-0">
-              <SetupScriptPromptCard />
+              {!ticketsActive && <SetupScriptPromptCard />}
 
-              {/* Fixed bottom toolbar */}
               <SidebarToolbar
                 workspaceBoardOpen={workspaceBoardOpen}
                 workspaceBoardDragPreviewOpen={workspaceBoardDragPreviewOpen}
                 onWorkspaceBoardToggle={toggleWorkspaceBoard}
+                showWorkspaceBoardToggle={!ticketsActive}
               />
             </div>
           </>
         )}
 
-        {sidebarOpen && affordance.visible ? (
+        {sidebarOpen && !ticketsActive && affordance.visible ? (
           <div
             className={cn(
               'pointer-events-none absolute inset-2 z-20 flex flex-col items-center justify-center gap-1.5 rounded-md border bg-worktree-sidebar-accent/95 px-4 text-center text-worktree-sidebar-accent-foreground shadow-xs',
@@ -223,7 +246,6 @@ function Sidebar({
           </div>
         ) : null}
 
-        {/* Resize handle */}
         {sidebarOpen && (
           <div
             data-sidebar-resize-handle=""
@@ -249,7 +271,7 @@ function Sidebar({
         {activeModal === 'confirm-orca-yaml-hooks' ? <OrcaYamlTrustDialog /> : null}
         {activeModal === 'forget-ssh-workspace' ? <ForgetSshWorkspaceDialog /> : null}
       </React.Suspense>
-      {sidebarOpen ? (
+      {sidebarOpen && !ticketsActive ? (
         <WorkspaceKanbanDrawer
           leftSidebarStyle={leftSidebarStyle}
           open={workspaceBoardRenderedOpen}

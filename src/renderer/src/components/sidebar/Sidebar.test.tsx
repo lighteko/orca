@@ -113,6 +113,10 @@ function setSidebarState(settings: GlobalSettings, statusBarVisible = true): voi
     settings,
     sidebarOpen: true,
     sidebarWidth: 320,
+    sidebarBody: 'workspaces',
+    pendingRevealWorktree: null,
+    pendingRevealSidebarRow: null,
+    setSidebarBody: vi.fn(),
     statusBarVisible
   }
 }
