@@ -29,16 +29,26 @@
 - [x] **시작·종료 계약 검토:** Astra xhigh가 정확한 launch 입력, 전체 시간 제한·타이머 인계·늦은 등록 차단 계약과 두 구현 범위를 검토해 `NEXT_APPROVE / CODE_READY`로 판정했다.
 - [x] **TW-PILOT-ENTRY 코드 검증:** 기존 private Luna의 F2가 같은-turn 입력 파괴와 server handoff 후 출력 오류를 해결했다. 집중 60개 통과·5개 기존 skip, 타입·빌드·품질 검사와 Astra 독립 12개·원본 재현 검사를 통과해 CODE_APPROVE다.
 - [x] **TW-PILOT-LEASE 코드 검증:** 기존 transport Luna의 F2가 stderr 종료·늦은 오류·중복 정리를 해결했다. 초기 관련 89개, 최종 lease/import 경계 12개와 Node 타입·품질 검사가 통과했다. Astra 독립 8개·원본 재현도 통과해 CODE_APPROVE다.
-- [x] **이번 통합 마감:** 실제 ENTRY/server ↔ LEASE/client/source의 유한 통합 두 사례, Fresh Astra INTEGRATION_APPROVE와 로컬 커밋을 완료했다. private `86b8e49`, public `ad16f44c2`이며 아직 미게시다. 커밋 gate의 테스트 문법 수정도 8개·Astra 리뷰를 통과했다. synthetic host/catalog/HWM 검증이며 실제 WSL 운영이나 Tickets 완료는 아니다.
-- [x] **다음 병렬 준비 경계 검토:** Astra가 아래 네 준비 작업을 검토했다. 코드 구현 packet은 아직 CODE_READY가 아니며, 계약·공유 파일 소유권 고정 후 별도 리뷰한다.
-  - [ ] **A — 실제 티켓·기존 Run/workspace:** 최소 enrollment, catalog/CAS 호환성과 strict caller·host/generation 검증 packet.
-  - [ ] **B — durable HWM:** 기존 history·epoch·atomic precommit·취소/시간 제한을 보존하는 격리 저장 packet.
-  - [ ] **C — live 표시·클릭:** current/stale/unavailable/unsupported DTO, 같은 source/owner 결합, preload·Tickets·클릭 재검증 packet.
-  - [ ] **D — 실행 환경·신뢰 증거:** pinned artifact/profile·host/경로·pipe/key·allowlist와 실제 Linux/WSL 검증/종료 packet. 실제 대상·키 선택은 사용자 승인 사항이다.
+- [x] **이번 통합 마감:** 실제 ENTRY/server ↔ LEASE/client/source의 유한 통합 두 사례, Fresh Astra INTEGRATION_APPROVE와 커밋을 완료했다. private `86b8e49`, public `ad16f44c2`와 완료 문서 `4d5a9630e`는 사용자 승인 후 게시했다. synthetic host/catalog/HWM 검증이며 실제 WSL 운영이나 Tickets 완료는 아니다.
+- [x] **비공개 새 CI:** `86b8e49`의 Ubuntu 빌드·타입·계약 59개·CLI 310개 통과/21개 skip.
+- [x] **공개 CI 마감:** 첫 `4d5a9630e`의 lease 테스트 관측 순서 오류를 테스트 한 파일에서 수정했다. 집중 8개·타입·lint·Astra 코드 리뷰와 추가 게시 승인 후 `70b0c763b`를 게시했다. [정확한 커밋의 PR Checks](https://github.com/lighteko/orca/actions/runs/36820264582)는 26개 성공·6개 skip·실패 0개이며 Mobile Checks·Computer-use e2e·PR test LoC도 성공이다.
+- [x] **다음 병렬 준비 경계 검토:** Astra가 아래 네 준비 작업을 검토했다. 이 준비 승인은 코드 일괄 승인이 아니며, 후속 A1·C1·D0의 개별 검토 결과와 현재 상태는 아래에 적었다.
+  - [x] **A 준비 리뷰:** 기존 private Luna의 strict caller·Run/host/generation·catalog/CAS 조사를 Astra가 검증했다. catalog v2·resident 쓰기 확장은 미채택 제안이며 첫 read-only pilot의 필수 조건으로 확정하지 않았다.
+  - [x] **B 준비 리뷰:** 기존 transport Luna의 저장 조사를 Astra가 검증했다. 기존 orchestration DB 공유는 main 잠금 위험이 있어 재검토하며 atomic commit·known-history 계약도 먼저 고정한다.
+  - [x] **C 준비 리뷰:** 표시·owner Luna의 live DTO·IPC·클릭 조사를 Astra가 검증했다. 별도 detailed source 결과와 정확한 DTO가 필요하다. 현재 팀에 기존 owner worker가 없어 이 작업선만 새 continuity 세션으로 시작했다.
+  - [x] **D 준비 리뷰:** 기존 verification Luna의 artifact/WSL 증거 조사를 Astra가 검증했다. 현재 캐시·소스 입력을 고정한 로컬 빌드는 가능하며 실제 UID·환경 격리·호스트/키 선택과 실행은 별도 승인 사항이다.
+  - [x] **A1 로컬 완료:** 기존 A Luna가 lazy DB 접근 없는 동기 Run 검증 헬퍼·테스트 두 파일을 완성했다. 새 Astra의 독립 5개·Node 타입·품질 검사와 CODE_APPROVE 후 `a909f7a69`로 로컬 커밋했다.
+  - [x] **A2 로컬 완료:** 같은 A Luna의 한 호출 티켓·Run·coordinator 연결을 구현했다. 집중·관련 36개, 전체 Node 타입·품질과 Astra 독립 14개 실제 모듈 재현 검사를 통과해 CODE_APPROVE 후 `61c8ebe04`로 로컬 커밋했다. 실제 등록·재시작 연결·catalog 쓰기는 포함하지 않는다.
+  - [ ] **B1 결정 필요:** 조사 완료. worker SQLite의 물리적 커밋 완료 시간을 기존 만료 전 완료 계약으로 보장할 수 없으며 trusted history도 미정이다. B2 코드는 배정하지 않는다.
+  - [x] **B0 로컬 완료:** 같은 transport Luna의 F2가 취소 뒤 새 retry/readback을 막고 기존 3회 충돌 격리 정책을 유지한다. Astra 독립 49개 테스트·실제 모듈 8개 재현 검사와 최종 Node 타입 검사를 통과해 `c010f3a66`로 로컬 커밋했다.
+  - [x] **C1 로컬 완료:** 정확한 DTO의 상속·숨김 필드와 배열 검증 우회를 수정했다. Astra 독립 14개 테스트·브라우저 266건·기본 품질 검사가 통과해 CODE_APPROVE 후 `9077430c2`로 로컬 커밋했다. 전체 웹 타입 검사도 작업 한정 8GiB로 통과했다.
+  - [x] **C2 계약 준비·다음 경계 리뷰:** 같은 C Luna의 보고를 Fresh Astra가 검토했다. detailed source와 channel/오류 계약을 고정한 IPC·preload는 다음 코드 후보이며, 표시 owner는 receipt 교체·stale 수명·A2와 repository 결합을 먼저 결정해야 한다. 구현은 아직 배정하지 않았다.
+  - [x] **D0 로컬 산출물 검증 완료:** 새 CLI·contracts와 Zod·noble 네 tarball의 잠금·오프라인 설치, 파일·SHA/SRI 폐쇄성 및 Linux Node 입력 서명을 Astra가 독립 검증해 EVIDENCE_APPROVE했다. 수정된 증거 manifest 해시는 `9a2bc679e38933e267549971dafe41a36a44cce982e2dcc591352c11ca1b9c1f`다. Windows 로컬 빌드이며 Linux 실행·네트워크 차단·생산 신뢰·실제 설치 증명은 아니다.
   - 준비 조사는 병렬 가능하다. A/C strict Run·owner 파일과 B/C/D setup·admission·등록 통합은 소유권 분리 또는 직렬화한다. [전체 계약](./task-graph.md#reviewed-next-preparation-frontier--2026-10-01).
+- [x] **이번 로컬 통합 마감:** A1·A2·C1·B0 관련 9개 파일/108개 테스트, 동결 코드 16개 전후 해시 일치, 최종 전체 Node 타입 검사와 Fresh Astra의 유한 주입형 통합 CODE_APPROVE를 확인했다. 네 코드 커밋은 현재 로컬이며 새 원격 게시 승인은 별도다.
 - [ ] **후속 pilot 통합:** 실제 티켓과 기존 Run/workspace의 엄격한 연결, durable HWM, live DTO·preload·Tickets·클릭 재검증을 연결한다. 완료 기준은 실제 티켓 한 건의 표시와 정확한 workspace 이동이다. 누락된 관측은 unavailable이며 effect·공개 `clear`는 비활성이다.
 
-**이번 코드 사이클 완료 기준:** ENTRY/LEASE 집중 테스트·적용 타입/품질 검사·Astra 코드 재리뷰·실제 구현끼리의 유한 통합 검증·로컬 커밋. 실제 운영 설치·키·호스트 활성화는 이 사이클의 완료 조건에서 분리한다.
+**다음 실행 경계:** C2A 상세 결과/남은 수명 packet, C2B receipt·공통 owner 결합 계약, C2C/D 채널·오류·preload 계약, C3 refresh/expiry 준비, B1 내구성 결정, D1 승인 실행서 준비는 파일·보고 소유권을 나눠 진행할 수 있다. injected C2 통합은 실제 WSL·운영 키·durable 구현을 기다릴 필요가 없다. 실제 pilot 활성화는 별도 운영·내구성·제품 연결 게이트다.
 
 ## 완료된 기반
 
