@@ -16,6 +16,12 @@ Snapshot date: 2026-10-01. This is a concise carry-forward of valid reviewer con
 - **PRESENTATION INVARIANT:** Admission and presentation are separate. An internal read cannot renew the pinned displayed receipt, even if its canonical revision is identical. Explicit main-owned presentation validates an actual current admitted read; baseline lookup also checks the trusted view getter and receipt expiry.
 - **SETTLEMENT INVARIANT:** Final source/currentness, displayed-baseline and exact owner checks cover the operation's awaited settlement. This is a final observation, without an atomicity guarantee against later changes.
 
+## Unbound release transition review — 2026-10-01
+
+- **FACT / RESOLVED:** TW-M1P-L1 invokes the actual verifier over raw bytes, binds issuer-owned one-use confirmations to captured identity/policy/incarnation, and resolves preview-alias, ABA and phase-dependent publication failure findings. Fresh Sol 6.1 approved the stable ten-file candidate after 35 tests; Root full regression passed contracts 59 and CLI 273/45 skipped. Local private checkpoint is `b556834`.
+- **RECOVERY INVARIANT:** Every session for a root shares one fail-closed recovery generation/barrier. Apply raises it before fence acquisition; ambiguous publish, descriptor-close or fence-release results remain unverifiable. Reconcile may clear readiness only after successful fence release; unexplained absent/other/invalid observations stay blocked. Initial reconciliation is distinct from uncertain-attempt reconciliation.
+- **ASSUMPTIONS / OPEN GATES:** Injected root identity, staged immutability, stable policy, root-wide fencing and linearizable fail-closed recovery storage require real adapter proof. Pure tests establish neither installed-tree provenance, physical host identity, directory-sync durability after reread, cross-distro serialization nor durable restart recovery.
+
 ## Active invariants
 
 1. **Exact identity, not path coincidence.** Bind evidence to a non-reused catalog/store incarnation and revision plus exact repository, execution host, workspace instance, canonical identity, kind, path, and actual route. Re-resolve and compare after asynchronous work. Missing, duplicate, stale, truncated, legacy-ambiguous, or ABA identity is unavailable.
