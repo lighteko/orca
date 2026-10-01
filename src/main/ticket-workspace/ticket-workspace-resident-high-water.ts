@@ -12,9 +12,11 @@ import {
   type ResidentSourceHighWaterStore,
   type ResidentSourceHighWaterPermissions,
   type ResidentHighWaterFacts,
-  type ResidentHighWaterAdmission
+  type ResidentHighWaterAdmission,
+  type ResidentHighWaterOperationContext
 } from './ticket-workspace-resident-high-water-contract'
 import { ResidentSourceHighWaterAdmissionEngine } from './ticket-workspace-resident-high-water-admission'
+import { ResidentSourceHighWaterAdmissionQueue } from './ticket-workspace-resident-high-water-admission-queue'
 
 export {
   compareSourceOrder,
@@ -24,6 +26,7 @@ export {
 export type {
   ResidentHighWaterAdmission,
   ResidentHighWaterFacts,
+  ResidentHighWaterOperationContext,
   ResidentSourceBaseKey,
   ResidentSourceHighWaterKey,
   ResidentSourceHighWaterPermissions,
@@ -34,9 +37,9 @@ export type {
 
 export class TicketWorkspaceResidentHighWater {
   private readonly partitions = new Map<string, ResidentHighWaterPartitionState>()
-  private readonly queues = new Map<string, Promise<void>>()
   private readonly pendingRebinds = new Set<string>()
   private readonly admission: ResidentSourceHighWaterAdmissionEngine
+  private readonly admissionQueue = new ResidentSourceHighWaterAdmissionQueue()
 
   constructor(
     private readonly store: ResidentSourceHighWaterStore,
@@ -75,17 +78,19 @@ export class TicketWorkspaceResidentHighWater {
     key: ResidentSourceHighWaterKey,
     candidate: ResidentSourceHighWaterRecord,
     leaseGeneration: number,
-    canContinue: () => boolean = () => true
+    canContinue: () => boolean = () => true,
+    context?: ResidentHighWaterOperationContext
   ): Promise<ResidentHighWaterAdmission> {
-    return await this.runExclusive(
-      key,
+    return await this.admissionQueue.enqueue(
+      highWaterKeyId(key),
+      context,
       async () =>
         await this.admission.admit(
           key,
           candidate,
           this.partition(key),
           leaseGeneration,
-          canContinue
+          () => (context?.isActive() ?? true) && canContinue()
         )
     )
   }
@@ -207,30 +212,6 @@ export class TicketWorkspaceResidentHighWater {
       if (sameHighWaterBase(partition.baseKey, key) && partition.key.ledgerEpoch === oldEpoch) {
         partition.rebindPending = false
         partition.invalidationGeneration += 1
-      }
-    }
-  }
-
-  private async runExclusive<T>(
-    key: ResidentSourceHighWaterKey,
-    operation: () => Promise<T>
-  ): Promise<T> {
-    const id = highWaterKeyId(key)
-    const previous = this.queues.get(id) ?? Promise.resolve()
-    const safePrevious = previous.catch(() => undefined)
-    let release = (): void => undefined
-    const held = new Promise<void>((resolve) => {
-      release = resolve
-    })
-    const tail = safePrevious.then(() => held)
-    this.queues.set(id, tail)
-    await safePrevious
-    try {
-      return await operation()
-    } finally {
-      release()
-      if (this.queues.get(id) === tail) {
-        this.queues.delete(id)
       }
     }
   }

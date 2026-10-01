@@ -41,6 +41,15 @@ export type ResidentSourceHighWaterStore = Readonly<{
   ): Promise<'rebound' | 'conflict' | 'failed'>
 }>
 
+export type ResidentHighWaterOperationContext = Readonly<{
+  remainingBudgetMs(): number
+  isAbandoned(): boolean
+  isActive(): boolean
+  abandon(): void
+  dispose(): void
+  onAbandon(callback: () => void): () => void
+}>
+
 export type ResidentSourceHighWaterPermissions = Readonly<{
   authorizeFirstAdoption(key: ResidentSourceHighWaterKey): Promise<boolean>
   authorizeRebind(key: ResidentSourceBaseKey, oldEpoch: string, newEpoch: string): Promise<boolean>
@@ -67,6 +76,8 @@ export type ResidentHighWaterAdmission =
         | 'high_water_quarantined'
         | 'high_water_history_lost'
         | 'high_water_storage_failure'
+        | 'high_water_admission_capacity'
+        | 'high_water_admission_abandoned'
     }
 
 export type ResidentHighWaterPartitionState = {

@@ -43,6 +43,9 @@ export class ResidentSourceHighWaterAdmissionEngine {
     }
 
     for (let attempt = 0; attempt < MAX_CAS_ATTEMPTS; attempt += 1) {
+      if (!isAdmissionCurrent()) {
+        return unavailable('high_water_quarantined')
+      }
       const state = await this.readState(key, partition)
       if (!state) {
         return unavailable('high_water_storage_failure')
@@ -62,6 +65,9 @@ export class ResidentSourceHighWaterAdmissionEngine {
         return unavailable('high_water_history_lost')
       }
       if (state.kind === 'never-initialized') {
+        if (!isAdmissionCurrent()) {
+          return unavailable('high_water_quarantined')
+        }
         const firstAdoption = await this.authorizeFirstAdoption(key)
         if (!firstAdoption) {
           return unavailable('initial_adoption_required')
@@ -76,12 +82,19 @@ export class ResidentSourceHighWaterAdmissionEngine {
           partition,
           isAdmissionCurrent
         )
-        if (result === 'conflict') {
-          continue
-        }
         if (result === 'failed') {
           await this.failClosed(partition, 'high_water_storage_failure')
           return unavailable('high_water_storage_failure')
+        }
+        if (result === 'conflict' && attempt === MAX_CAS_ATTEMPTS - 1) {
+          await this.failClosed(partition, 'high_water_storage_failure')
+          return unavailable('high_water_storage_failure')
+        }
+        if (!isAdmissionCurrent()) {
+          return unavailable('high_water_quarantined')
+        }
+        if (result === 'conflict') {
+          continue
         }
         if (result !== 'committed') {
           return unavailable('high_water_quarantined')
@@ -119,12 +132,19 @@ export class ResidentSourceHighWaterAdmissionEngine {
         partition,
         isAdmissionCurrent
       )
-      if (result === 'conflict') {
-        continue
-      }
       if (result === 'failed') {
         await this.failClosed(partition, 'high_water_storage_failure')
         return unavailable('high_water_storage_failure')
+      }
+      if (result === 'conflict' && attempt === MAX_CAS_ATTEMPTS - 1) {
+        await this.failClosed(partition, 'high_water_storage_failure')
+        return unavailable('high_water_storage_failure')
+      }
+      if (!isAdmissionCurrent()) {
+        return unavailable('high_water_quarantined')
+      }
+      if (result === 'conflict') {
+        continue
       }
       if (result !== 'committed') {
         return unavailable('high_water_quarantined')
@@ -193,6 +213,9 @@ export class ResidentSourceHighWaterAdmissionEngine {
     leaseGeneration: number,
     isAdmissionCurrent: () => boolean
   ): Promise<ResidentHighWaterAdmission> {
+    if (!isAdmissionCurrent()) {
+      return unavailable('high_water_quarantined')
+    }
     const state = await this.readState(key, partition)
     if (!state) {
       return unavailable('high_water_storage_failure')

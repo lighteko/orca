@@ -16,7 +16,11 @@ import {
   vector
 } from './ticket-workspace-resident-test-peer'
 import { connectTicketWorkspaceResidentSourceAdapter } from './ticket-workspace-resident-source-adapter'
-import { TicketWorkspaceResidentHighWater } from './ticket-workspace-resident-high-water'
+import {
+  createResidentSourceHighWaterKey,
+  TicketWorkspaceResidentHighWater,
+  type ResidentHighWaterOperationContext
+} from './ticket-workspace-resident-high-water'
 import { MemoryResidentSourceHighWaterStore } from './ticket-workspace-resident-high-water-test-store'
 
 describe('resident source adapter', () => {
@@ -356,6 +360,139 @@ describe('resident source adapter', () => {
     expect(store.committedCandidates).toHaveLength(0)
     source.close()
   })
+
+  it('uses the original read budget after transport time and removes an expired queued admission', async () => {
+    let now = 100
+    const value = snapshot()
+    const store = new MemoryResidentSourceHighWaterStore()
+    const connected = await connectSource(
+      [value],
+      () => now,
+      () => 0,
+      () => null,
+      store,
+      () => {
+        now = 900
+      }
+    )
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const leaseIdentity = JSON.stringify([
+      binding.expectedService.releaseId,
+      binding.expectedService.artifactSha256,
+      vector.inputs.connectionIncarnation
+    ])
+    const lease = connected.highWater.registerLease(key, leaseIdentity)
+    let markReadStarted = (): void => undefined
+    const readStarted = new Promise<void>((resolve) => {
+      markReadStarted = resolve
+    })
+    let releaseRead = (): void => undefined
+    const readGate = new Promise<void>((resolve) => {
+      releaseRead = resolve
+    })
+    store.beforeRead = async () => {
+      markReadStarted()
+      await readGate
+    }
+    const active = connected.highWater.admit(
+      key,
+      {
+        ledgerRevision: value.source.ledgerRevision,
+        projectionSequence: value.source.projectionSequence,
+        catalogDigest: value.source.catalogDigest
+      },
+      lease
+    )
+    await readStarted
+
+    let capturedContext: ResidentHighWaterOperationContext | undefined
+    let markContextCaptured = (): void => undefined
+    const contextCaptured = new Promise<void>((resolve) => {
+      markContextCaptured = resolve
+    })
+    const originalAdmit = connected.highWater.admit.bind(connected.highWater)
+    vi.spyOn(connected.highWater, 'admit').mockImplementation(
+      (admissionKey, candidate, leaseGeneration, canContinue, context) => {
+        if (context) {
+          capturedContext = context
+          markContextCaptured()
+        }
+        return originalAdmit(admissionKey, candidate, leaseGeneration, canContinue, context)
+      }
+    )
+    const pendingRead = connected.source.readCurrentSnapshot(new AbortController().signal, 1_000)
+    await contextCaptured
+    expect(capturedContext?.remainingBudgetMs()).toBe(200)
+    now = 1_100
+    expect(capturedContext?.isActive()).toBe(false)
+    await expect(pendingRead).resolves.toBeNull()
+    expect([...store.readCounts.values()]).toEqual([1])
+    expect(store.quarantinedReasons).toHaveLength(0)
+
+    releaseRead()
+    await expect(active).resolves.toMatchObject({ status: 'unavailable' })
+    expect(store.compareCandidates).toHaveLength(0)
+    connected.source.close()
+  })
+
+  it('keeps a timed-out high-water read in its key slot until raw storage settles', async () => {
+    const value = snapshot()
+    const store = new MemoryResidentSourceHighWaterStore()
+    const connected = await connectSource(
+      [value, value],
+      () => 100,
+      () => 0,
+      () => null,
+      store
+    )
+    let markReadStarted = (): void => undefined
+    const readStarted = new Promise<void>((resolve) => {
+      markReadStarted = resolve
+    })
+    let releaseRead = (): void => undefined
+    const readGate = new Promise<void>((resolve) => {
+      releaseRead = resolve
+    })
+    let blockFirstRead = true
+    store.beforeRead = async () => {
+      if (blockFirstRead) {
+        blockFirstRead = false
+        markReadStarted()
+        await readGate
+      }
+    }
+
+    const first = connected.source.readCurrentSnapshot(new AbortController().signal, 40)
+    await readStarted
+    await expect(first).resolves.toBeNull()
+
+    let markAdmissionQueued = (): void => undefined
+    const admissionQueued = new Promise<void>((resolve) => {
+      markAdmissionQueued = resolve
+    })
+    const originalAdmit = connected.highWater.admit.bind(connected.highWater)
+    vi.spyOn(connected.highWater, 'admit').mockImplementation(
+      (key, candidate, leaseGeneration, canContinue, context) => {
+        if (context) {
+          markAdmissionQueued()
+        }
+        return originalAdmit(key, candidate, leaseGeneration, canContinue, context)
+      }
+    )
+    const nextWriteCount = connected.duplex.writes.length + 1
+    const second = connected.source.readCurrentSnapshot(new AbortController().signal, 1_000)
+    await connected.duplex.waitForWriteCount(nextWriteCount)
+    await admissionQueued
+    expect([...store.readCounts.values()]).toEqual([1])
+    releaseRead()
+
+    const current = await second
+    expect(current).not.toBeNull()
+    expect([...store.readCounts.values()]).toEqual([3])
+    expect(store.compareCandidates).toHaveLength(1)
+    expect(store.quarantinedReasons).toHaveLength(0)
+    connected.source.close()
+  })
 })
 
 type SnapshotChanges = Readonly<{
@@ -416,7 +553,8 @@ async function connectSource(
   now: () => number,
   suspendGeneration: () => number,
   getDisplayedSnapshotRevision: () => string | null,
-  store = new MemoryResidentSourceHighWaterStore()
+  store = new MemoryResidentSourceHighWaterStore(),
+  beforeSnapshotResponse?: () => void
 ) {
   let sequence = 1
   let nextSnapshotIndex = 0
@@ -428,6 +566,7 @@ async function connectSource(
       push(sourceBoundWire)
     }
     if (index >= 3) {
+      beforeSnapshotResponse?.()
       const value = snapshots[nextSnapshotIndex]
       if (!value) {
         throw new Error('No synthetic resident snapshot remains')
@@ -463,5 +602,5 @@ async function connectSource(
   if (connected.status !== 'connected') {
     throw new Error(`Resident source setup failed: ${connected.reason}`)
   }
-  return { source: connected.source, duplex, store }
+  return { source: connected.source, duplex, store, highWater }
 }

@@ -10,6 +10,7 @@ import { admitTicketWorkspaceResidentSnapshot } from './ticket-workspace-residen
 import { waitForResidentSourceAdmission } from './ticket-workspace-resident-source-admission-wait'
 import { ResidentSourceCurrentness } from './ticket-workspace-resident-source-currentness'
 import { ResidentSourceClockMonitor } from './ticket-workspace-resident-source-clock'
+import { ResidentHighWaterOperationContext } from './ticket-workspace-resident-high-water-operation-context'
 import {
   createResidentSourceHighWaterKey,
   type TicketWorkspaceResidentHighWater
@@ -181,30 +182,41 @@ class ResidentSourceAdapter implements TicketWorkspaceResidentSourceAdapter {
     }
 
     const sourceRecord = residentHighWaterRecordFromSnapshot(admission.snapshot)
-    let admissionAbandoned = false
+    const operationContext = new ResidentHighWaterOperationContext(
+      signal,
+      () => this.currentness.remainingOperationBudget(operationDeadlineAt),
+      () => this.highWater.invalidateLease(this.key, this.leaseGeneration)
+    )
     const highWaterOperation = this.highWater.admit(
       this.key,
       sourceRecord,
       this.leaseGeneration,
       () =>
-        !admissionAbandoned &&
+        operationContext.isActive() &&
         this.currentness.isReadAdmissible(
           signal,
           clockAtStart,
           readStartedAtMonotonicMs,
           operationDeadlineAt
-        )
+        ),
+      operationContext
     )
     const highWaterAdmission = await waitForResidentSourceAdmission(
       highWaterOperation,
       signal,
-      this.currentness.remainingOperationBudget(operationDeadlineAt),
-      () => {
-        admissionAbandoned = true
-      }
-    )
+      operationContext.remainingBudgetMs(),
+      () => operationContext.abandon()
+    ).finally(() => operationContext.dispose())
+    if (
+      highWaterAdmission?.status === 'unavailable' &&
+      highWaterAdmission.reason === 'high_water_admission_capacity'
+    ) {
+      return null
+    }
     if (!highWaterAdmission || highWaterAdmission.status !== 'admitted') {
-      this.highWater.invalidateLease(this.key, this.leaseGeneration)
+      if (!operationContext.isAbandoned()) {
+        this.highWater.invalidateLease(this.key, this.leaseGeneration)
+      }
       return null
     }
     if (

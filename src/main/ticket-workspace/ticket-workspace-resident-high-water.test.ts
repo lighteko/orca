@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { binding } from './ticket-workspace-resident-test-peer'
+import { ResidentHighWaterOperationContext } from './ticket-workspace-resident-high-water-operation-context'
 import {
   createResidentSourceBaseKey,
   createResidentSourceHighWaterKey,
@@ -8,6 +9,7 @@ import {
   type ResidentSourceHighWaterRecord
 } from './ticket-workspace-resident-high-water'
 import { MemoryResidentSourceHighWaterStore } from './ticket-workspace-resident-high-water-test-store'
+import { waitForResidentSourceAdmission } from './ticket-workspace-resident-source-admission-wait'
 
 describe('resident source high-water admission', () => {
   it('requires explicit first adoption and does not bootstrap from an absent row alone', async () => {
@@ -368,6 +370,388 @@ describe('resident source high-water admission', () => {
     })
   })
 
+  it('caps active and queued admissions by exact key across lease generations', async () => {
+    const store = new MemoryResidentSourceHighWaterStore()
+    const manager = new TicketWorkspaceResidentHighWater(store, permissions())
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const oldLease = manager.registerLease(key, 'lease-old')
+    let markReadStarted = (): void => undefined
+    const readStarted = new Promise<void>((resolve) => {
+      markReadStarted = resolve
+    })
+    let releaseRead = (): void => undefined
+    const readGate = new Promise<void>((resolve) => {
+      releaseRead = resolve
+    })
+    let blockFirstRead = true
+    store.beforeRead = async () => {
+      if (blockFirstRead) {
+        blockFirstRead = false
+        markReadStarted()
+        await readGate
+      }
+    }
+
+    const active = manager.admit(key, record(7, 'a'), oldLease)
+    await readStarted
+    const queuedOld = Array.from({ length: 6 }, () => manager.admit(key, record(7, 'a'), oldLease))
+    const newLease = manager.registerLease(key, 'lease-new')
+    const queuedNew = manager.admit(key, record(7, 'a'), newLease)
+    await expect(manager.admit(key, record(7, 'a'), newLease)).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'high_water_admission_capacity'
+    })
+    expect([...store.readCounts.values()]).toEqual([1])
+    expect(store.quarantinedReasons).toHaveLength(0)
+
+    releaseRead()
+    await expect(active).resolves.toMatchObject({ status: 'unavailable' })
+    const queuedResults = await Promise.all([...queuedOld, queuedNew])
+    expect(queuedResults.slice(0, 6)).toEqual(
+      Array.from({ length: 6 }, () => ({ status: 'unavailable', reason: 'high_water_quarantined' }))
+    )
+    expect(queuedResults[6].status).toBe('admitted')
+    expect(store.compareCandidates).toHaveLength(1)
+    expect(store.quarantinedReasons).toHaveLength(0)
+  })
+
+  it('expires or aborts queued reads without releasing an active raw admission', async () => {
+    let now = 100
+    const store = new MemoryResidentSourceHighWaterStore()
+    const manager = new TicketWorkspaceResidentHighWater(store, permissions())
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const oldLease = manager.registerLease(key, 'lease-old')
+    let markReadStarted = (): void => undefined
+    const readStarted = new Promise<void>((resolve) => {
+      markReadStarted = resolve
+    })
+    let releaseRead = (): void => undefined
+    const readGate = new Promise<void>((resolve) => {
+      releaseRead = resolve
+    })
+    let blockFirstRead = true
+    store.beforeRead = async () => {
+      if (blockFirstRead) {
+        blockFirstRead = false
+        markReadStarted()
+        await readGate
+      }
+    }
+    const activeController = new AbortController()
+    const activeContext = new ResidentHighWaterOperationContext(
+      activeController.signal,
+      () => 5_000,
+      () => manager.invalidateLease(key, oldLease)
+    )
+    const active = manager.admit(key, record(7, 'a'), oldLease, () => true, activeContext)
+    await readStarted
+
+    const expiredController = new AbortController()
+    const expiredContext = new ResidentHighWaterOperationContext(
+      expiredController.signal,
+      () => 2_600 - now,
+      () => manager.invalidateLease(key, oldLease)
+    )
+    expect(expiredContext.remainingBudgetMs()).toBe(2_500)
+    now = 2_100
+    expect(expiredContext.remainingBudgetMs()).toBe(500)
+    const expired = manager.admit(key, record(8, 'b'), oldLease, () => true, expiredContext)
+    now = 2_600
+    expect(expiredContext.isActive()).toBe(false)
+    await expect(expired).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'high_water_admission_abandoned'
+    })
+
+    const abortedController = new AbortController()
+    const abortedContext = new ResidentHighWaterOperationContext(
+      abortedController.signal,
+      () => 1_000,
+      () => manager.invalidateLease(key, oldLease)
+    )
+    const aborted = manager.admit(key, record(8, 'b'), oldLease, () => true, abortedContext)
+    const abortedWait = waitForResidentSourceAdmission(
+      aborted,
+      abortedController.signal,
+      1_000,
+      () => abortedContext.abandon()
+    )
+    abortedController.abort()
+    await expect(abortedWait).resolves.toBeUndefined()
+    await expect(aborted).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'high_water_admission_abandoned'
+    })
+    expect([...store.readCounts.values()]).toEqual([1])
+
+    const newLease = manager.registerLease(key, 'lease-new')
+    const next = manager.admit(key, record(8, 'b'), newLease)
+    activeContext.abandon()
+    await Promise.resolve()
+    expect([...store.readCounts.values()]).toEqual([1])
+    expect(store.compareCandidates).toHaveLength(0)
+
+    releaseRead()
+    await expect(active).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'high_water_admission_abandoned'
+    })
+    await expect(next).resolves.toMatchObject({ status: 'admitted' })
+    expect(store.compareCandidates).toHaveLength(1)
+    expect(store.quarantinedReasons).toHaveLength(0)
+  })
+
+  it('bounds a stalled first-adoption permission and retains its slot until settlement', async () => {
+    const store = new MemoryResidentSourceHighWaterStore()
+    let allowFirstAdoption = (): void => undefined
+    let markPermissionStarted = (): void => undefined
+    const permissionStarted = new Promise<void>((resolve) => {
+      markPermissionStarted = resolve
+    })
+    const permissionGate = new Promise<void>((resolve) => {
+      allowFirstAdoption = resolve
+    })
+    let blockFirstPermission = true
+    const manager = new TicketWorkspaceResidentHighWater(store, {
+      ...permissions(),
+      authorizeFirstAdoption: async () => {
+        if (blockFirstPermission) {
+          blockFirstPermission = false
+          markPermissionStarted()
+          await permissionGate
+        }
+        return true
+      }
+    })
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const lease = manager.registerLease(key, 'lease-a')
+    const controller = new AbortController()
+    const context = new ResidentHighWaterOperationContext(
+      controller.signal,
+      () => 25,
+      () => manager.invalidateLease(key, lease)
+    )
+    const active = manager.admit(key, record(7, 'a'), lease, () => true, context)
+    const caller = waitForResidentSourceAdmission(active, controller.signal, 25, () =>
+      context.abandon()
+    )
+    await permissionStarted
+    await expect(caller).resolves.toBeUndefined()
+
+    const successor = manager.admit(key, record(7, 'a'), lease)
+    expect([...store.readCounts.values()]).toEqual([1])
+    expect(store.compareCandidates).toHaveLength(0)
+    allowFirstAdoption()
+    await expect(active).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'high_water_admission_abandoned'
+    })
+    await expect(successor).resolves.toMatchObject({ status: 'admitted' })
+    expect(store.compareCandidates).toHaveLength(1)
+  })
+
+  it.each([
+    { result: 'committed', conflict: false, expectedReads: 2 },
+    { result: 'conflict', conflict: true, expectedReads: 3 }
+  ] as const)(
+    'does not start retry or confirmation reads after a delayed $result acknowledgement is abandoned',
+    async ({ conflict, expectedReads }) => {
+      const acknowledgementStarted = deferredVoid()
+      const acknowledgement = deferredVoid()
+      const store = new DelayedCompareAcknowledgementStore(
+        () => acknowledgementStarted.resolve(),
+        acknowledgement.promise
+      )
+      if (conflict) {
+        store.conflictNextCompare = 1
+      }
+      const manager = new TicketWorkspaceResidentHighWater(store, permissions())
+      const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+      const lease = manager.registerLease(key, 'lease-a')
+      const controller = new AbortController()
+      const context = new ResidentHighWaterOperationContext(
+        controller.signal,
+        () => 5_000,
+        () => manager.invalidateLease(key, lease)
+      )
+      const active = manager.admit(key, record(7, 'a'), lease, () => true, context)
+      const caller = waitForResidentSourceAdmission(active, controller.signal, 5_000, () =>
+        context.abandon()
+      )
+      await acknowledgementStarted.promise
+
+      expect(store.committedCandidates).toHaveLength(conflict ? 0 : 1)
+      const successor = manager.admit(key, record(7, 'a'), lease)
+      let activeSettled = false
+      void active.then(() => {
+        activeSettled = true
+      })
+      controller.abort()
+      await expect(caller).resolves.toBeUndefined()
+      expect(activeSettled).toBe(false)
+      expect([...store.readCounts.values()]).toEqual([1])
+
+      acknowledgement.resolve()
+      await expect(active).resolves.toEqual({
+        status: 'unavailable',
+        reason: 'high_water_admission_abandoned'
+      })
+      await expect(successor).resolves.toMatchObject({ status: 'admitted' })
+      expect([...store.readCounts.values()]).toEqual([expectedReads])
+      expect(store.quarantinedReasons).toHaveLength(0)
+    }
+  )
+
+  it('retains the admission slot through required quarantine cleanup after a delayed failed CAS', async () => {
+    const acknowledgementStarted = deferredVoid()
+    const acknowledgement = deferredVoid()
+    const quarantineStarted = deferredVoid()
+    const quarantineAcknowledgement = deferredVoid()
+    const store = new DelayedCompareAndQuarantineAcknowledgementStore(
+      () => acknowledgementStarted.resolve(),
+      acknowledgement.promise,
+      () => quarantineStarted.resolve(),
+      quarantineAcknowledgement.promise
+    )
+    store.failCompare = true
+    const manager = new TicketWorkspaceResidentHighWater(store, permissions())
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const lease = manager.registerLease(key, 'lease-a')
+    const controller = new AbortController()
+    const context = new ResidentHighWaterOperationContext(
+      controller.signal,
+      () => 5_000,
+      () => manager.invalidateLease(key, lease)
+    )
+    const active = manager.admit(key, record(7, 'a'), lease, () => true, context)
+    const caller = waitForResidentSourceAdmission(active, controller.signal, 5_000, () =>
+      context.abandon()
+    )
+    await acknowledgementStarted.promise
+    const successor = manager.admit(key, record(7, 'a'), lease)
+    controller.abort()
+    await expect(caller).resolves.toBeUndefined()
+
+    acknowledgement.resolve()
+    await quarantineStarted.promise
+    let activeSettled = false
+    void active.then(() => {
+      activeSettled = true
+    })
+    expect(activeSettled).toBe(false)
+    expect(store.quarantinedReasons).toHaveLength(0)
+
+    quarantineAcknowledgement.resolve()
+    await expect(active).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'high_water_admission_abandoned'
+    })
+    await expect(successor).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'high_water_quarantined'
+    })
+    expect([...store.readCounts.values()]).toEqual([1])
+    expect(store.quarantinedReasons).toEqual(['high_water_storage_failure'])
+  })
+
+  it('quarantines after a delayed third CAS conflict even when its caller abandoned', async () => {
+    const acknowledgementStarted = deferredVoid()
+    const acknowledgement = deferredVoid()
+    const quarantineStarted = deferredVoid()
+    const quarantineAcknowledgement = deferredVoid()
+    const store = new DelayedCompareAndQuarantineAcknowledgementStore(
+      () => acknowledgementStarted.resolve(),
+      acknowledgement.promise,
+      () => quarantineStarted.resolve(),
+      quarantineAcknowledgement.promise,
+      3
+    )
+    store.conflictNextCompare = 3
+    const manager = new TicketWorkspaceResidentHighWater(store, permissions())
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const lease = manager.registerLease(key, 'lease-a')
+    const controller = new AbortController()
+    const context = new ResidentHighWaterOperationContext(
+      controller.signal,
+      () => 5_000,
+      () => manager.invalidateLease(key, lease)
+    )
+    const active = manager.admit(key, record(7, 'a'), lease, () => true, context)
+    const caller = waitForResidentSourceAdmission(active, controller.signal, 5_000, () =>
+      context.abandon()
+    )
+    await acknowledgementStarted.promise
+    const successor = manager.admit(key, record(7, 'a'), lease)
+    let activeSettled = false
+    void active.then(() => {
+      activeSettled = true
+    })
+    controller.abort()
+    await expect(caller).resolves.toBeUndefined()
+    acknowledgement.resolve()
+    await quarantineStarted.promise
+    expect(activeSettled).toBe(false)
+    expect([...store.readCounts.values()]).toEqual([3])
+
+    quarantineAcknowledgement.resolve()
+    await expect(active).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'high_water_admission_abandoned'
+    })
+    await expect(successor).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'high_water_quarantined'
+    })
+    expect([...store.readCounts.values()]).toEqual([3])
+    expect(store.quarantinedReasons).toEqual(['high_water_storage_failure'])
+  })
+
+  it('bounds stalled commit readback without publishing late admission or releasing its slot', async () => {
+    const store = new MemoryResidentSourceHighWaterStore()
+    let readCount = 0
+    let markReadbackStarted = (): void => undefined
+    const readbackStarted = new Promise<void>((resolve) => {
+      markReadbackStarted = resolve
+    })
+    let releaseReadback = (): void => undefined
+    const readbackGate = new Promise<void>((resolve) => {
+      releaseReadback = resolve
+    })
+    store.beforeRead = async () => {
+      readCount += 1
+      if (readCount === 2) {
+        markReadbackStarted()
+        await readbackGate
+      }
+    }
+    const manager = new TicketWorkspaceResidentHighWater(store, permissions())
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const lease = manager.registerLease(key, 'lease-a')
+    const controller = new AbortController()
+    const context = new ResidentHighWaterOperationContext(
+      controller.signal,
+      () => 25,
+      () => manager.invalidateLease(key, lease)
+    )
+    const active = manager.admit(key, record(7, 'a'), lease, () => true, context)
+    const caller = waitForResidentSourceAdmission(active, controller.signal, 25, () =>
+      context.abandon()
+    )
+    await readbackStarted
+    await expect(caller).resolves.toBeUndefined()
+    const successor = manager.admit(key, record(7, 'a'), lease)
+    expect([...store.readCounts.values()]).toEqual([2])
+    expect(store.committedCandidates).toHaveLength(1)
+
+    releaseReadback()
+    await expect(active).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'high_water_admission_abandoned'
+    })
+    await expect(successor).resolves.toMatchObject({ status: 'admitted' })
+    expect(store.quarantinedReasons).toHaveLength(0)
+  })
+
   it('requires explicit rebind and quarantine recovery, revoking earlier facts', async () => {
     let rebindAllowed = false
     let recoveryAllowed = false
@@ -419,4 +803,58 @@ function record(
     projectionSequence: 0,
     catalogDigest: catalogDigestSuffix.repeat(64).slice(0, 64)
   }
+}
+
+class DelayedCompareAcknowledgementStore extends MemoryResidentSourceHighWaterStore {
+  private delayed = false
+  private compareCount = 0
+
+  constructor(
+    private readonly markAcknowledgementStarted: () => void,
+    private readonly acknowledgement: Promise<void>,
+    private readonly delayedCompareNumber = 1
+  ) {
+    super()
+  }
+
+  override async compareAndAdvance(
+    ...args: Parameters<MemoryResidentSourceHighWaterStore['compareAndAdvance']>
+  ): ReturnType<MemoryResidentSourceHighWaterStore['compareAndAdvance']> {
+    const result = await super.compareAndAdvance(...args)
+    this.compareCount += 1
+    if (!this.delayed && this.compareCount === this.delayedCompareNumber) {
+      this.delayed = true
+      this.markAcknowledgementStarted()
+      await this.acknowledgement
+    }
+    return result
+  }
+}
+
+class DelayedCompareAndQuarantineAcknowledgementStore extends DelayedCompareAcknowledgementStore {
+  constructor(
+    markAcknowledgementStarted: () => void,
+    acknowledgement: Promise<void>,
+    private readonly markQuarantineStarted: () => void,
+    private readonly quarantineAcknowledgement: Promise<void>,
+    delayedCompareNumber = 1
+  ) {
+    super(markAcknowledgementStarted, acknowledgement, delayedCompareNumber)
+  }
+
+  override async quarantine(
+    ...args: Parameters<MemoryResidentSourceHighWaterStore['quarantine']>
+  ): ReturnType<MemoryResidentSourceHighWaterStore['quarantine']> {
+    this.markQuarantineStarted()
+    await this.quarantineAcknowledgement
+    return super.quarantine(...args)
+  }
+}
+
+function deferredVoid(): Readonly<{ promise: Promise<void>; resolve: () => void }> {
+  let resolvePromise = (): void => undefined
+  const promise = new Promise<void>((resolve) => {
+    resolvePromise = () => resolve()
+  })
+  return { promise, resolve: resolvePromise }
 }
