@@ -41,11 +41,123 @@ Independent [direction audit](./review-findings.md#astra-direction-audit--2026-1
 
 The next acceptance is one actual ticket associated with an existing Orca Run/workspace, actual catalog/resident data in Tickets, and exact-owner navigation. Missing external/agent/test/lease observations stay unavailable; public `clear` and ticket effects stay disabled. Sol owns this single integration result. Before code allocation, freeze a finite pilot packet covering actual record creation/minimal enrollment, approved target/trust inputs, retained lifecycle, presentation DTO and HWM policy. None of those packets is CODE_READY from this audit alone.
 
-The subsequent fresh Astra next-step review recommends **TW-PILOT-ENTRY** (existing private CLI/reader/server wiring) first, but records **NEEDS_PACKET**, not implementation approval. Close only its two remaining contract items: total startup deadline versus the existing hello/bind deadline, and terminal retirement preventing late preparation from starting the server. **TW-PILOT-LEASE** (public explicit setup/retained stdio/retirement) also remains NEEDS_PACKET. Their proposed launch envelope is separate from unchanged logical-v1; reuse the existing frame reader across bootstrap/server to preserve coalesced bytes. After the shared bootstrap/deadline/retirement interface and task boundaries pass review, private ENTRY and public LEASE have disjoint ownership and can run in parallel. Actual record/strict Run association and durable HWM/live presentation require their own finite packets; they are not included in these two candidates. The current review receipt is in project-state.
+The subsequent fresh Astra next-step review returned **NEXT_APPROVE / CODE_READY** for **TW-PILOT-ENTRY** and **TW-PILOT-LEASE** after their shared launch/deadline/retirement contract was frozen. The continuing private and public Luna workstreams implemented the disjoint packets. The launch envelope is separate from unchanged logical-v1; reuse the existing readers across launch/protocol boundaries. Actual record/strict Run association and durable HWM/live presentation require their own finite packets and are not included in these allocations. The current integration receipt is in project-state.
 
 Read-only `discover/inspect` is TW-04R, independent of the TW-05G effect gateway. Existing navigation is already covered by TW-02F/TW-07F; other existing Orca action seams can have their own exact-target/authority packets without waiting for unrelated external effects. The ticket-effect subset of TW-08 retains live/root/confirmation dependencies. Fixtures never authorize effects or impersonate a coordinator Run.
 
 One combined CLI/resident release and a separation of durable HWM persistence from deadline-bounded current publication are **design proposals awaiting review**. Existing wire, trust, source-order, precommit and currentness contracts are unchanged.
+
+## Actual-ticket pilot entry and lease cycle — 2026-10-01
+
+```text
+reviewed launch contract ──> TW-PILOT-ENTRY ──┐
+                        └─> TW-PILOT-LEASE ─┴─> focused verification + fresh Astra + paired-path integration
+actual record/strict Run association + durable HWM + live view contracts remain later pilot dependencies
+```
+
+Fresh Astra reproduced terminal-loss and queued stream-error defects, corrected by the same private/public Luna owners through ENTRY-F2 and LEASE-F2. Both have CODE_APPROVE; the finite actual-implementation pairing passed 2/2 and fresh Astra issued INTEGRATION_APPROVE after independently auditing its receipts. Sol owns local private-first/public-gitlink commits. [Review findings](./review-findings.md#pilot-entry-and-lease-code-review--2026-10-01) retain the correction and harness evidence.
+
+### TW-PILOT-ENTRY
+
+- **STATUS:** Complete local module; ENTRY-F2 CODE_APPROVE, final paired 2/2 and INTEGRATION_APPROVE. Publication/operational activation remain separate.
+- **GOAL:** Connect the existing private CLI to the real read-only catalog capability/reader and existing resident server.
+- **DEPENDENCIES:** Frozen [foreground launch contract](./resident-ticket-transport.md#first-ticket-pilot-foreground-launch-contract); existing logical-v1 producer.
+- **OWNERSHIP:** Continuing Luna artifact-delivery workstream, private CLI only.
+- **FILES / MODULES LIKELY INVOLVED:** CLI dispatch; new resident entry module/test; narrow server optional reader/budget inputs; focused existing CLI/server tests. Split the new entry's launch parsing/process adaptation into private `ticket-workspace-resident-launch-v1.ts` to satisfy the enforced 300-line source limit. F1's three process-terminal regressions move to `ticket-workspace-resident-entry-terminal-v1.test.ts` because the combined test exceeded the enforced 800-line limit. Existing CLI/server baseline lint debt is compared against `b556834`; no suppressions or unrelated legacy rewrite are allocated.
+- **INPUT CONTRACT:** Explicit profile/machine config paths; strict bounded bootstrap frame with exact binding, ephemeral key, separate sorted allowlists and positive relative budget.
+- **OUTPUT CONTRACT:** Bounded ready frame and unchanged logical-v1 server on the same buffered reader; real loader/identity/read-capability/catalog path.
+- **CONSTRAINTS:** Initial entry deadline bounds missing prelude; bounded preparation/ready and synchronous timer handoff; no renewed overall budget; sticky retirement suppresses late preparation; resident-prefixed failures keep stdout protocol-only. Compare canonical original bytes and reject BOM. Preserve ordinary CLI/default protocol behavior.
+- **DO_NOT_TOUCH:** Public source/docs, schema/packages/dependencies, config/authority/catalog semantics or writes, real roots/keys/WSL/services and operational activation.
+- **ACCEPTANCE CRITERIA:** Reject malformed envelopes before config access; split/coalesced framing; failure/timeout/EOF/late resolve/reject at preparation boundaries; bounded writes/cleanup; correct timer handoff; healthy residence beyond startup limit; existing protocol regressions.
+- **VERIFICATION:** Focused entry/CLI/server tests, CLI types, exact-file quality/format/diff; fresh Astra code/integration review. Synthetic/native tests do not prove real WSL/catalog activation.
+- **PARALLELIZATION SAFETY:** Private-only edits independent of public LEASE after contract freeze. Pair actual implementations only after both candidates are stable; no concurrent cross-repository build reads.
+- **POTENTIAL CONFLICTS:** Only this workstream modifies private CLI/server. Necessary loader/schema deviations return to root before expansion.
+
+### TW-PILOT-LEASE
+
+- **STATUS:** Complete local module; LEASE-F2 CODE_APPROVE, final paired 2/2 and INTEGRATION_APPROVE. Publication/operational activation remain separate.
+- **GOAL:** Adapt one explicitly started foreground resident child into the existing client/source adapter with a retained lifetime.
+- **DEPENDENCIES:** Same frozen launch contract; existing process wrapper, WSL argv builder, logical client/source adapter. Production trust/host/HWM gates remain separate.
+- **OWNERSHIP:** Continuing Luna transport workstream, public main source only; root owns shared state/docs.
+- **FILES / MODULES LIKELY INVOLVED:** New resident-process-lease module/test; narrow client/client-contract/source-adapter/source-adapter-contract setup seams; byte stream only as needed; focused existing tests. The enforced 300-line source limit requires concrete launch-bootstrap, process-lease-child, source-adapter-connection and client-setup splits in the same ticket-workspace directory; existing connector exports/private token-issuer class and the client's same-deadline hello/auth/bind/default behavior stay unchanged.
+- **INPUT CONTRACT:** Already-resolved independently trusted launch inputs, binding/allowlists and existing HWM/clock ports; no renderer paths or self-attested artifact/host selection.
+- **OUTPUT CONTRACT:** Explicit setup returns an established retained source lease or unavailable; reads never spawn, reconnect or respawn.
+- **CONSTRAINTS:** One parent 10-second deadline through registration; existing reader consumes ready; capped remaining hello/bind budget; synchronous guard immediately before adapter/HWM lease construction. Retire before cleanup awaits, reject late results, bound exact-child cleanup and stderr/backpressure, handle all stream errors. WSL wrapper loss stays unverifiable.
+- **DO_NOT_TOUCH:** Private source, owner/admission/HWM semantics, IPC/preload/UI, packages/dependencies, user configuration/keys/WSL/services and production registration.
+- **ACCEPTANCE CRITERIA:** One spawn on explicit setup and zero on reads; strict control framing; no budget renewal or late HWM registration; abort/EOF/stream/child errors; stalled writes/cleanup; idempotent retirement/binding isolation; unchanged old client/source defaults.
+- **VERIFICATION:** Focused lease/client/source/byte-stream and logical regressions, Node types, exact-file quality/format/diff; fresh Astra code/integration review. Paired-path verification uses both frozen candidates; no new public test dependency on unpublished private source.
+- **PARALLELIZATION SAFETY:** Disjoint from private ENTRY; do not import or test its changing build. Serialize final paired-path integration and root commits.
+- **POTENTIAL CONFLICTS:** Only this workstream modifies client/source-adapter setup paths. Reuse current implementation; a second store/client/provider or admission change requires a new reviewed packet.
+
+## Reviewed next preparation frontier — 2026-10-01
+
+Fresh integration Astra approved **four disjoint preparation lanes**, not four new code allocations. They can run concurrently with read-only source access and separate reports; Sol integrates durable documents. Each implementation packet still needs exact ownership, contracts, acceptance and fresh review before CODE_READY. Do not treat real provisioning as a prerequisite of independent local module preparation.
+
+```text
+ENTRY + LEASE integration ──> A/B/C/D finite packet preparation in parallel
+A strict enrollment + B durable admission + C live view + D trusted explicit setup
+    └─> approved pilot activation ──> one actual ticket displayed ──> exact workspace navigation
+```
+
+### TW-PILOT-A-PREP — actual ticket and strict existing Run/workspace association
+
+- **GOAL:** Freeze the smallest enrollment packet using an existing Run/workspace and strict caller verification.
+- **DEPENDENCIES:** Existing catalog/CAS and Orca caller verifier; coordinate public owner contracts with C before implementation.
+- **OWNERSHIP:** Continuing private Luna proposes catalog/enrollment changes; Sol assigns exclusive public strict-Run ownership in the output packet.
+- **FILES / MODULES LIKELY INVOLVED:** Private catalog/ledger/enrollment CLI; public `orca-runtime-verify-orchestration-compatibility-caller.ts` and `orchestration-caller-workspace.ts` for read-only seam checks.
+- **INPUT CONTRACT:** Current schema/CAS compatibility, strict non-null caller evidence, exact host/workspace/Run generation and retry boundaries.
+- **OUTPUT CONTRACT:** Finite implementation packet with catalog compatibility decision, exact file ownership, failure cases and synthetic verification.
+- **CONSTRAINTS:** Reuse existing verifier; path coincidence or ordinary Run calls are insufficient authority. Separate minimal enrollment from folder creation and external effects.
+- **DO_NOT_TOUCH:** Product source, schema, catalog contents, user Runs/workspaces and configuration during preparation.
+- **ACCEPTANCE CRITERIA:** Record every unresolved authority/compatibility choice; specify exact association and stale/host/generation rejection criteria without inventing an actual target.
+- **VERIFICATION:** Read current readers/writers and strict verifier; fresh Astra packet review before implementation.
+- **PARALLELIZATION SAFETY:** Read-only preparation is independent of B/C/D; only this lane proposes private catalog/CAS edits.
+- **POTENTIAL CONFLICTS:** Public strict-Run and C owner wiring require nonoverlapping files or serial allocation; version changes also affect existing catalog readers.
+
+### TW-PILOT-B-PREP — durable high-water admission
+
+- **GOAL:** Freeze a durable store packet that preserves the existing history, epoch and atomic precommit contracts.
+- **DEPENDENCIES:** Frozen high-water/currentness contracts and existing process/worker isolation mechanisms.
+- **OWNERSHIP:** Continuing public transport Luna, HWM storage proposal only.
+- **FILES / MODULES LIKELY INVOLVED:** Resident high-water contract/implementation and existing isolated storage mechanisms located by source search.
+- **INPUT CONTRACT:** Known-history marker, exact source partition, atomic `canCommit`, cancellation/deadline, quarantine and restart/uncertain outcomes.
+- **OUTPUT CONTRACT:** Bounded adapter packet with ownership, isolation mechanism, persistence/commit semantics and meaningful failure tests.
+- **CONSTRAINTS:** Preserve ordering/currentness; no synchronous FULL-sync SQLite on the main thread, serialized commit boolean or new generic SAB framework. Policy simplification remains a separate proposal.
+- **DO_NOT_TOUCH:** Product source, existing currentness semantics, real user storage, setup/registration and UI during preparation.
+- **ACCEPTANCE CRITERIA:** Explain the precommit race boundary and restart/lost-history behavior; identify concrete existing isolation reuse and unresolved design choices.
+- **VERIFICATION:** Compare existing tested HWM invariants with proposed storage behavior; fresh Astra packet review before implementation.
+- **PARALLELIZATION SAFETY:** Read-only proposal beside A/C/D; later storage adapter files may be disjoint after the startup/registration interface freezes.
+- **POTENTIAL CONFLICTS:** B/C/D all touch admission or setup integration; assign the join serially and preserve synchronous pre-registration guards.
+
+### TW-PILOT-C-PREP — live presentation and exact-owner click
+
+- **GOAL:** Freeze current/stale/unavailable/unsupported presentation and source-correlated owner navigation contracts.
+- **DEPENDENCIES:** Existing live owner composition/currentness and fixture semantic validator; coordinate A's strict association and B's admission port.
+- **OWNERSHIP:** Luna owner/presentation workstream after explicit allocation; Sol owns DTO and main/preload/renderer boundaries.
+- **FILES / MODULES LIKELY INVOLVED:** `runtime-ticket-workspace-owner-binding.ts`, `ticket-workspace-live-owner-composition*.ts`, fixture bridge/API and Tickets components located by source search.
+- **INPUT CONTRACT:** Same admitted source/owner identity, immutable presentation receipt and existing exact click rechecks; no ticket-supplied navigation target.
+- **OUTPUT CONTRACT:** Frozen live DTO and finite main/preload/renderer packets with exclusive files and an integration order.
+- **CONSTRAINTS:** Reuse semantic validation without weakening fixture pinning; freeze DTO before splitting main/preload and renderer; missing evidence is unavailable and effects/public clear stay disabled.
+- **DO_NOT_TOUCH:** Product source, IPC/UI, fixture bytes/validation policy, owner/currentness semantics and actual navigation during preparation.
+- **ACCEPTANCE CRITERIA:** Define all state mappings, request/response correlation and click-time revalidation; identify exact reusable live owner seams and source-trust gates.
+- **VERIFICATION:** Read existing UI/IPC/owner implementations and tests; fresh Astra packet review before implementation or UI validation.
+- **PARALLELIZATION SAFETY:** Read-only preparation beside A/B/D; main/preload and renderer implementation only separate after DTO freeze.
+- **POTENTIAL CONFLICTS:** A strict-Run seam and C owner composition, plus B/D admission/registration joins, need exclusive ownership or serialization.
+
+### TW-PILOT-D-PREP — operational launch and trust evidence
+
+- **GOAL:** Define the smallest approved pinned runtime/profile and actual Linux/WSL launch evidence for the developer pilot.
+- **DEPENDENCIES:** Implemented ENTRY/LEASE and existing artifact verifier; actual host/profile/artifact/key choices require Sol-routed user approval.
+- **OWNERSHIP:** Continuing verification Luna prepares evidence/operation packet; Sol selects no real target or security policy implicitly.
+- **FILES / MODULES LIKELY INVOLVED:** Entry/lease/verifier source and existing runtime/profile/WSL evidence, read-only.
+- **INPUT CONTRACT:** Exact artifact/runtime/profile identity, approved paths/host/distro, independent allowlists and pipe/key privacy, explicit start/quit/stop boundaries.
+- **OUTPUT CONTRACT:** Finite approval and verification packet separating local preparation from actual operations, with hashes, byte-conformance cases and bounded cleanup.
+- **CONSTRAINTS:** Synthetic pairing is not WSL/host trust. Transport loss stays unverifiable; no read-triggered start/replacement, broad distro termination or full updater/recovery prerequisite.
+- **DO_NOT_TOUCH:** Product source, keys, user configuration/services/WSL and actual host/profile selection during preparation.
+- **ACCEPTANCE CRITERIA:** List exactly which inputs are known, unverified or owner-selected; specify actual Linux/WSL byte, cleanup and trust receipts required before activation.
+- **VERIFICATION:** Review current code/evidence; fresh Astra packet review and root approval before operational execution.
+- **PARALLELIZATION SAFETY:** Read-only evidence preparation beside A/B/C; actual activation joins their completed contracts serially.
+- **POTENTIAL CONFLICTS:** Startup/registration/quit integration may share public owner files; freeze explicit ownership before code or operations.
 
 ## Bounded module cycle — 2026-10-01
 
@@ -539,7 +651,7 @@ One combined CLI/resident release and a separation of durable HWM persistence fr
 - **DEPENDENCIES:** TW-00 strict snapshot/corpus and M0 host ownership; injected TW-06P/T are complete. Explicit pilot setup requires its approved pinned runtime/profile, actual resident entrypoint/artifact, endpoint, credential handoff and host mapping. Full updater/recovery and separate CLI/service distribution lifecycles are not prerequisites. Production enablement still needs applicable trust/currentness/owner proofs.
 - **OWNERSHIP:** One Orca main transport worker after cross-repository protocol ownership is fixed.
 - **FILES / MODULES LIKELY INVOLVED:** Orca main local integration service and resident client; the ticket-domain producer belongs to TW-06P.
-- **INPUT CONTRACT:** Configured coordinator/authority/profile binding, explicit setup authority, and a separately reviewed versioned endpoint protocol; no resident endpoint or production snapshot producer is present in the pinned source.
+- **INPUT CONTRACT:** Configured coordinator/authority/profile binding, explicit setup authority and reviewed logical-v1/launch protocols. ENTRY/LEASE implement local producer/lifecycle seams; operational endpoint, artifact/profile and key/host trust proof remain separate activation inputs.
 - **OUTPUT CONTRACT:** Owned resident endpoint/connection lifecycle plus bounded snapshot byte stream with authenticated source/provenance, or unavailable during disconnected reads.
 - **CONSTRAINTS:** Snapshot reads never launch WSL, CLI, or coordinator; connection setup requires its separate explicit authority. No path/secret exposure, new state owner, or silent local fallback.
 - **DO_NOT_TOUCH:** Main/preload snapshot cache and renderer UI until TW-06 owns that layer.

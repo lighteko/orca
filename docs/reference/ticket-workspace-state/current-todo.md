@@ -26,11 +26,19 @@
 - [x] **Astra xhigh 방향성 감사:** 원래 플랜·현재 코드·최근 구현을 독립 검토해 **부분적 방향 이탈**로 판정했다. 올바른 내부 기반을 만들었지만 실제 사용 흐름보다 배포·롤백·복구에 투자가 앞섰다. [근거·결정](./review-findings.md#astra-direction-audit--2026-10-01).
 - [ ] **TW-M1P-L2 — 연기:** 첫 수정 전에 동결했으며 변경 파일은 없다. 실제 티켓 pilot에 필요한 근거가 생기기 전까지 staging·runtime recovery 후속 작업과 함께 연기한다. 완료된 verifier/L1 코드는 보존한다.
 - [x] **방향 재정렬:** read-only 관측기를 effect gateway에서 분리하고, 설치 전체를 첫 pilot의 선행 조건으로 두지 않도록 DAG를 수정했다. HWM 계약 단순화와 CLI/resident 단일 release는 검토할 제안이며 아직 구현 결정이 아니다.
-- [ ] **바로 다음 — resident 실행 진입점:** Astra xhigh가 첫 구현 방향으로 검증했다. 기존 CLI·실제 catalog reader·resident server를 연결한다. 구현 승인 전 남은 것은 전체 startup 시간 제한과 종료 후 늦은 준비 작업 차단 계약 두 가지다. 현재 `NEEDS_PACKET`이며 새 코드 배정은 없다.
-- [ ] **병렬 후보 — Orca stdio 연결 관리:** 기존 Luna 전송 workstream이 명시적 시작·유지·종료 packet을 준비한다. 위 진입점과 공통 입력·시간 제한·종료 계약을 고정하고 독립 리뷰를 통과한 뒤 두 작업을 병행할 수 있다. 아직 구현 승인은 아니다.
+- [x] **시작·종료 계약 검토:** Astra xhigh가 정확한 launch 입력, 전체 시간 제한·타이머 인계·늦은 등록 차단 계약과 두 구현 범위를 검토해 `NEXT_APPROVE / CODE_READY`로 판정했다.
+- [x] **TW-PILOT-ENTRY 코드 검증:** 기존 private Luna의 F2가 같은-turn 입력 파괴와 server handoff 후 출력 오류를 해결했다. 집중 60개 통과·5개 기존 skip, 타입·빌드·품질 검사와 Astra 독립 12개·원본 재현 검사를 통과해 CODE_APPROVE다.
+- [x] **TW-PILOT-LEASE 코드 검증:** 기존 transport Luna의 F2가 stderr 종료·늦은 오류·중복 정리를 해결했다. 초기 관련 89개, 최종 lease/import 경계 12개와 Node 타입·품질 검사가 통과했다. Astra 독립 8개·원본 재현도 통과해 CODE_APPROVE다.
+- [x] **이번 통합 마감:** 실제 ENTRY/server ↔ LEASE/client/source의 유한 통합 두 사례, Fresh Astra INTEGRATION_APPROVE와 로컬 커밋을 완료했다. private `86b8e49`, public `ad16f44c2`이며 아직 미게시다. 커밋 gate의 테스트 문법 수정도 8개·Astra 리뷰를 통과했다. synthetic host/catalog/HWM 검증이며 실제 WSL 운영이나 Tickets 완료는 아니다.
+- [x] **다음 병렬 준비 경계 검토:** Astra가 아래 네 준비 작업을 검토했다. 코드 구현 packet은 아직 CODE_READY가 아니며, 계약·공유 파일 소유권 고정 후 별도 리뷰한다.
+  - [ ] **A — 실제 티켓·기존 Run/workspace:** 최소 enrollment, catalog/CAS 호환성과 strict caller·host/generation 검증 packet.
+  - [ ] **B — durable HWM:** 기존 history·epoch·atomic precommit·취소/시간 제한을 보존하는 격리 저장 packet.
+  - [ ] **C — live 표시·클릭:** current/stale/unavailable/unsupported DTO, 같은 source/owner 결합, preload·Tickets·클릭 재검증 packet.
+  - [ ] **D — 실행 환경·신뢰 증거:** pinned artifact/profile·host/경로·pipe/key·allowlist와 실제 Linux/WSL 검증/종료 packet. 실제 대상·키 선택은 사용자 승인 사항이다.
+  - 준비 조사는 병렬 가능하다. A/C strict Run·owner 파일과 B/C/D setup·admission·등록 통합은 소유권 분리 또는 직렬화한다. [전체 계약](./task-graph.md#reviewed-next-preparation-frontier--2026-10-01).
 - [ ] **후속 pilot 통합:** 실제 티켓과 기존 Run/workspace의 엄격한 연결, durable HWM, live DTO·preload·Tickets·클릭 재검증을 연결한다. 완료 기준은 실제 티켓 한 건의 표시와 정확한 workspace 이동이다. 누락된 관측은 unavailable이며 effect·공개 `clear`는 비활성이다.
 
-**이번 코드 사이클 완료 기준:** 집중 테스트·적용 타입/품질 검사·독립 코드 리뷰·owner/cache 통합 리뷰·로컬 커밋. 실제 운영 설치·키·호스트 활성화는 이 사이클의 완료 조건에서 분리한다.
+**이번 코드 사이클 완료 기준:** ENTRY/LEASE 집중 테스트·적용 타입/품질 검사·Astra 코드 재리뷰·실제 구현끼리의 유한 통합 검증·로컬 커밋. 실제 운영 설치·키·호스트 활성화는 이 사이클의 완료 조건에서 분리한다.
 
 ## 완료된 기반
 
