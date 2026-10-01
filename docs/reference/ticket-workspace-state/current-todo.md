@@ -50,7 +50,9 @@
 - [x] **수정 게시·CI:** 사용자 추가 승인 후 `823c918ea`를 게시하고 원격 해시를 확인했다. [정확한 커밋의 PR Checks](https://github.com/lighteko/orca/actions/runs/36836563109)는 26개 성공·6개 skip·실패 0개이며 Mobile·Computer-use e2e·PR test LoC도 성공이다. 이전 `2f00e82e6`의 CLI 컴파일 실패는 이 수정으로 해결됐다.
 - [ ] **후속 pilot 통합:** 실제 티켓과 기존 Run/workspace의 엄격한 연결, durable HWM, live DTO·preload·Tickets·클릭 재검증을 연결한다. 완료 기준은 실제 티켓 한 건의 표시와 정확한 workspace 이동이다. 누락된 관측은 unavailable이며 effect·공개 `clear`는 비활성이다.
 
-**다음 실행 경계:** C2A 상세 결과/남은 수명 packet, C2B receipt·공통 owner 결합 계약, C2C/D 채널·오류·preload 계약, C3 refresh/expiry 준비, B1 내구성 결정, D1 승인 실행서 준비는 파일·보고 소유권을 나눠 진행할 수 있다. injected C2 통합은 실제 WSL·운영 키·durable 구현을 기다릴 필요가 없다. 실제 pilot 활성화는 별도 운영·내구성·제품 연결 게이트다.
+- [x] **정확한 다음 구현 검증:** 새 Fresh Astra가 추가된 HWM stamp 검사·정상 admission 갱신 구분·파일 분리와 전체 IPC packet을 검토해 **C2A·C2C0 모두 CODE_READY / NEXT_APPROVE**로 판정했다. 기존 C Luna의 source 7개 파일과 B Luna의 새 shared boundary 2개 파일은 병렬 배정이 안전하다. A의 공통 Run/coordinator/repository 결합은 계약 보완만 준비됐다. 구현은 아직 배정하지 않았다.
+
+**다음 실행 경계:** 검증된 C2A source와 C2C0 공통 IPC를 병렬 구현할 수 있다. 공통 IPC 고정 뒤 main/preload packet을 배정하고, C2B receipt·공통 owner 결합은 별도 계약 검증을 마친다. C3 refresh/expiry·C2E 사례 준비, B1 내구성 결정과 D1 실행서 준비는 독립적으로 진행 가능하다. injected C2 통합은 실제 WSL·운영 키·durable 구현을 기다릴 필요가 없다. 실제 pilot 활성화는 별도 운영·내구성·제품 연결 게이트다.
 
 ## 완료된 기반
 

@@ -298,17 +298,17 @@ actual source/HWM/lease registration remains one serial activation join
 
 #### TW-PILOT-C2A — detailed source and remaining lifetime
 
-- **STATUS:** NEXT_APPROVE for a narrow implementation packet; freeze exact result signature before allocation.
+- **STATUS:** CODE_READY / NEXT_APPROVE from fresh Astra's exact packet review. Original-stamp versus admitted-facts phases below are frozen; no further contract review is required for this bounded allocation. Implementation is not yet assigned.
 - **GOAL:** Distinguish complete positively unsupported source evidence from ordinary unavailable and expose existing remaining currentness lifetime privately.
 - **DEPENDENCIES:** B0 freeze, existing semantic admission/currentness and frozen detailed result.
-- **OWNERSHIP:** C owner/presentation Luna after allocation; sole source-adapter editor.
-- **FILES / MODULES LIKELY INVOLVED:** Adapter contract/implementation/test; narrowly currentness implementation if its TTL getter requires a seam.
-- **INPUT CONTRACT:** Same signal/original budget and authenticated canonical full-source read as the current nullable owner port.
-- **OUTPUT CONTRACT:** Main-private admitted read plus currentness remaining ms, positive unsupported or unavailable. Existing nullable method delegates to the same operation and maps only admitted to a read.
-- **CONSTRAINTS:** Derive lifetime from the existing currentness authority; no new TTL/cache. Unsupported requires complete authentication/policy and terminal lease/cancellation/deadline checks. Preserve HWM/owner semantics.
+- **OWNERSHIP:** Existing C owner/presentation Luna after exclusive transfer of frozen B0 adapter/HWM files; B owns only disjoint C2C0 files during this allocation.
+- **FILES / MODULES LIKELY INVOLVED:** Exactly seven files under `src/main/ticket-workspace/`: existing `ticket-workspace-resident-source-adapter-contract.ts`, `ticket-workspace-resident-source-adapter.ts`, `ticket-workspace-resident-source-currentness.ts`, `ticket-workspace-resident-high-water.ts`, `ticket-workspace-resident-source-adapter.test.ts`; new `ticket-workspace-resident-source-presentation-read.ts` and `ticket-workspace-resident-high-water-lease.test.ts`. Adapter 289/300, existing HWM test 800/800 nonblank lines justify this domain extraction and focused new test, not cap exceptions.
+- **INPUT CONTRACT:** Same signal/original 1–10,000 ms budget and authenticated canonical full-source read. Add non-mutating `captureLeaseInvalidationGeneration(key, leaseGeneration): number | null` and `isLeaseCurrent(key, leaseGeneration, expectedInvalidationGeneration): boolean`, using existing partition lookup only, active identity/generation, no pending rebind or quarantine.
+- **OUTPUT CONTRACT:** `readCurrentPresentationSnapshot(signal, deadlineBudgetMs)` returns admitted `CurrentTicketOwnerRead` plus `currentnessRemainingMs`, status-only unsupported, or unavailable. Existing nullable method delegates one operation and maps only admitted to a read. Adapter's main-private `getCurrentnessRemainingMs(read): number` uses existing weak token/clock/HWM/client facts, zero invalid/expired, otherwise floored original lifetime.
+- **CONSTRAINTS:** Original lease/stamp guards transport and every pre-publication admission continuation, including queued/raw waits. Unsupported checks original signal/deadline/clock/client/lease/stamp, then preserves local invalidation and returns without an await or store/CAS/token. Admitted uses returned HWM facts after its own authorized stamp update plus original context checks; never recapture a stamp to excuse unrelated invalidation. Preserve terminal checks after admission cleanup and any added internal await. See [exact branch rules](./review-findings.md#exact-c2-implementation-packet-review--2026-10-01). No new clock/cache/token/TTL; preserve fractional boolean currentness and B0 raw ownership/cleanup.
 - **DO_NOT_TOUCH:** Owner source port, wire, setup/launch, renderer, private source, actual targets or currentness policy. Do not present/renew during ordinary reads.
-- **ACCEPTANCE CRITERIA:** Valid read/lifetime, positive whole unsupported and all malformed/cancelled/disconnected/HWM cases map correctly; nullable behavior unchanged; no duplicate read or late positive result.
-- **VERIFICATION:** Focused adapter/currentness/HWM regressions, Node types, exact default/native/type-aware lint/format/diff and Astra code review.
+- **ACCEPTANCE CRITERIA:** First adoption/advancement succeeds despite its own stamp update; timestamp-only rereads preserve earlier currentness. Unrelated transport/queue/raw/final-settlement invalidation fails. Unsupported revokes prior tokens with zero store/CAS/token work. Nullable single-read delegation, fractional boolean/getter behavior, original lifetime, clock/suspend/expiry/cancel, missing/replaced/rebinding/quarantined leases all preserve fail-closed behavior.
+- **VERIFICATION:** Focused adapter/currentness/lease/HWM and B0 queue/abandonment/cleanup regression; Node and CLI impact checks; exact default/native/type-aware lint/format/diff and fresh Astra code review. Tests use background launch policy.
 - **PARALLELIZATION SAFETY:** Serial after B0; disjoint from new IPC/preload files and B1/D1 read-only preparation.
 - **POTENTIAL CONFLICTS:** Different quarantine/disconnect stale policies would need a minimal private invalidation distinction; freeze receipt policy before introducing it.
 
@@ -327,6 +327,22 @@ actual source/HWM/lease registration remains one serial activation join
 - **VERIFICATION:** Meaningful projection/receipt/race/combined-owner tests, Node types and exact quality; fresh Astra contract and code checkpoints.
 - **PARALLELIZATION SAFETY:** Preparation beside C2A/C/D; implementation beside preload only after contracts and runtime ownership freeze.
 - **POTENTIAL CONFLICTS:** One global sender-bound slot replaces another renderer's receipt; this is an unratified arbitration choice. Three-state source disposition cannot express different unavailable-retention policies by itself.
+
+#### TW-PILOT-C2C0 — shared live IPC contract
+
+- **STATUS:** CODE_READY / NEXT_APPROVE from fresh Astra's exact packet review; implementation is not yet assigned.
+- **GOAL:** Freeze the shared bridge contract needed by separate main and preload implementations.
+- **DEPENDENCIES:** Published and CI-verified C1; no C2A/B implementation, durable store or WSL prerequisite.
+- **OWNERSHIP:** Existing B transport Luna; only two new shared files. C retains exclusive C2A ownership.
+- **FILES / MODULES LIKELY INVOLVED:** Only `src/shared/ticket-workspace-live-ipc-boundary.ts` and its test.
+- **INPUT CONTRACT:** Parsed C1 presentation/selection requests; derive method request/response mappings from the existing C1 API/types, without another schema.
+- **OUTPUT CONTRACT:** Exactly `ticketWorkspaceLive:getPresentation`, `ticketWorkspaceLive:matchSelection`, `ticketWorkspaceLive:rebindSelectionAtClick`; three correlated-unavailable builders. Presentation copies request ID; match/rebind copy every selector field and nested source identity from the original parsed request.
+- **CONSTRAINTS:** Callers reject invalid input before provider/getter/IPC; valid-call failures use the original parsed request. No fabricated IDs or exception details. Preserve synchronous shared JSON/CJS/browser compatibility.
+- **DO_NOT_TOUCH:** Main/provider/sender lifecycle, preload/API exposure, renderer, fixture surfaces, receipt/stale policy, source/HWM, private files and operational state.
+- **ACCEPTANCE CRITERIA:** Unique exact channels, C1-derived method mapping, full correlation and actual C1 acceptance of all three unavailable shapes; no new authority or fixture fallback.
+- **VERIFICATION:** Focused C1/boundary tests; CLI/Node/Web types, actual browser execution and CommonJS load; exact quality/format/diff and fresh Astra code review. All tests background.
+- **PARALLELIZATION SAFETY:** Two new files are disjoint from C2A's seven files and A's common-join preparation. Main/preload branch only after this boundary freezes and their separate provider/handler packets are ready.
+- **POTENTIAL CONFLICTS:** This packet does not freeze provider/sender/lifecycle signatures or register handlers. B must not edit the transferred C2A/HWM files.
 
 #### TW-PILOT-C2C — live channels and injected main IPC
 
