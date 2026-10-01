@@ -9,16 +9,22 @@
 - [x] **TW-02L-CT1:** Luna owner workstream이 같은 source 읽기의 eligibility·owner 결합·클릭 재검증 계약을 고정했다. `workspace-owner-boundary.md`.
 - [x] **TW-EXEC-GATE-REVIEW:** Fresh Sol 6.1 xhigh가 네 코드 packet을 승인하고, 운영 준비를 독립 모듈 구현까지 막던 DAG 조건을 수정했다. 사용자가 이 네 작업과 이후 계획 범위의 검토된 가역적 로컬 작업을 승인했다.
 - [x] **TW-06-B1:** Caller 시간 제한·공유 타입·checked token issuer·전송 직전 만료 검사를 구현했다. 집중 33개 테스트, Node 타입·코드 품질·형식 검사와 fresh Sol 6.1 독립 코드 리뷰를 통과했다.
-- [x] **TW-M1P-I:** 비공개 manifest·서명·해시·profile 검증기를 구현했다. 계약 59개·CLI 257개 통과/45개 skip, 전체 타입 검사·코드 품질·독립 Sol 6.1 리뷰와 C1 원본 5개 해시의 읽기 전용 재생을 통과했다. 로컬 비공개 커밋 `052fa3b`; 원격 게시 전이다.
+- [x] **TW-M1P-I:** 비공개 manifest·서명·해시·profile 검증기를 구현했다. 계약 59개·CLI 257개 통과/45개 skip, 전체 타입 검사·코드 품질·독립 Sol 6.1 리뷰와 C1 원본 5개 해시의 읽기 전용 재생을 통과했다. 커밋 `052fa3b`는 아래 `b556834`와 함께 비공개 원격에 게시됐다.
 - [x] **TW-02L-I:** 같은 Luna owner workstream이 주입형 owner 조합을 구현했다. 기존 binder·selector·capture를 포함한 47개 테스트, Node 타입·품질·형식 검사와 fresh Sol 6.1 독립 코드 리뷰를 통과했다. 실제 source adapter 연결은 아래 IJ에서 검증했다.
 - [x] **TW-06-I:** 같은 Luna 전송 workstream이 주입형 admission·high-water·최신성을 구현했다. 71개 집중 테스트, Node 타입·품질·형식 검사와 fresh Sol 6.1 독립 리뷰를 통과했다. 리뷰어의 실제 소스 재현 검사 18개도 통과했다.
 
 - [x] **TW-02L-06-IJ:** 실제 인증된 source adapter·high-water·owner 조합을 연결한 7개 테스트와 독립 Sol 6.1 코드 리뷰를 통과했다. Root 관련 회귀 18개 suite/143개 테스트, 최종 Node 타입 검사와 변경 코드 품질 검사 175개 파일도 통과했다.
 - [x] **최종 통합·DAG 리뷰:** fresh Sol 6.1이 실제 연결과 완료 문서, 다음 작업 경계를 검증해 `INTEGRATION_APPROVE`를 판정했다.
-- [x] **로컬 커밋:** `5b39c5963`에 검토된 공개 코드·테스트·문서 39개 파일을 커밋했다. 기존 서브모듈 핀 `14c69a1`을 유지했고 원격 게시 전이다. 새 비공개 커밋 게시와 핀 갱신은 별도 게시 승인 뒤에 한다.
+- [x] **공개 코드 커밋:** `5b39c5963`에 검토된 공개 코드·테스트·문서 39개 파일을 커밋했다. 사용자 게시 승인 후 완료 문서 `6ca4bb7e5`와 핀 갱신 `52c1525c2`까지 기존 공개 PR #1에 게시했다.
 - [x] **TW-M1P-L1:** 같은 배포 Luna가 unbound 설치·업데이트·롤백·명시적 복구 상태머신을 구현했다. 집중 16개, 독립 리뷰 회귀 35개, Root 전체 계약 59개·CLI 273개 통과/45개 skip, 타입·정확한 파일 품질·형식 검사를 통과했다. 로컬 비공개 커밋 `b556834`; 실제 파일 설치·WSL·운영 키 변경과 재시작 내구성 증명은 포함되지 않는다.
-- [ ] **게시 후보 검토:** 공개 코드 `5b39c5963`과 비공개 verifier `052fa3b`·L1 `b556834`, 완료 문서와 핀 갱신 순서를 검토한다. 게시 승인을 받으면 비공개 원격 확인 후 공개 PR과 CI를 진행한다.
-- [ ] **다음 병렬 구현 경계 검토:** Fresh Sol 6.1이 현재 소스와 DAG를 대조해 다음 로컬 코드 후보 전체와 선행 조건을 검증한다. 승인된 로컬 범위의 구현은 추가 승인 질문 없이 기존 Luna workstream에 배정한다.
+- [x] **게시 후보 검토·게시:** Fresh Sol 6.1 검토와 사용자 승인 후 비공개 `b556834`를 먼저 게시·검증하고 공개 `52c1525c2`를 게시했다. [비공개 새 Ubuntu CI](https://github.com/lighteko/ticket-workspace/actions/runs/36800471659)는 잠금 설치·빌드·타입 검사, 계약 59개·CLI 297개 통과/21개 skip이다.
+- [x] **TW-06-CI-F1:** 첫 공개 CI는 한 파일의 중복 타입 import 경고와 연쇄 verify 실패로 29개 성공·8개 skip·2개 실패였다. 같은 전송 Luna의 import 전용 수정, native lint·Node 타입·형식·독립 Sol 6.1 리뷰를 통과해 `ab422754b`로 게시했다. 기능·계약 변경은 없다.
+- [x] **공개 CI 완료 확인:** 수정된 공개 `ab422754b`의 [PR Checks](https://github.com/lighteko/orca/actions/runs/36802113499)와 전체 PR 검사가 31개 성공·8개 skip·실패 0개다. 비공개 `b556834`의 새 Ubuntu CI도 별도로 통과했다.
+- [x] **다음 병렬 구현 경계 검토:** Fresh Sol 6.1이 현재 소스·DAG·후보 전체의 기술적 준비도를 검토했고 Astra가 목표 대비 가치를 재검증했다. L2만 준비된 packet이었으나 연기했다. 실제-ticket pilot의 새 packet을 고정하기 전에는 후보를 구현 가능하다고 부르거나 배정하지 않는다.
+- [x] **Astra xhigh 방향성 감사:** 원래 플랜·현재 코드·최근 구현을 독립 검토해 **부분적 방향 이탈**로 판정했다. 올바른 내부 기반을 만들었지만 실제 사용 흐름보다 배포·롤백·복구에 투자가 앞섰다. [근거·결정](./review-findings.md#astra-direction-audit--2026-10-01).
+- [ ] **TW-M1P-L2 — 연기:** 첫 수정 전에 동결했으며 변경 파일은 없다. 실제 티켓 pilot에 필요한 근거가 생기기 전까지 staging·runtime recovery 후속 작업과 함께 연기한다. 완료된 verifier/L1 코드는 보존한다.
+- [x] **방향 재정렬:** read-only 관측기를 effect gateway에서 분리하고, 설치 전체를 첫 pilot의 선행 조건으로 두지 않도록 DAG를 수정했다. HWM 계약 단순화와 CLI/resident 단일 release는 검토할 제안이며 아직 구현 결정이 아니다.
+- [ ] **다음 실제 사용 흐름 packet:** 실제 티켓 생성·최소 enrollment, 승인된 개발 대상·신뢰 입력, resident entrypoint·명시적 lifecycle, HWM 정책과 live DTO를 고정한다. 완료 기준은 실제 티켓 한 건의 Tickets 표시·정확한 workspace 이동이며 effect·공개 `clear`는 비활성이다. 아직 새 코드 배정은 없다.
 
 **이번 코드 사이클 완료 기준:** 집중 테스트·적용 타입/품질 검사·독립 코드 리뷰·owner/cache 통합 리뷰·로컬 커밋. 실제 운영 설치·키·호스트 활성화는 이 사이클의 완료 조건에서 분리한다.
 

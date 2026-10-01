@@ -13,18 +13,21 @@ TW-06P injected tests + approved vector bytes ──> TW-06P-F1 private fixture 
 TW-00-R2 first native-Linux run ──> TW-00-R3A SQLite test boundary + TW-00-R3B state-root test boundary ──> native-Linux full-suite rerun
 TW-00-R3A + TW-00-R3B ──> TW-00-R4 real-WSL replay in isolated temporary roots
 TW-00 ──> TW-M1P-C1 offline runtime artifact closure; TW-00 + owner delivery decisions ──> TW-M1P base runtime/profile delivery
-reviewed logical-v1 protocol and vectors ──> TW-06T fake-duplex client; TW-M1P + TW-06P service artifact + production host/key/endpoint proofs ──> TW-06T production setup
+reviewed logical-v1 protocol and vectors ──> TW-06T fake-duplex client
+approved pinned developer runtime/profile + actual resident entrypoint + host/key/endpoint proofs ──> TW-06T explicit pilot setup (not full updater/recovery)
 reviewed logical-v1 + TW-06-B1 source port ──> TW-02L-I injected owner composition + TW-06-I injected admission/cache
 TW-M1P-D1 verifier contract ──> TW-M1P-I private artifact verifier
 TW-M1P-I + reviewed L1 contract ──> TW-M1P-L1 injected unbound release transitions
+TW-M1P-L1 + reviewed descriptor adapter contract ──> TW-M1P-L2 root/active/fence adapters (fake I/O proof)
 TW-02L-I + TW-06-I + production TW-06P service/TW-06T setup and owner proofs ──> TW-02L production activation
 TW-06F + production TW-06P service/TW-06T authenticated lease + P3/P6 currentness ──> TW-06
 TW-06 snapshot core + TW-02L ──> TW-06 live matched-overlay publication
 TW-07F + TW-06 + TW-02L ──> TW-07         (live Tickets and owner-status cutover)
 TW-00 ──> TW-04A + TW-05; TW-05 ──> TW-05G
-TW-04A + TW-05G ──> TW-04B
-TW-02L + TW-04B + other owner-source contracts ──> TW-03
-TW-05G + TW-06 + TW-07 ──> TW-08; TW-04B + TW-08 ──> TW-04C
+TW-04A + ratified read-side owner contracts ──> TW-04R (discover/inspect, no effects)
+TW-04A + TW-05G ──> TW-04B (external effects)
+TW-02L + TW-04R + other owner-source contracts ──> TW-03 (complete read-only evidence)
+TW-05G + TW-06 + TW-07 ──> TW-08 (ticket effects only); TW-04B + TW-08 ──> TW-04C
 TW-03 + TW-04C + TW-05 + TW-06 + TW-08 ──> TW-09 ──> TW-10
 ```
 
@@ -32,13 +35,23 @@ TW-01, TW-02F and TW-06F passed independent review; TW-00's private publication,
 
 Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation and verification tasks continue in their Luna workstream sessions; shared repository state remains authoritative. The user approved continued reviewed reversible local implementation/test/integration/commit work within the existing project on 2026-10-01. External publication, operational changes and actual credential/security policy decisions still require approval routed through Sol.
 
+## Direction correction — Astra xhigh, 2026-10-01
+
+Independent [direction audit](./review-findings.md#astra-direction-audit--2026-10-01) found PARTIAL_DRIFT. Preserve completed code, but defer L2/staging/runtime-recovery expansion. Full updater/rollback and multi-machine delivery are not prerequisites for the first approved developer read-only pilot. A trusted pinned executable/profile, actual resident entrypoint and explicit setup still require proof; this correction supplies no credentials or production authority.
+
+The next acceptance is one actual ticket associated with an existing Orca Run/workspace, actual catalog/resident data in Tickets, and exact-owner navigation. Missing external/agent/test/lease observations stay unavailable; public `clear` and ticket effects stay disabled. Sol owns this single integration result. Before code allocation, freeze a finite pilot packet covering actual record creation/minimal enrollment, approved target/trust inputs, retained lifecycle, presentation DTO and HWM policy. None of those packets is CODE_READY from this audit alone.
+
+Read-only `discover/inspect` is TW-04R, independent of the TW-05G effect gateway. Existing navigation is already covered by TW-02F/TW-07F; other existing Orca action seams can have their own exact-target/authority packets without waiting for unrelated external effects. The ticket-effect subset of TW-08 retains live/root/confirmation dependencies. Fixtures never authorize effects or impersonate a coordinator Run.
+
+One combined CLI/resident release and a separation of durable HWM persistence from deadline-bounded current publication are **design proposals awaiting review**. Existing wire, trust, source-order, precommit and currentness contracts are unchanged.
+
 ## Bounded module cycle — 2026-10-01
 
 **Status: four code packets independently approved by Sol 6.1 xhigh and authorized by the user on 2026-10-01.** Source inspection found that actual production publisher/key/host provisioning is not a dependency of the existing injected transport, owner-selection and capture interfaces. The packets below separate module implementation from production activation. They retain the reviewed logical-v1 wire, fixture UI/IPC, and all live evidence/effect gates. Detailed contracts are owned by the continuing delivery, transport and owner workstreams in their existing documents.
 
 ### TW-06-B1 — Propagate the caller's remaining read budget
 
-- **STATUS:** Complete locally; 33 focused tests, Node typecheck, changed quality/format checks and fresh Sol 6.1 code review passed. Shared source port is ready for the two dependent modules. Commits and integration follow this cycle.
+- **STATUS:** Complete in published code checkpoint `5b39c5963`; 33 focused tests, Node typecheck, quality/format and fresh Sol 6.1 review passed. Both dependent modules and their IJ integration are complete; current published CI receipts are in project-state.
 
 - **GOAL:** Extend the local resident read API to honor one caller deadline without changing wire v1.
 - **DEPENDENCIES:** Reviewed logical-v1 client; final budget/source-port contract review and user scope approval.
@@ -55,7 +68,7 @@ Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation a
 
 ### TW-02L-I — Compose owner evidence through an injected admitted source
 
-- **STATUS:** Complete locally; 47 focused owner/binder/selector/capture tests, Node typecheck, scoped quality/format checks and fresh Sol 6.1 code review passed. Reviewer independently ran the original 46 and the one added deferred-timeout case, with unchanged production hashes. Actual owner/source integration follows TW-06-I approval.
+- **STATUS:** Complete in published code checkpoint `5b39c5963`; 47 focused owner/binder/selector/capture tests, Node typecheck, quality/format and fresh Sol 6.1 review passed. Actual owner/source integration is complete in IJ; production registration remains unimplemented.
 
 - **GOAL:** Implement the exact owner join and source rechecks without registering a production provider.
 - **DEPENDENCIES:** TW-06-B1 frozen port; reviewed P4/P5 source-policy admission; user scope approval. Test sources inject admitted evidence; production construction later requires TW-06-I plus real setup proofs.
@@ -89,7 +102,7 @@ Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation a
 
 ### TW-M1P-I — Verify release artifacts against injected trust
 
-- **STATUS:** Complete locally at private `052fa3b`: contracts 59 passed, CLI 257 passed/45 skipped, typecheck and scoped quality/format passed; fresh Sol 6.1 code review and five-input read-only C1 replay approved. Private publication and Orca gitlink update remain pending the external approval gate.
+- **STATUS:** Complete at private `052fa3b`, now published as an ancestor of `b556834` and pinned by Orca. Verifier checkpoint passed contracts 59, CLI 257/45 skipped, typecheck/quality/format, fresh Sol 6.1 review and five-input C1 replay. Current exact-SHA CI receipts are in project-state.
 
 - **GOAL:** Implement a private pure manifest/signature/digest verifier before provisioning a publisher or installer.
 - **DEPENDENCIES:** TW-M1P-D1 exact manifest bytes/schema and verifier-policy review; user scope approval.
@@ -106,7 +119,7 @@ Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation a
 
 ### TW-02L-06-IJ — Verify the admitted source and owner composition together
 
-- **STATUS:** Complete locally at public code checkpoint `5b39c5963`; fresh Sol 6.1 issued `INTEGRATION_APPROVE`. Seven integrated tests passed independently; root regression passed 18 suites/143 tests, final Node typecheck and the 175-file changed-quality gate. The unpublished commit retains published gitlink `14c69a1` until external publication approval.
+- **STATUS:** Complete at published code checkpoint `5b39c5963`; fresh Sol 6.1 issued `INTEGRATION_APPROVE`. Seven integrated tests, Root 18 suites/143 regression, Node types and 175-file quality passed. Publication and CI are complete; current exact-SHA receipts are in project-state.
 - **GOAL:** Exercise the real injected resident source adapter and owner composition together through an authenticated fake duplex.
 - **DEPENDENCIES:** TW-06-B1 complete; TW-02L-I and TW-06-I focused verification and independent code approval.
 - **OWNERSHIP:** Continuing Luna owner workstream owns one new integration test; transport workstream owns any demonstrated source-module correction.
@@ -122,7 +135,7 @@ Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation a
 
 ### TW-M1P-L1 — Implement injected unbound release transitions
 
-- **STATUS:** Complete locally at private `b556834`; fresh Sol 6.1 xhigh approved the stable ten-file candidate. Focused state tests passed 16, independent state/verifier/publication regression passed 35, and Root full regression passed contracts 59 plus CLI 273 with 45 skips. CLI typecheck and exact quality/format passed; all ten reviewed hashes matched before commit. External publication remains pending.
+- **STATUS:** Complete and published at private `b556834`; fresh Sol 6.1 xhigh approved the stable ten-file candidate. Focused state tests passed 16, independent regression 35, Root Windows contracts 59/CLI 273 with 45 skips, and exact-main Ubuntu CI contracts 59/CLI 297 with 21 skips. Type/quality/format and reviewed hashes passed; this is not production activation proof.
 - **GOAL:** Implement install/update/rollback preview, apply and explicit reconciliation over an already staged release and injected stores.
 - **DEPENDENCIES:** Reviewed private verifier `052fa3b`; corrected [L1 contract](./profile-delivery.md#l1-candidate--unbound-active-release-transitions). Actual staging or ext4 activation retains separate prerequisites.
 - **OWNERSHIP:** Continuing Luna artifact-delivery workstream exclusively owns the new private state module and tests.
@@ -136,13 +149,29 @@ Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation a
 - **PARALLELIZATION SAFETY:** Independent private files; public owner/source integration can continue concurrently. Commit only verified owned files after code review.
 - **POTENTIAL CONFLICTS:** No overlap with existing private verifier or CLI/config/ledger writers; any real storage adapter or staging implementation requires a separately reviewed packet.
 
+### TW-M1P-L2 — Implement descriptor-backed unbound runtime adapters
+
+- **STATUS:** Technically reviewed finite packet, deferred after Astra's direction audit because it does not complete the first actual-ticket user path. Worker was frozen before any edit; no source changes. Resume only when a reviewed pilot or later delivery acceptance requires this adapter.
+- **GOAL:** Implement the existing L1 root-observation, active-record and per-root fence ports, reusing the current descriptor filesystem, durable publisher and SQLite process fence.
+- **DEPENDENCIES:** Reviewed verifier/L1 at private `b556834`; frozen L1 port shapes. Staged-byte storage, durable shared restart recovery and actual activation remain separate successors.
+- **OWNERSHIP:** Continuing Luna artifact-delivery workstream, private adapter files and exact impacted descriptor-stat fakes only.
+- **FILES / MODULES LIKELY INVOLVED:** New private `ticket-workspace-runtime-release-root-v1.ts`, `ticket-workspace-runtime-release-active-store-v1.ts`, `ticket-workspace-runtime-release-fence-v1.ts` and a focused storage/fence test. Add `uid`/`mode` only to descriptor `TrustedLedgerStatV1` in `trusted-wsl-ledger-file-v1.ts`; update stat records in `test/support/memory-trusted-ledger-filesystem.ts` and `test/trusted-wsl-ledger-file-v1.test.ts`. Mechanical concrete adapter/test-support splits require root notice; no generic helper subsystem.
+- **INPUT CONTRACT:** Injected filesystem/fence/environment observations; already selected root and expected device/inode, UID and configured distro. Independently sampled effective UID must match expected UID and root owner. Root selection/creation is not performed.
+- **OUTPUT CONTRACT:** Authenticated descriptor-scoped root observation, bounded canonical active record or trusted absence, unchanged fixed-name durable publication and caller-label-independent runtime fence; errors and close/release uncertainty are unverifiable.
+- **CONSTRAINTS:** Root no-follow directory open; exact identity, ext4, owner and mode `0700`, effective UID and natural/configured distro agreement. Active filename is only `active-runtime-v1.json`; no-follow regular/same-device/owner/mode `0600` read, 4 KiB cap and existing record validation. Only `ENOENT` under a proven root is absence. Hold root/child descriptors through I/O/publication/fence release; never let `/proc/self/fd/N` escape lifetime. Publish through unchanged `durablyReplaceTrustedLedgerV1`. Use constant runtime-domain machine ID, fixed fence key, `createStateRoot: false` and pinned lock root; reject alternate distro access. Observed `dev:ino` is object identity, not proof of non-reuse or durable ABA protection.
+- **DO_NOT_TOUCH:** Existing L1/verifier contracts, filesystem `lstat` shape, publisher/fence algorithms, dependencies, CLI/config/catalog/ledger/authority, public source/owner/IPC/UI, actual roots, WSL/services/keys or remote publication.
+- **ACCEPTANCE CRITERIA:** Fake-I/O tests cover good/bad root identity/type/owner/mode/filesystem/distro/effective UID, active absence/presence/corruption/read failure/incarnation, size limit and close uncertainty, pre/post-publication outcomes and label-independent lock scope. No second pointer, deletion, extraction, process launch or unrelated state write. Shared restart recovery remains required before activation.
+- **VERIFICATION:** Focused adapter plus existing descriptor publisher, initializer/CAS and L1 regressions; private CLI typecheck, exact changed-file quality/format and diff checks; fresh Sol 6.1 code review. Reuse the published baseline CI; fake tests do not prove physical WSL/ext4 or durable restart behavior.
+- **PARALLELIZATION SAFETY:** Private-only ownership, disjoint from public high-water/presentation work; root may monitor existing commit CI concurrently. Serialize any other private descriptor/fence/stat writer and shared build mutations.
+- **POTENTIAL CONFLICTS:** Exactly two existing test fakes share the descriptor-stat extension. Production backend registration, staging and recovery ports require separate reviewed packets; do not silently expand into them.
+
 ## Tasks
 
 ### TW-M1P — Deliver a provenance-bound ticket profile and CLI runtime
 
-- **STATUS:** Open. The private CLI and contracts passed isolated offline local-install tests. The detailed [profile/base-runtime delivery proposal](./profile-delivery.md) passed independent review as a contract candidate after bootstrap, host-binding and recovery corrections; production installation, update and rollback remain unimplemented. Product code needs owner decisions and a frozen packet.
+- **STATUS:** Full delivery track open; verifier/L1 are complete, while real install/update/rollback are unimplemented. Further L2/staging/recovery expansion is deferred by Astra audit. A limited explicit developer runtime/profile path is a separate pilot contract, not completion of this full delivery task.
 - **GOAL:** Make the configured ticket profile and a source-pinned Linux Node 22.13+ CLI/base runtime reproducibly installable, updatable and recoverable for explicit Orca setup. TW-06P separately supplies the future resident service artifact.
-- **DEPENDENCIES:** TW-00 published source and profile schema; decide base artifact provenance, execution host, install target, version binding and rollback semantics before implementation. TW-06P/T logical protocol and injected code passed review; TW-06T production setup needs both this verified base runtime/profile and the separately delivered TW-06P service artifact.
+- **DEPENDENCIES:** Full delivery needs TW-00 source/profile schema and decisions on artifact provenance, execution host, install target, version binding and rollback. First developer pilot needs only its separately approved pinned executable/profile and actual resident entrypoint with explicit setup/host/trust proof; updater/rollback/recovery are not pilot prerequisites. Whether CLI/resident share one release is an unadopted proposal.
 - **OWNERSHIP:** One ticket-domain delivery workstream for private package/profile artifacts; Orca setup integration owns only the separately agreed host/authority handoff. Do not have both workstreams edit the private CLI or the same setup seam concurrently.
 - **FILES / MODULES LIKELY INVOLVED:** `ticket-workspace/packages/cli/`, profile/config contracts, private packaging/install tests and later Orca explicit setup integration. The seven approved public fixture files are unrelated.
 - **INPUT CONTRACT:** Source-pinned private package and strict profile/config schema, explicit install authority, exact WSL machine/distro target, verified Node runtime and artifact identity.
@@ -364,7 +393,7 @@ Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation a
 ### TW-03 — Compose read-only production plan evidence
 
 - **GOAL:** Join exact worktree, agent, test/lease, ownership, and external-resource owner observations into conservative ticket plan projection.
-- **DEPENDENCIES:** TW-02L authenticated live owner evidence; TW-04B external-resource inspection/evidence; exact agent host/workspace association and complete host-store read; test-lease ledger/adapter scope and semantics; ticket ownership and host proof; source-owned freshness and validated cross-clock handoff. TW-02F fixture matching alone is insufficient.
+- **DEPENDENCIES:** TW-02L authenticated live owner evidence; TW-04R read-only external-resource inspection; exact agent host/workspace association and complete host-store read; test-lease ledger/adapter scope and semantics; ticket ownership and host proof; source-owned freshness and validated cross-clock handoff. These gate complete positive evidence, not partial read-only display. TW-02F fixture matching alone is insufficient for live evidence; TW-05G effect authority is not a read-side dependency.
 - **OWNERSHIP:** Ticket-domain provider worker after owner-source contracts are frozen; Orca owner adapters separately reviewed.
 - **FILES / MODULES LIKELY INVOLVED:** Ticket-domain plan evidence provider/CLI; Orca execution-host status store and observation ports.
 - **INPUT CONTRACT:** One invocation-bound, source-owned observation per required authority, with target identity, completeness, provenance, and clock handoff.
@@ -392,9 +421,25 @@ Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation a
 - **PARALLELIZATION SAFETY:** The reviewed design was safe beside TW-00C package preparation in separate docs. Contract-package implementation must be serial with TW-00C package edits because both own `packages/contracts`; TW-04B remains downstream.
 - **POTENTIAL CONFLICTS:** Shared role/schema fields and resource-universe semantics affect TW-03 and TW-04B. The older package default model has incompatible typed Docker/IIS contracts; copying it would create a second authority.
 
-### TW-04B — Implement external adapters under the root gateway
+### TW-04R — Collect read-only external-resource evidence
 
-- **GOAL:** Provision, inspect, reconcile, and prune only ticket-owned external resources under explicit user confirmation; prepare role evidence for later Orca-action convergence.
+- **STATUS:** Required capability separated by Astra audit; NEEDS_OWNER_EVIDENCE/PACKET for each resource family. No collector implementation is authorized by this definition alone.
+- **GOAL:** Return authenticated scoped `discover/inspect` observations without provisioning, teardown or effect authority.
+- **DEPENDENCIES:** TW-04A common read-side contract; owner-ratified endpoint/route, identity, ownership, complete scope and clock handoff for the selected family. Typed persisted catalog changes need their own compatibility contract. No TW-05G dependency.
+- **OWNERSHIP:** One private adapter owner per resource family; shared typed schema has one owner.
+- **FILES / MODULES LIKELY INVOLVED:** Private read-side observation modules and focused fixtures; reuse the common universe validator and existing authority readers.
+- **INPUT CONTRACT:** Exact ticket/repository/host subject, trusted adapter identity/query scope and source-owned read start; no mutation token.
+- **OUTPUT CONTRACT:** Proven present/absent/unverifiable read-side evidence; unavailable where identity, scope or freshness is missing.
+- **CONSTRAINTS:** No read-triggered resource/WSL start, inferred owner, incomplete negative census or wall-clock equivalence. Inspection never grants effect authority.
+- **DO_NOT_TOUCH:** Live mutation, provision/teardown, effect gateway, Orca lifecycle/status, user config or unreviewed schema migration.
+- **ACCEPTANCE CRITERIA:** Foreign/shared collisions and partial/failed reads remain unavailable; exact complete negative scope can establish absence; no fabricated `clear` or state changes.
+- **VERIFICATION:** Family-specific fixtures/fault tests and source-contract review; real read-only evidence follows the existing authorized scope. New operational changes or actual credential/security choices require root-routed approval, not each read-only investigation.
+- **PARALLELIZATION SAFETY:** Docker and IIS may separate after their contracts and schema boundaries freeze; provider composition remains serial.
+- **POTENTIAL CONFLICTS:** Shared catalog typing and clock/route evidence; production owner inputs are still unresolved.
+
+### TW-04B — Execute external-resource effects under the root gateway
+
+- **GOAL:** Provision, reconcile and prune only ticket-owned external resources under explicit user confirmation, consuming independently collected read-side evidence; prepare role receipts for later Orca-action convergence.
 - **DEPENDENCIES:** TW-04A and TW-05G; TW-00 verified ledger CAS, while the target-bound external-action preview/token contract must be frozen through TW-04A/TW-05G before effects. The pinned source does not yet implement mutation commands.
 - **OWNERSHIP:** Ticket-domain adapter worker with one resource family at a time unless interfaces and files are isolated.
 - **FILES / MODULES LIKELY INVOLVED:** Adapter implementations, ledger evidence/CAS, role transition commands, platform scripts.
@@ -450,7 +495,7 @@ Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation a
 - **DO_NOT_TOUCH:** Parallel coordinator/Run owner, agent-status store, renderer-created authority tokens.
 - **ACCEPTANCE CRITERIA:** Changed Run, token reuse/expiry, lost contact, changed ledger or target, and fence failure prevent effects. Reset/delete during an effect cannot erase the exclusion or authorize a replacement root.
 - **VERIFICATION:** Command-authority fixtures, concurrency/replay tests, host attestation review.
-- **PARALLELIZATION SAFETY:** Serial with TW-05 identity and shared token contract; blocks live TW-04B and TW-08.
+- **PARALLELIZATION SAFETY:** Serial with TW-05 identity and shared token contract; gates TW-04B effects and the ticket-effect subset of TW-08, not read-only collectors or existing navigation.
 - **POTENTIAL CONFLICTS:** Run binding generation and ticket ledger revision may change between preview and effect.
 
 ### TW-06P — Produce a bounded ticket navigator snapshot
@@ -489,7 +534,7 @@ Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation a
 
 - **STATUS:** Orca runtime/WSL survey, exact logical-v1 protocol/crypto vectors and injected fake-duplex client passed independent Sol review on 2026-09-30. The client passed 30 focused tests, changed-code quality, Node typecheck with an 8 GiB heap, and cross-peer conformance. The user approved its public PR publication; code HEAD `a29bc2169` passed PR CI with 31 successes and eight skips. Pinned WSL stdio remains an unselected production endpoint candidate; the WSL hook relay cannot supervise ticket reads.
 - **GOAL:** Establish and own an authenticated resident ticket endpoint/connection lifecycle during explicit setup, then provide a no-start transport from Orca main during snapshot reads.
-- **DEPENDENCIES:** TW-00 published the strict navigator snapshot DTO/corpus; M0 host ownership seams. TW-06P and TW-06T injected code passed independent review against logical-v1 schemas, projection policy and golden vectors. Real endpoint, credential handoff, ticket-ID host mapping, TW-M1P verified Linux base runtime/profile and a pinned TW-06P service artifact must all precede production setup.
+- **DEPENDENCIES:** TW-00 strict snapshot/corpus and M0 host ownership; injected TW-06P/T are complete. Explicit pilot setup requires its approved pinned runtime/profile, actual resident entrypoint/artifact, endpoint, credential handoff and host mapping. Full updater/recovery and separate CLI/service distribution lifecycles are not prerequisites. Production enablement still needs applicable trust/currentness/owner proofs.
 - **OWNERSHIP:** One Orca main transport worker after cross-repository protocol ownership is fixed.
 - **FILES / MODULES LIKELY INVOLVED:** Orca main local integration service and resident client; the ticket-domain producer belongs to TW-06P.
 - **INPUT CONTRACT:** Configured coordinator/authority/profile binding, explicit setup authority, and a separately reviewed versioned endpoint protocol; no resident endpoint or production snapshot producer is present in the pinned source.
@@ -568,10 +613,10 @@ Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation a
 
 - **STATUS:** Read-only Orca action/receipt audit and the [action/authority matrix](./action-authority-matrix.md) passed fresh Sol review after corrections. The matrix is a contract survey; no ticket effect gateway or action code is implemented.
 - **GOAL:** Expose ticket actions through Orca's existing worktree, agent, Run, and confirmation authorities.
-- **DEPENDENCIES:** Completed M3 coordinator foundation, TW-05G strict root gateway, TW-02L exact live owner evidence, TW-06 live current snapshot boundary, and TW-07 live read-only cutover; separately proven per-action preview/authority contracts. The TW-07F fixture tree supplies no action authority.
+- **DEPENDENCIES:** For ticket effects: M3 coordinator foundation, TW-05G strict root gateway, TW-02L exact live owner evidence, TW-06/TW-07 live state and separately proven per-action preview/authority contracts. Existing workspace navigation is complete in TW-02F/TW-07F. Other existing Orca action seams may use separate exact-host/target/caller contracts and existing Orca confirmations without unrelated external-effect prerequisites; no such new packet is approved here. Fixtures supply no mutation authority.
 - **OWNERSHIP:** One integration worker per agreed action seam, with Orchestrator controlling shared contracts.
 - **FILES / MODULES LIKELY INVOLVED:** Orca orchestration commands, worktree action routing, ticket action descriptors, renderer confirmation UI.
-- **INPUT CONTRACT:** Live current validated ticket snapshot, exact target and execution-host reattestation, root gateway authority, explicit user confirmation for effects.
+- **INPUT CONTRACT:** Ticket effects require a live current validated snapshot, exact target/host, root gateway authority and effect confirmation. Separate existing Orca action packets require independently verified real Orca target/caller and their existing authority/confirmation; fixture declarations cannot substitute for either.
 - **OUTPUT CONTRACT:** Existing Orca mutation receipts and ticket correlation; no copied lifecycle state.
 - **CONSTRAINTS:** Preserve branch, folder, artifacts and focus; SSH/folder behavior cannot regress even though Tickets MVP is local. Ticket worktree removal sets `preserveBranchOnDelete: true` on the target host's authoritative metadata before invoking Orca removal. The ordinary boolean confirmation and its skip preference are UX precedents, not ticket authority; a ticket effect needs target-bound one-use confirmation. Require an attested host even where an older RPC permits an omitted host, and do not inherit sidebar deletion's active-worktree focus change.
 - **DO_NOT_TOUCH:** Parallel worktree manager, message bus, agent-status store, unowned external resources.
@@ -612,7 +657,7 @@ Independent reviews use fresh **Sol 6.1 xhigh** agents. Related implementation a
 
 ## Current execution checkpoint and next allocation
 
-1. **Verified foundation:** TW-01 owner capture, TW-02F fixture binding, TW-06F fixture boundary, TW-07F fixture UI/navigation and private TW-04A common resource contract are complete in their stated scopes. Published Orca `d5e0ab670` pins private `14c69a1` and passed 31 CI checks with eight skipped. The newer local public `5b39c5963` completes B1, owner composition, admission/currentness and actual injected owner/source integration; local private `b556834` completes verifier plus L1 unbound transitions. Recorded code, type, quality and independent review gates passed; these local commits have not run remote CI.
+1. **Verified foundation:** TW-01 owner capture, TW-02F fixture binding, TW-06F fixture boundary, TW-07F fixture UI/navigation and private TW-04A common resource contract are complete in their scopes. B1, owner composition, admission/currentness, IJ, verifier and L1 also passed their code/type/quality/review and published CI gates. Current exact commits and CI evidence are in project-state. These do not establish an actual-ticket pilot or production activation.
 2. **Next critical path:** The logical-v1 P1–P8 injected protocol and disjoint TW-06P/T code passed independent review and local cross-peer conformance. The shipped owner-mismatch fixture remains negative; the recomputed synthetic fixture proves the positive click through real main/preload handlers. Live TW-06/TW-07 still require production endpoint/key/host/artifact proofs, currentness rules and TW-02L authenticated owner evidence, not fixture promotion.
 3. **Next allocation gate:** Validate all remaining local code candidates against current source and freeze concrete packets before assigning continuing Luna workstreams. The user's authorization covers reviewed reversible local work; publication, operational setup and real key/security choices retain separate approval. Production setup still joins the verified base runtime/profile with a pinned resident service artifact and P1–P8 proofs. The completed TW-07F sidebar remains single-owner for any future live cutover.
 4. **Still gated:** TW-06P/TW-06T production producer/transport and TW-05/TW-05G coordinator/root authority need their own contract gates. TW-02L authenticated owner evidence waits for live source authority; TW-03 production `plan`, TW-04B/C production adapters/role changes, TW-06/TW-07 live cutovers, TW-08 effects, TW-09 integration and TW-10 release retain their DAG dependencies. A fixture cannot claim live `current`, mutation authority or public `clear`.
@@ -625,14 +670,14 @@ The accepted fixture M5 is a completed prerequisite. The nine rows below name pr
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | TW-06P/TW-06T live snapshot            | Logical-v1 injected producer/client and cross-peer conformance are complete. Remaining service-artifact/endpoint integration candidates need concrete next packets; production authentication and host proofs remain open. | Real setup joins verified base runtime/profile, a pinned service artifact and applicable production proofs. Existing injected protocol/client do not need reimplementation.                                                             |
 | TW-02L live owner design               | TW-02L-I and actual owner/source IJ are complete at `5b39c5963`, including exact joins, completeness, deadlines and final rechecks.                                                                                        | Real owner activation needs production admitted currentness and setup/host proofs. Fixture IPC/sidebar and public clear retain their own gates.                                                                                         |
-| TW-08 action authority                 | The continuing Luna action workstream completed the read-only action matrix and fresh Sol approved its corrected source claims. Owners can now ratify their separate cells beside protocol and other contract work.        | No action/DTO/IPC/UI/effect code yet. TW-05G ratifies root/confirmation cells, TW-02L exact owner cells, and TW-04B only adapter-dependent cells; M3 and live TW-06/TW-07 gate implementation.                                          |
+| TW-08 action authority                 | The read-only action matrix is complete. Existing navigation is implemented; other existing Orca actions need their own exact target/caller packets.                                                                       | M3/live/TW-05G conditions apply to ticket effects. No fixture grants mutation authority; unrelated external-effect infrastructure is not a navigation prerequisite.                                                                     |
 | TW-05 coordinator and TW-05G authority | Source audit and decision matrix are complete; owner ratification of folder identity, documents, migration, enrollment, strict Run caller and reset fence can proceed separately.                                          | TW-05 code waits for those decisions. TW-05G effect-gateway code waits for durable TW-05 correlation and a binding-fence/token contract. Private catalog/ledger edits cannot overlap TW-06P or TW-M1P edits without a frozen interface. |
 | TW-04A Docker evidence                 | The Docker owner can supply exact engine endpoint/route, physical identity, owner marker, complete discovery/read-back and clock evidence. The initial source survey found none of that production evidence.               | Typed production fixtures/adapter wait for owner-ratified Docker evidence; TW-04B effects additionally wait for TW-05G. No live resource mutation in evidence collection.                                                               |
 | TW-04A IIS evidence                    | The IIS owner can independently supply Windows configuration authority/route, site and pool physical identity, owner marker, complete discovery/read-back and clock evidence.                                              | Typed production fixtures/adapter wait for owner-ratified IIS evidence; TW-04B effects additionally wait for TW-05G. No live resource mutation in evidence collection.                                                                  |
-| TW-03 other owner sources              | The completed source survey leaves independent owner contracts for exact agent host/workspace association, test-lease scope, ownership/host census and source clock transfer.                                              | The final ticket plan provider waits for TW-02L, TW-04B and every required source contract. No second status store or public `clear`.                                                                                                   |
-| TW-M1P profile delivery                | D1, private verifier and L1 injected unbound transitions are complete at private `b556834`. Next staging/backend/recovery candidates require concrete packets derived from current code.                                   | Actual profile/publisher/key custody and installer activation remain owner-gated. TW-06T setup joins verified base/profile with the separate service artifact.                                                                          |
+| TW-03 other owner sources              | Independent agent/test/lease/ownership/host/clock contracts remain to be supplied. Partial read-only output can explicitly report unavailable.                                                                             | Complete evidence/public `clear` needs TW-02L, TW-04R and all required source proofs. No second status store; no TW-05G dependency for read-side collectors.                                                                            |
+| TW-M1P profile delivery                | Verifier/L1 are complete; L2/staging/backend/recovery are deferred delivery work, not the current next implementation.                                                                                                     | First pilot needs its approved pinned runtime/profile plus resident entrypoint/setup proofs. Full updater/recovery is later; actual trust choices remain owner-gated.                                                                   |
 | TW-06 live cache/overlay contract      | B1 shared port and TW-06-I admission/high-water/currentness are complete, with actual owner/source integration at `5b39c5963`. Next durable-store or IPC integration candidates require concrete packets.                  | Durable adapter proof and live IPC/UI activation retain setup/owner dependencies; preserve fixture boundaries and source order across updates/rollback.                                                                                 |
 
-These nine rows describe the **production preparation** frontier. Completed local modules and tests are recorded above; they are not remaining implementation allocations. Production P1–P8 proofs, owner-ratified resource evidence and delivery choices remain open where stated. Docker and IIS evidence collection can proceed independently. Published private `14c69a1` passed exact-main Ubuntu/ext4 CI; real WSL replay and experimental offline runtime closure also passed their bounded reviews. TW-06T production setup still joins verified base/profile with the separate service artifact. TW-05 enrollment and TW-04A typed resources share one strict catalog-compatibility decision before either modifies v1 readers or CAS. The next local code frontier is being revalidated from the post-L1 checkout.
+These rows describe capability/owner preparation, not ready implementation allocations. Current next packets must serve the actual-ticket pilot described above; L2/staging/recovery remain deferred. Docker and IIS read-only evidence can proceed independently within approved scope. TW-05 enrollment and typed resource persistence still share one catalog-compatibility decision before changing v1 readers/CAS. Current commits and CI belong in project-state, not repeated frontier statements.
 
-The historical 2026-09-30 audit reported **zero additional production feature workers** ready; the 2026-10-01 source review corrected its overbroad application to injected modules. B1, private artifact verification, owner composition, admission/currentness and their actual injected integration are now complete; L1 injected unbound release transitions are also complete. Actual production activation still requires a setup packet covering TW-M1P target/publisher/receipt, TW-06P service manifest/entrypoint, and TW-06T endpoint/key/host proofs. Next-step review must evaluate remaining local adapter/staging/recovery and integration candidates from the current source, without re-running completed packets or treating production provisioning as a universal prerequisite. Contract and evidence research may overlap across the nine rows; private catalog/profile/ledger edits, Orca main handler integration, fixture sidebar IPC, and action/effect authority remain serialized at their shared ownership seams.
+The earlier universal production-provisioning gate was corrected for injected modules. Astra's later value audit also found that more ready internal modules need not advance the usable milestone. Prioritize a finite pilot packet rather than allocate the deferred delivery frontier. Shared private catalog/ledger, public registration/sidebar and authority seams remain serialized; do not relax currentness or security contracts without explicit design review.
