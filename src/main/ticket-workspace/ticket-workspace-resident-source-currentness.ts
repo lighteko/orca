@@ -5,10 +5,14 @@ import {
   type TicketWorkspaceCurrentnessToken
 } from './ticket-workspace-resident-source-port'
 import type { TicketWorkspaceResidentClient } from './ticket-workspace-resident-client'
-import type { ResidentSourceClockMonitor } from './ticket-workspace-resident-source-clock'
-import type { ResidentSourceClockObservation } from './ticket-workspace-resident-source-clock'
-import type { ResidentHighWaterFacts } from './ticket-workspace-resident-high-water'
-import type { TicketWorkspaceResidentHighWater } from './ticket-workspace-resident-high-water'
+import type {
+  ResidentSourceClockMonitor,
+  ResidentSourceClockObservation
+} from './ticket-workspace-resident-source-clock'
+import type {
+  ResidentHighWaterFacts,
+  TicketWorkspaceResidentHighWater
+} from './ticket-workspace-resident-high-water'
 
 const OWNER_CURRENTNESS_TTL_MS = 30_000
 
