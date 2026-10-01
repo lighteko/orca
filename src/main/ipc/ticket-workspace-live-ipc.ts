@@ -18,20 +18,39 @@ import {
   unavailableTicketWorkspaceLivePresentationResponse,
   unavailableTicketWorkspaceLiveRebindResponse
 } from '../../shared/ticket-workspace-live-ipc-boundary'
+import type { DesktopRuntimeSenderLifecycle } from './desktop-runtime-sender-lifecycle'
 import { abortWhenRendererGone } from './renderer-lifetime-abort'
 import { isTrustedUIRenderer } from './ui'
 
+export type TicketWorkspaceLiveRequestContext = Readonly<{
+  signal: AbortSignal
+  isCurrentDocument(): boolean
+  setFinalPublicationGuard(guard: () => boolean): void
+}>
+
 export type TicketWorkspaceLiveApiForTrustedSender = (
-  sender: WebContents
+  sender: WebContents,
+  context: TicketWorkspaceLiveRequestContext
 ) => TicketWorkspaceLiveApi | null
 
-type TicketWorkspaceLiveHandler<Response> = (
+type SenderLifecycle = Pick<
+  DesktopRuntimeSenderLifecycle,
+  'connectionIdFor' | 'captureCurrentDocument'
+>
+type GetSenderLifecycle = () => SenderLifecycle | null
+type TicketWorkspaceLiveResponse =
+  | TicketWorkspaceLivePresentationResponse
+  | TicketWorkspaceLiveMatchResponse
+  | TicketWorkspaceLiveRebindResponse
+
+type TicketWorkspaceLiveHandler<Response extends TicketWorkspaceLiveResponse> = (
   event: IpcMainInvokeEvent,
   ...args: unknown[]
 ) => Promise<Response>
 
 export function registerTicketWorkspaceLiveIpcHandlers(
-  getApiForTrustedSender: TicketWorkspaceLiveApiForTrustedSender = () => null
+  getApiForTrustedSender: TicketWorkspaceLiveApiForTrustedSender = () => null,
+  getSenderLifecycle: GetSenderLifecycle = () => null
 ): void {
   ipcMain.handle(
     TICKET_WORKSPACE_LIVE_IPC_CHANNELS.getPresentation,
@@ -40,7 +59,8 @@ export function registerTicketWorkspaceLiveIpcHandlers(
       unavailableTicketWorkspaceLivePresentationResponse,
       (api, request) => api.getPresentation(request),
       validateTicketWorkspaceLivePresentationResponse,
-      getApiForTrustedSender
+      getApiForTrustedSender,
+      getSenderLifecycle
     )
   )
   ipcMain.handle(
@@ -50,7 +70,8 @@ export function registerTicketWorkspaceLiveIpcHandlers(
       unavailableTicketWorkspaceLiveMatchResponse,
       (api, request) => api.matchSelection(request),
       validateTicketWorkspaceLiveMatchResponse,
-      getApiForTrustedSender
+      getApiForTrustedSender,
+      getSenderLifecycle
     )
   )
   ipcMain.handle(
@@ -60,17 +81,19 @@ export function registerTicketWorkspaceLiveIpcHandlers(
       unavailableTicketWorkspaceLiveRebindResponse,
       (api, request) => api.rebindSelectionAtClick(request),
       validateTicketWorkspaceLiveRebindResponse,
-      getApiForTrustedSender
+      getApiForTrustedSender,
+      getSenderLifecycle
     )
   )
 }
 
-function createHandler<Request, Response>(
+function createHandler<Request, Response extends TicketWorkspaceLiveResponse>(
   parseRequest: (value: unknown) => Request | null,
   unavailable: (request: Request) => Response,
   invoke: (api: TicketWorkspaceLiveApi, request: Request) => Promise<unknown>,
   validate: (value: unknown, request: Request) => Response | null,
-  getApiForTrustedSender: TicketWorkspaceLiveApiForTrustedSender
+  getApiForTrustedSender: TicketWorkspaceLiveApiForTrustedSender,
+  getSenderLifecycle: GetSenderLifecycle
 ): TicketWorkspaceLiveHandler<Response> {
   return async (event, ...args) => {
     const request = args.length === 1 ? parseRequest(args[0]) : null
@@ -80,24 +103,115 @@ function createHandler<Request, Response>(
 
     const invokingFrame = event.senderFrame
     const caller = abortWhenRendererGone(event.sender)
+    let guardRegistrationOpen = true
+    let guardRegistrationInvalid = false
+    let handlerCompleted = false
+    const finalPublicationGuard: { current: (() => boolean) | null } = { current: null }
     try {
       if (!isCurrentTrustedMainFrame(event, invokingFrame, caller.signal)) {
         return unavailable(request)
       }
-      const api = getApiForTrustedSender(event.sender)
-      if (!api || caller.signal.aborted) {
+
+      const senderLifecycle = getSenderLifecycle()
+      if (!senderLifecycle || !isCurrentTrustedMainFrame(event, invokingFrame, caller.signal)) {
         return unavailable(request)
       }
-      const response = validate(await invoke(api, request), request)
-      return response && isCurrentTrustedMainFrame(event, invokingFrame, caller.signal)
-        ? response
-        : unavailable(request)
+
+      senderLifecycle.connectionIdFor(event.sender)
+      const capturedDocument = senderLifecycle.captureCurrentDocument(event.sender)
+      if (!capturedDocument) {
+        return unavailable(request)
+      }
+      const isCurrentDocument = (): boolean => {
+        try {
+          return (
+            !caller.signal.aborted &&
+            capturedDocument.isCurrent() &&
+            isCurrentTrustedMainFrame(event, invokingFrame, caller.signal)
+          )
+        } catch {
+          return false
+        }
+      }
+      const context: TicketWorkspaceLiveRequestContext = Object.freeze({
+        signal: caller.signal,
+        isCurrentDocument,
+        setFinalPublicationGuard: (guard: () => boolean): void => {
+          if (handlerCompleted) {
+            return
+          }
+          if (
+            !guardRegistrationOpen ||
+            finalPublicationGuard.current !== null ||
+            typeof guard !== 'function'
+          ) {
+            guardRegistrationInvalid = true
+            return
+          }
+          finalPublicationGuard.current = guard
+        }
+      })
+
+      if (!context.isCurrentDocument()) {
+        return unavailable(request)
+      }
+      const api = getApiForTrustedSender(event.sender, context)
+      if (!api || !context.isCurrentDocument()) {
+        return unavailable(request)
+      }
+
+      let rawResponse: unknown
+      try {
+        rawResponse = await invoke(api, request)
+      } finally {
+        guardRegistrationOpen = false
+      }
+      const response = validate(rawResponse, request)
+      if (!response) {
+        return unavailable(request)
+      }
+      const requiresPublicationGuard = requiresFinalPublicationGuard(response)
+      if (requiresPublicationGuard) {
+        const guard = finalPublicationGuard.current
+        if (!guard) {
+          return unavailable(request)
+        }
+        let guardResult: unknown
+        try {
+          guardResult = guard()
+        } catch {
+          return unavailable(request)
+        }
+        if (guardResult !== true) {
+          return unavailable(request)
+        }
+      }
+      const callerIsCurrent =
+        context.isCurrentDocument() &&
+        isCurrentTrustedMainFrame(event, invokingFrame, caller.signal)
+      if (!callerIsCurrent || (requiresPublicationGuard && guardRegistrationInvalid)) {
+        return unavailable(request)
+      }
+      return response
     } catch {
       return unavailable(request)
     } finally {
+      guardRegistrationOpen = false
+      handlerCompleted = true
       caller.dispose()
     }
   }
+}
+
+function requiresFinalPublicationGuard(
+  response:
+    | TicketWorkspaceLivePresentationResponse
+    | TicketWorkspaceLiveMatchResponse
+    | TicketWorkspaceLiveRebindResponse
+): boolean {
+  return (
+    response.status === 'current' || response.status === 'matched' || response.status === 'rebound'
+  )
 }
 
 function isCurrentTrustedMainFrame(

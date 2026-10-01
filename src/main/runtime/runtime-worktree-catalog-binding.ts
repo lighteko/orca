@@ -158,6 +158,15 @@ export class RuntimeWorktreeCatalogBindingCommands {
     }
   }
 
+  isExactLocalNativeGitBindingCatalogCurrent(binding: ExactLocalNativeGitWorktreeBinding): boolean {
+    try {
+      const current = this.readSourceSnapshot(binding.request)
+      return current !== null && sameToken(binding.token, current.token)
+    } catch {
+      return false
+    }
+  }
+
   private readSourceSnapshot(
     request: WorktreeCatalogBindingRequest
   ): WorktreeCatalogBindingSourceSnapshot | null {

@@ -224,6 +224,35 @@ describe('RuntimeWorktreeCatalogBindingCommands', () => {
     await expect(bindingCommands.isExactLocalNativeGitBindingCurrent(binding)).resolves.toBe(false)
   })
 
+  it('checks the captured catalog incarnation and revision synchronously without Git reads', async () => {
+    const initial = sourceSnapshot()
+    let current: WorktreeCatalogBindingSourceSnapshot | null = initial
+    const readSource = vi.fn(() => current)
+    const readGit = vi.fn(async () => [gitWorktree()])
+    const readRegistration = vi.fn(async () => registrationIdentity('registration-1'))
+    const bindingCommands = new RuntimeWorktreeCatalogBindingCommands({
+      getWorktreeCatalogBindingSourceSnapshot: readSource,
+      listNativeGitWorktrees: readGit,
+      readWorktreeRegistrationIdentity: readRegistration
+    })
+    const binding = await bindingCommands.resolveExactLocalNativeGitTarget(request())
+    readSource.mockClear()
+
+    expect(bindingCommands.isExactLocalNativeGitBindingCatalogCurrent(binding)).toBe(true)
+    expect(readSource).toHaveBeenCalledOnce()
+    expect(readGit).toHaveBeenCalledOnce()
+    expect(readRegistration).toHaveBeenCalledTimes(2)
+
+    current = { ...initial, token: { ...initial.token, revision: initial.token.revision + 1 } }
+    expect(bindingCommands.isExactLocalNativeGitBindingCatalogCurrent(binding)).toBe(false)
+    current = { ...initial, token: { ...initial.token, incarnationId: 'replacement' } }
+    expect(bindingCommands.isExactLocalNativeGitBindingCatalogCurrent(binding)).toBe(false)
+    current = null
+    expect(bindingCommands.isExactLocalNativeGitBindingCatalogCurrent(binding)).toBe(false)
+    expect(readGit).toHaveBeenCalledOnce()
+    expect(readRegistration).toHaveBeenCalledTimes(2)
+  })
+
   it('rejects an external Git registration ABA even when the porcelain target is unchanged', async () => {
     const source = sourceSnapshot()
     const readSource = vi.fn(() => source)

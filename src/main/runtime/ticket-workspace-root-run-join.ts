@@ -1,26 +1,24 @@
 import { performance } from 'node:perf_hooks'
-import type { TicketNavigatorSnapshotV1 } from '@lighteko/ticket-workspace-contracts/navigator-snapshot-v1'
 import type { TicketWorkspaceOwnerSourcePort } from '../ticket-workspace/ticket-workspace-resident-source-port'
 import type { TicketWorkspaceRootRunAttestationResultV1 } from './ticket-workspace-root-run-attestation'
-import type {
-  ExactLocalNativeGitWorktreeBinding,
-  RuntimeWorktreeCatalogBindingCommands
-} from './runtime-worktree-catalog-binding'
+import type { RuntimeWorktreeCatalogBindingCommands } from './runtime-worktree-catalog-binding'
 import {
   runTicketWorkspaceOwnerOperation,
-  type TicketWorkspaceOwnerClock
+  type TicketWorkspaceOwnerClock,
+  type TicketWorkspaceOwnerOperationContext
 } from './ticket-workspace-live-owner-composition-operation'
 import type { TicketWorkspaceOwnerSelection } from './ticket-workspace-owner-selection'
 import {
-  isExactCoordinatorBindingV1,
-  finalizeTicketWorkspaceRootRunJoinV1,
-  readTicketWorkspaceRootRunJoinFactsV1,
-  readRootRunFactsV1,
-  sameTicketRunCoordinatorFactsV1,
-  sameTicketWorkspaceOwnerFactsV1,
-  type TicketWorkspaceRootRunJoinCandidateV1,
-  type TicketWorkspaceRootRunJoinAttemptV1,
-  type TicketWorkspaceRootRunHostScopeMapV1
+  prepareTicketWorkspaceRootRunJoinOperationV1,
+  type CommonJoinDependenciesV1,
+  type CommonJoinInputV1,
+  type TicketWorkspaceRootRunCommonJoinCandidateV1,
+  type TicketWorkspaceRootRunCommonJoinWitnessV1,
+  type TicketWorkspaceRootRunJoinOperationWitnessV1
+} from './ticket-workspace-root-run-join-operation'
+import type {
+  TicketWorkspaceRootRunHostScopeMapV1,
+  TicketWorkspaceRootRunJoinCandidateV1
 } from './ticket-workspace-root-run-join-facts'
 
 const defaultClock: TicketWorkspaceOwnerClock = { monotonicNow: () => performance.now() }
@@ -38,7 +36,13 @@ export type TicketWorkspaceRootRunJoinDependenciesV1 = Readonly<{
   clock?: TicketWorkspaceOwnerClock
 }>
 
-export type { TicketWorkspaceRootRunJoinCandidateV1 } from './ticket-workspace-root-run-join-facts'
+export type { TicketWorkspaceRootRunJoinCandidateV1 }
+export type {
+  CommonJoinDependenciesV1,
+  CommonJoinInputV1,
+  TicketWorkspaceRootRunCommonJoinCandidateV1,
+  TicketWorkspaceRootRunCommonJoinWitnessV1
+}
 
 export type TicketWorkspaceRootRunJoinResultV1 =
   | TicketWorkspaceRootRunJoinCandidateV1
@@ -71,167 +75,103 @@ export async function createTicketWorkspaceRootRunJoinCandidateV1(
     return unavailable('operation_expired')
   }
 
-  const attempt = await runTicketWorkspaceOwnerOperation(
+  const prepared = await runTicketWorkspaceOwnerOperation(
     dependencies.sourcePort,
     clock,
     selection,
     signal,
-    async (context): Promise<TicketWorkspaceRootRunJoinAttemptV1 | null> => {
-      const rootFacts = readRootRunFactsV1(dependencies.readRootRunFacts)
-      if (!rootFacts || !context.check()) {
-        return null
-      }
-      const baseline = readDisplayedBaseline(dependencies.sourcePort, selection)
-      if (!baseline) {
-        return null
-      }
-      const baselineFacts = readTicketWorkspaceRootRunJoinFactsV1(
-        baseline,
-        selection,
-        rootFacts,
-        dependencies.mapOrchestrationHostScope
+    async (context): Promise<TicketWorkspaceRootRunJoinOperationWitnessV1 | null> =>
+      prepareTicketWorkspaceRootRunJoinOperationV1(
+        dependencies,
+        {
+          selection,
+          context,
+          callerSignal: signal,
+          checkOriginalOperation: () =>
+            checkOriginalOperation(signal, context, clock, invocationStartedAt)
+        },
+        false
       )
-      if (!baselineFacts) {
-        return null
-      }
-
-      const firstRead = await context.readCurrent()
-      if (!firstRead || !context.check()) {
-        return null
-      }
-      const firstFacts = readTicketWorkspaceRootRunJoinFactsV1(
-        firstRead.snapshot,
-        selection,
-        rootFacts,
-        dependencies.mapOrchestrationHostScope
-      )
-      if (
-        !firstFacts ||
-        !sameTicketWorkspaceOwnerFactsV1(baseline, baselineFacts, firstRead, firstFacts, selection)
-      ) {
-        return null
-      }
-
-      let binding: ExactLocalNativeGitWorktreeBinding
-      try {
-        binding = await dependencies.worktreeBindings.resolveExactLocalNativeGitTarget(
-          firstFacts.request,
-          context.signal
-        )
-      } catch {
-        context.check()
-        return null
-      }
-      if (!context.check() || !isExactCoordinatorBindingV1(binding, firstFacts)) {
-        return null
-      }
-
-      if (!(await isOriginalBindingCurrent(dependencies, binding, context.signal))) {
-        context.check()
-        return null
-      }
-      if (!context.check()) {
-        return null
-      }
-
-      const secondRead = await context.readCurrent()
-      if (!secondRead || !context.check()) {
-        return null
-      }
-      const secondFacts = readTicketWorkspaceRootRunJoinFactsV1(
-        secondRead.snapshot,
-        selection,
-        rootFacts,
-        dependencies.mapOrchestrationHostScope
-      )
-      if (
-        !secondFacts ||
-        !sameTicketWorkspaceOwnerFactsV1(
-          firstRead.snapshot,
-          firstFacts,
-          secondRead,
-          secondFacts,
-          selection
-        )
-      ) {
-        return null
-      }
-
-      if (!(await isOriginalBindingCurrent(dependencies, binding, context.signal))) {
-        context.check()
-        return null
-      }
-      if (!context.check()) {
-        return null
-      }
-      const terminalBaseline = readDisplayedBaseline(dependencies.sourcePort, selection)
-      const terminalFacts = terminalBaseline
-        ? readTicketWorkspaceRootRunJoinFactsV1(
-            terminalBaseline,
-            selection,
-            rootFacts,
-            dependencies.mapOrchestrationHostScope
-          )
-        : null
-      if (
-        !terminalBaseline ||
-        !terminalFacts ||
-        !sameTicketWorkspaceOwnerFactsV1(
-          terminalBaseline,
-          terminalFacts,
-          secondRead,
-          secondFacts,
-          selection
-        ) ||
-        !sameTicketRunCoordinatorFactsV1(baselineFacts.ticket, secondFacts.ticket)
-      ) {
-        return null
-      }
-
-      return Object.freeze({
-        rootFacts,
-        baseline,
-        firstRead,
-        secondRead,
-        firstFacts,
-        secondFacts,
-        binding
-      })
-    }
   )
-
-  if (!attempt) {
+  if (!prepared) {
     return unavailable(signal?.aborted ? 'operation_expired' : 'catalog_unavailable')
   }
-  const candidate = finalizeTicketWorkspaceRootRunJoinV1(attempt, {
-    ...dependencies,
-    selection,
-    clock,
-    signal,
-    startedAt: invocationStartedAt
-  })
+  const candidate = prepared.finalize()?.rootRun
   return candidate ?? unavailable(signal?.aborted ? 'operation_expired' : 'catalog_unavailable')
 }
 
-function readDisplayedBaseline(
-  sourcePort: TicketWorkspaceOwnerSourcePort,
-  selection: TicketWorkspaceOwnerSelection
-): TicketNavigatorSnapshotV1 | null {
-  try {
-    const baseline = sourcePort.getDisplayedBaseline(selection.snapshotRevision)
-    return baseline?.snapshotRevision === selection.snapshotRevision ? baseline : null
-  } catch {
+export async function prepareTicketWorkspaceRootRunCommonJoinV1(
+  dependencies: CommonJoinDependenciesV1,
+  input: CommonJoinInputV1
+): Promise<TicketWorkspaceRootRunCommonJoinWitnessV1 | null> {
+  const prepared = await prepareTicketWorkspaceRootRunJoinOperationV1(
+    dependencies,
+    {
+      ...input,
+      checkOriginalOperation: () => checkCommonOriginalOperation(input, dependencies.sourcePort)
+    },
+    true
+  )
+  if (!prepared) {
     return null
   }
+  return Object.freeze({
+    finalize: (): TicketWorkspaceRootRunCommonJoinCandidateV1 | null => {
+      const candidate = prepared.finalize()
+      const selectedRepositoryWorktreeId = candidate?.selectedRepositoryWorktreeId
+      return candidate && selectedRepositoryWorktreeId !== undefined
+        ? Object.freeze({ rootRun: candidate.rootRun, selectedRepositoryWorktreeId })
+        : null
+    }
+  })
 }
 
-async function isOriginalBindingCurrent(
-  dependencies: TicketWorkspaceRootRunJoinDependenciesV1,
-  binding: ExactLocalNativeGitWorktreeBinding,
-  signal: AbortSignal
-): Promise<boolean> {
+function checkCommonOriginalOperation(
+  input: CommonJoinInputV1,
+  sourcePort: CommonJoinDependenciesV1['sourcePort']
+): boolean {
+  if (!checkOriginalOperation(input.callerSignal, input.context)) {
+    return false
+  }
+  let presentedReadIsCurrent: boolean
   try {
-    return await dependencies.worktreeBindings.isExactLocalNativeGitBindingCurrent(binding, signal)
+    presentedReadIsCurrent = sourcePort.isCurrent(input.presentedRead)
+  } catch {
+    return false
+  }
+  return presentedReadIsCurrent && signalsCurrent(input.callerSignal, input.context)
+}
+
+function checkOriginalOperation(
+  callerSignal: AbortSignal | undefined,
+  context: TicketWorkspaceOwnerOperationContext,
+  legacyClock?: TicketWorkspaceOwnerClock,
+  legacyStartedAt?: number
+): boolean {
+  if (!signalsCurrent(callerSignal, context)) {
+    return false
+  }
+  const current = context.check()
+  if (!current || !signalsCurrent(callerSignal, context)) {
+    return false
+  }
+  const legacyCurrent =
+    legacyStartedAt === undefined ||
+    (legacyClock !== undefined && withinLegacyDeadline(legacyClock, legacyStartedAt))
+  return legacyCurrent && signalsCurrent(callerSignal, context)
+}
+
+function signalsCurrent(
+  callerSignal: AbortSignal | undefined,
+  context: TicketWorkspaceOwnerOperationContext
+): boolean {
+  return !callerSignal?.aborted && !context.signal.aborted
+}
+
+function withinLegacyDeadline(clock: TicketWorkspaceOwnerClock, startedAt: number): boolean {
+  try {
+    const now = clock.monotonicNow()
+    return Number.isFinite(now) && now >= startedAt && now < startedAt + 30_000
   } catch {
     return false
   }

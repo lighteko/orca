@@ -22,7 +22,6 @@ import {
   selectEligibleTicketWorkspaceOwnerMapping
 } from './ticket-workspace-live-owner-composition-policy'
 import type { TicketWorkspaceOwnerSelection } from './ticket-workspace-owner-selection'
-import type { TicketWorkspaceOwnerClock } from './ticket-workspace-live-owner-composition-operation'
 
 export type TicketWorkspaceRootRunHostScopeMapV1 = (
   orchestrationExecutionHostId: string
@@ -41,9 +40,11 @@ export type TicketWorkspaceRootRunJoinAttemptV1 = Readonly<{
   baseline: TicketNavigatorSnapshotV1
   firstRead: CurrentTicketOwnerRead
   secondRead: CurrentTicketOwnerRead
+  presentedRead?: CurrentTicketOwnerRead
   firstFacts: TicketWorkspaceRootRunJoinFactsV1
   secondFacts: TicketWorkspaceRootRunJoinFactsV1
   binding: ExactLocalNativeGitWorktreeBinding
+  selectedRepositoryBinding?: ExactLocalNativeGitWorktreeBinding
 }>
 
 export type TicketWorkspaceRootRunJoinCandidateV1 = Readonly<{
@@ -146,6 +147,22 @@ export function isExactCoordinatorBindingV1(
   )
 }
 
+export function isExactRepositoryBindingV1(
+  binding: ExactLocalNativeGitWorktreeBinding,
+  mapping: TicketWorkspaceRootRunJoinFactsV1['mapping']
+): boolean {
+  const target = mapping.workspaceRef
+  return (
+    target.kind === 'git-worktree' &&
+    isDeepStrictEqual(binding.request, mapping.request) &&
+    binding.target.executionHostId === target.executionHostId &&
+    binding.target.repo?.id === target.repoId &&
+    binding.target.worktree.id === target.worktreeId &&
+    binding.target.worktree.instanceId === target.instanceId &&
+    binding.target.worktree.identity?.key === target.identityKey
+  )
+}
+
 export function readRootRunFactsV1(
   readFacts: () => TicketWorkspaceRootRunAttestationResultV1
 ): TicketWorkspaceRootRunRuntimeFactsV1 | null {
@@ -164,12 +181,11 @@ export function finalizeTicketWorkspaceRootRunJoinV1(
     readRootRunFacts(): TicketWorkspaceRootRunAttestationResultV1
     mapOrchestrationHostScope: TicketWorkspaceRootRunHostScopeMapV1
     selection: TicketWorkspaceOwnerSelection
-    clock: TicketWorkspaceOwnerClock
-    signal?: AbortSignal
-    startedAt: number
+    checkOriginalOperation(): boolean
+    finalizeAdditionalBindings?(): boolean
   }>
 ): TicketWorkspaceRootRunJoinCandidateV1 | null {
-  if (!isWithinJoinDeadline(input.clock, input.startedAt, input.signal)) {
+  if (!input.checkOriginalOperation()) {
     return null
   }
   const finalRootFacts = readRootRunFactsV1(input.readRootRunFacts)
@@ -212,8 +228,11 @@ export function finalizeTicketWorkspaceRootRunJoinV1(
     ) ||
     !isCurrentOwnerReadV1(input.sourcePort, attempt.firstRead) ||
     !isCurrentOwnerReadV1(input.sourcePort, attempt.secondRead) ||
+    (attempt.presentedRead !== undefined &&
+      (!isCurrentOwnerReadV1(input.sourcePort, attempt.presentedRead) ||
+        !sameOwnerReadFacts(attempt.presentedRead, attempt.firstRead, input.selection))) ||
     !sameOwnerReadFacts(attempt.firstRead, attempt.secondRead, input.selection) ||
-    !isWithinJoinDeadline(input.clock, input.startedAt, input.signal)
+    !input.checkOriginalOperation()
   ) {
     return null
   }
@@ -223,7 +242,7 @@ export function finalizeTicketWorkspaceRootRunJoinV1(
     return null
   }
 
-  return Object.freeze({
+  const candidate = Object.freeze({
     verdict: 'available',
     displayedSnapshotRevision: input.selection.snapshotRevision,
     ticketKey: input.selection.ticketKey,
@@ -233,9 +252,19 @@ export function finalizeTicketWorkspaceRootRunJoinV1(
     coordinatorTarget: Object.freeze({ ...finalFacts.coordinatorTarget }),
     repositoryTarget: Object.freeze({ ...repositoryTarget })
   })
+  if (input.finalizeAdditionalBindings) {
+    try {
+      if (!input.finalizeAdditionalBindings() || !input.checkOriginalOperation()) {
+        return null
+      }
+    } catch {
+      return null
+    }
+  }
+  return candidate
 }
 
-function readDisplayedBaselineV1(
+export function readDisplayedBaselineV1(
   sourcePort: TicketWorkspaceOwnerSourcePort,
   selection: TicketWorkspaceOwnerSelection
 ): TicketNavigatorSnapshotV1 | null {
@@ -272,20 +301,4 @@ function sameRootRunFactsV1(
     left.worktreeId === right.worktreeId &&
     isDeepStrictEqual(left.hostScope, right.hostScope)
   )
-}
-
-function isWithinJoinDeadline(
-  clock: TicketWorkspaceOwnerClock,
-  startedAt: number,
-  signal: AbortSignal | undefined
-): boolean {
-  if (signal?.aborted) {
-    return false
-  }
-  try {
-    const now = clock.monotonicNow()
-    return Number.isFinite(now) && now >= startedAt && now < startedAt + 30_000
-  } catch {
-    return false
-  }
 }

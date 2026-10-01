@@ -19,6 +19,24 @@ export class DesktopRuntimeSenderLifecycle {
     return this.stateFor(sender).connectionId
   }
 
+  captureCurrentDocument(sender: WebContents): Readonly<{ isCurrent(): boolean }> | null {
+    const state = this.senders.get(sender.id)
+    if (!state || state.sender !== sender || sender.isDestroyed()) {
+      return null
+    }
+
+    const connectionId = state.connectionId
+    const mainFrame = sender.mainFrame
+    return Object.freeze({
+      isCurrent: () =>
+        !sender.isDestroyed() &&
+        this.senders.get(sender.id) === state &&
+        state.sender === sender &&
+        state.connectionId === connectionId &&
+        sender.mainFrame === mainFrame
+    })
+  }
+
   subscriptionsFor(sender: WebContents): Map<string, AbortController> {
     return this.stateFor(sender).subscriptions
   }
