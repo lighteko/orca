@@ -57,31 +57,49 @@ export class ResidentSourceCurrentness {
   }
 
   isCurrent(read: CurrentTicketOwnerRead): boolean {
-    if (!isTicketWorkspaceCurrentnessToken(read.evidence.currentnessToken)) {
-      return false
-    }
-    const facts = this.tokenFacts.get(read.evidence.currentnessToken)
+    const observation = this.observeCurrentness(read)
+    return (
+      observation !== undefined &&
+      observation.elapsedMs < OWNER_CURRENTNESS_TTL_MS &&
+      this.highWater.isCurrent(observation.facts.highWater)
+    )
+  }
+
+  isCurrentForOriginalOperation(
+    read: CurrentTicketOwnerRead,
+    signal: AbortSignal,
+    operationDeadlineAt: number
+  ): boolean {
+    const facts = this.getCurrentnessFacts(read)
     if (
       !facts ||
-      facts.read !== read ||
-      this.client.isRetired ||
-      this.client.boundLedgerEpoch !== read.evidence.ledgerEpoch ||
-      this.client.connectionIncarnation !== read.evidence.connectionIncarnation
+      !Number.isFinite(operationDeadlineAt) ||
+      operationDeadlineAt <= facts.readStartedAtMonotonicMs
     ) {
-      this.retireIfClientClosed()
       return false
     }
-    const now = this.clock.observe()
+    const started: ResidentSourceClockObservation = {
+      now: facts.readStartedAtMonotonicMs,
+      suspendGeneration: facts.suspendGeneration,
+      clockGeneration: facts.clockGeneration,
+      anomaly: false
+    }
+    return (
+      this.isReadAdmissible(signal, started, facts.readStartedAtMonotonicMs, operationDeadlineAt) &&
+      this.highWater.isCurrent(facts.highWater)
+    )
+  }
+
+  getCurrentnessRemainingMs(read: CurrentTicketOwnerRead): number {
+    const observation = this.observeCurrentness(read)
     if (
-      now.anomaly ||
-      now.clockGeneration !== facts.clockGeneration ||
-      now.suspendGeneration !== facts.suspendGeneration ||
-      now.now < facts.readStartedAtMonotonicMs ||
-      now.now - facts.readStartedAtMonotonicMs >= OWNER_CURRENTNESS_TTL_MS
+      !observation ||
+      observation.elapsedMs >= OWNER_CURRENTNESS_TTL_MS ||
+      !this.highWater.isCurrent(observation.facts.highWater)
     ) {
-      return false
+      return 0
     }
-    return this.highWater.isCurrent(facts.highWater)
+    return Math.floor(OWNER_CURRENTNESS_TTL_MS - observation.elapsedMs)
   }
 
   presentSnapshot(read: CurrentTicketOwnerRead): boolean {
@@ -124,6 +142,10 @@ export class ResidentSourceCurrentness {
     }
     const finished = this.clock.observe()
     return (
+      !signal.aborted &&
+      !this.client.isRetired &&
+      this.client.boundLedgerEpoch === this.ledgerEpoch &&
+      this.client.connectionIncarnation === this.connectionIncarnation &&
       !finished.anomaly &&
       finished.clockGeneration === started.clockGeneration &&
       finished.suspendGeneration === started.suspendGeneration &&
@@ -145,5 +167,41 @@ export class ResidentSourceCurrentness {
     if (this.client.isRetired) {
       this.retireLease()
     }
+  }
+
+  private observeCurrentness(
+    read: CurrentTicketOwnerRead
+  ): Readonly<{ facts: CurrentnessFacts; elapsedMs: number }> | undefined {
+    const facts = this.getCurrentnessFacts(read)
+    if (!facts) {
+      return undefined
+    }
+    const now = this.clock.observe()
+    const elapsedMs = now.now - facts.readStartedAtMonotonicMs
+    return now.anomaly ||
+      now.clockGeneration !== facts.clockGeneration ||
+      now.suspendGeneration !== facts.suspendGeneration ||
+      !Number.isFinite(elapsedMs) ||
+      elapsedMs < 0
+      ? undefined
+      : { facts, elapsedMs }
+  }
+
+  private getCurrentnessFacts(read: CurrentTicketOwnerRead): CurrentnessFacts | undefined {
+    if (!isTicketWorkspaceCurrentnessToken(read.evidence.currentnessToken)) {
+      return undefined
+    }
+    const facts = this.tokenFacts.get(read.evidence.currentnessToken)
+    if (
+      !facts ||
+      facts.read !== read ||
+      this.client.isRetired ||
+      this.client.boundLedgerEpoch !== read.evidence.ledgerEpoch ||
+      this.client.connectionIncarnation !== read.evidence.connectionIncarnation
+    ) {
+      this.retireIfClientClosed()
+      return undefined
+    }
+    return facts
   }
 }

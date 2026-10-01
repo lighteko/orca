@@ -74,6 +74,30 @@ export class TicketWorkspaceResidentHighWater {
     }
   }
 
+  captureLeaseInvalidationGeneration(
+    key: ResidentSourceHighWaterKey,
+    leaseGeneration: number
+  ): number | null {
+    const partition = this.partitions.get(highWaterKeyId(key))
+    return isActiveLease(partition, key, leaseGeneration, this.pendingRebinds)
+      ? partition.invalidationGeneration
+      : null
+  }
+
+  isLeaseCurrent(
+    key: ResidentSourceHighWaterKey,
+    leaseGeneration: number,
+    expectedInvalidationGeneration: number
+  ): boolean {
+    const partition = this.partitions.get(highWaterKeyId(key))
+    return (
+      Number.isSafeInteger(expectedInvalidationGeneration) &&
+      expectedInvalidationGeneration >= 0 &&
+      isActiveLease(partition, key, leaseGeneration, this.pendingRebinds) &&
+      partition.invalidationGeneration === expectedInvalidationGeneration
+    )
+  }
+
   async admit(
     key: ResidentSourceHighWaterKey,
     candidate: ResidentSourceHighWaterRecord,
@@ -227,4 +251,22 @@ function rebindId(key: ResidentSourceBaseKey, ledgerEpoch: string): string {
     key.authorityId,
     ledgerEpoch
   ])
+}
+
+function isActiveLease(
+  partition: ResidentHighWaterPartitionState | undefined,
+  key: ResidentSourceHighWaterKey,
+  leaseGeneration: number,
+  pendingRebinds: ReadonlySet<string>
+): partition is ResidentHighWaterPartitionState {
+  return (
+    partition !== undefined &&
+    Number.isSafeInteger(leaseGeneration) &&
+    leaseGeneration >= 0 &&
+    partition.leaseIdentity !== undefined &&
+    partition.leaseGeneration === leaseGeneration &&
+    !partition.rebindPending &&
+    !pendingRebinds.has(rebindId(key, key.ledgerEpoch)) &&
+    !partition.quarantined
+  )
 }

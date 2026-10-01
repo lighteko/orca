@@ -28,8 +28,22 @@ export type TicketWorkspaceResidentSourceConnectResult =
   | { status: 'connected'; source: TicketWorkspaceResidentSourceAdapter }
   | { status: 'unavailable'; reason: TicketResidentUnavailableReason }
 
+export type TicketWorkspaceResidentPresentationReadResult =
+  | {
+      status: 'admitted'
+      read: CurrentTicketOwnerRead
+      currentnessRemainingMs: number
+    }
+  | { status: 'unsupported' }
+  | { status: 'unavailable' }
+
 export type TicketWorkspaceResidentSourceAdapter = TicketWorkspaceOwnerSourcePort &
   Readonly<{
     close(): void
     presentSnapshot(read: CurrentTicketOwnerRead): boolean
+    readCurrentPresentationSnapshot(
+      signal: AbortSignal,
+      deadlineBudgetMs: number
+    ): Promise<TicketWorkspaceResidentPresentationReadResult>
+    getCurrentnessRemainingMs(read: CurrentTicketOwnerRead): number
   }>

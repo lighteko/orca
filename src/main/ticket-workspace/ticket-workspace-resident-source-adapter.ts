@@ -6,20 +6,19 @@ import {
 } from './ticket-workspace-resident-source-port'
 import type { TicketResidentBinding } from './ticket-workspace-resident-protocol'
 import { connectResidentSourceAdapterAfterSetup } from './ticket-workspace-resident-source-adapter-connection'
-import { admitTicketWorkspaceResidentSnapshot } from './ticket-workspace-resident-admission'
-import { waitForResidentSourceAdmission } from './ticket-workspace-resident-source-admission-wait'
 import { ResidentSourceCurrentness } from './ticket-workspace-resident-source-currentness'
 import { ResidentSourceClockMonitor } from './ticket-workspace-resident-source-clock'
-import { ResidentHighWaterOperationContext } from './ticket-workspace-resident-high-water-operation-context'
+import {
+  readResidentSourcePresentationCandidate,
+  type ResidentSourcePresentationReadContext
+} from './ticket-workspace-resident-source-presentation-read'
 import {
   createResidentSourceHighWaterKey,
   type TicketWorkspaceResidentHighWater
 } from './ticket-workspace-resident-high-water'
-import {
-  freezeResidentValue,
-  residentHighWaterRecordFromSnapshot
-} from './ticket-workspace-resident-source-values'
+import { freezeResidentValue } from './ticket-workspace-resident-source-values'
 import type {
+  TicketWorkspaceResidentPresentationReadResult,
   TicketWorkspaceResidentSourceAdapter,
   TicketWorkspaceResidentSourceAdapterOptions,
   TicketWorkspaceResidentSourceConnectResult
@@ -94,179 +93,139 @@ class ResidentSourceAdapter implements TicketWorkspaceResidentSourceAdapter {
     signal: AbortSignal,
     deadlineBudgetMs: number
   ): Promise<CurrentTicketOwnerRead | null> {
+    const result = await this.readCurrentPresentationSnapshot(signal, deadlineBudgetMs)
     if (
-      this.isClosed ||
-      this.client.isRetired ||
-      !Number.isSafeInteger(deadlineBudgetMs) ||
-      deadlineBudgetMs < 1 ||
-      deadlineBudgetMs > 10_000
-    ) {
-      this.retireIfClientClosed()
-      return null
-    }
-    const clockAtStart = this.clock.observe()
-    if (clockAtStart.anomaly) {
-      this.highWater.invalidateLease(this.key, this.leaseGeneration)
-      return null
-    }
-    const readStartedAtMonotonicMs = clockAtStart.now
-    const operationDeadlineAt = readStartedAtMonotonicMs + deadlineBudgetMs
-    const boundEpochAtStart = this.client.boundLedgerEpoch
-    const incarnationAtStart = this.client.connectionIncarnation
-    if (
-      boundEpochAtStart !== this.ledgerEpoch ||
-      incarnationAtStart !== this.connectionIncarnation
-    ) {
-      await waitForResidentSourceAdmission(
-        this.highWater.quarantine(this.key, 'binding_mismatch'),
+      result.status !== 'admitted' ||
+      !this.currentness.isCurrentForOriginalOperation(
+        result.read,
         signal,
-        this.currentness.remainingOperationBudget(operationDeadlineAt),
-        () => undefined
-      )
-      this.retireLease()
-      return null
-    }
-
-    const clientReadBudget = this.currentness.remainingOperationBudget(operationDeadlineAt)
-    if (clientReadBudget < 1 || signal.aborted) {
-      return null
-    }
-    const result = await this.client.readSnapshot(signal, clientReadBudget)
-    if (result.status !== 'snapshot') {
-      if (this.client.isRetired) {
-        this.retireLease()
-      } else {
-        this.highWater.invalidateLease(this.key, this.leaseGeneration)
-      }
-      return null
-    }
-    if (
-      signal.aborted ||
-      this.client.isRetired ||
-      this.client.boundLedgerEpoch !== boundEpochAtStart ||
-      this.client.connectionIncarnation !== incarnationAtStart
-    ) {
-      this.retireLease()
-      return null
-    }
-
-    const snapshotBytes = Buffer.from(result.snapshotBytes)
-    if (
-      !this.currentness.isReadAdmissible(
-        signal,
-        clockAtStart,
-        readStartedAtMonotonicMs,
-        operationDeadlineAt
+        result.read.evidence.readStartedAtMonotonicMs + deadlineBudgetMs
       )
     ) {
-      this.highWater.invalidateLease(this.key, this.leaseGeneration)
       return null
     }
-    const admission = admitTicketWorkspaceResidentSnapshot(
-      snapshotBytes,
-      this.expectedBinding,
-      boundEpochAtStart
+    return result.read
+  }
+
+  async readCurrentPresentationSnapshot(
+    signal: AbortSignal,
+    deadlineBudgetMs: number
+  ): Promise<TicketWorkspaceResidentPresentationReadResult> {
+    const candidate = await readResidentSourcePresentationCandidate(
+      {
+        client: this.client,
+        expectedBinding: this.expectedBinding,
+        ledgerEpoch: this.ledgerEpoch,
+        connectionIncarnation: this.connectionIncarnation,
+        key: this.key,
+        leaseGeneration: this.leaseGeneration,
+        highWater: this.highWater,
+        clock: this.clock,
+        currentness: this.currentness,
+        isClosed: () => this.isClosed,
+        retireLease: () => this.retireLease()
+      },
+      signal,
+      deadlineBudgetMs
     )
-    if (admission.status !== 'accepted') {
-      if (admission.status === 'rejected' && admission.reason === 'binding_mismatch') {
-        await waitForResidentSourceAdmission(
-          this.highWater.quarantine(this.key, 'binding_mismatch'),
-          signal,
-          this.currentness.remainingOperationBudget(operationDeadlineAt),
-          () => undefined
+    if (candidate.status === 'unavailable') {
+      return { status: 'unavailable' }
+    }
+    if (candidate.status === 'unsupported') {
+      if (
+        !this.isOriginalReadCurrent(candidate.context) ||
+        !this.highWater.isLeaseCurrent(
+          this.key,
+          this.leaseGeneration,
+          candidate.context.originalInvalidationGeneration
         )
-      } else {
-        this.highWater.invalidateLease(this.key, this.leaseGeneration)
+      ) {
+        return { status: 'unavailable' }
       }
-      return null
+      this.highWater.invalidateLease(this.key, this.leaseGeneration)
+      return { status: 'unsupported' }
     }
 
-    const sourceRecord = residentHighWaterRecordFromSnapshot(admission.snapshot)
-    const operationContext = new ResidentHighWaterOperationContext(
-      signal,
-      () => this.currentness.remainingOperationBudget(operationDeadlineAt),
-      () => this.highWater.invalidateLease(this.key, this.leaseGeneration)
-    )
-    const highWaterOperation = this.highWater.admit(
-      this.key,
-      sourceRecord,
-      this.leaseGeneration,
-      () =>
-        operationContext.isActive() &&
-        this.currentness.isReadAdmissible(
-          signal,
-          clockAtStart,
-          readStartedAtMonotonicMs,
-          operationDeadlineAt
-        ),
-      operationContext
-    )
-    const highWaterAdmission = await waitForResidentSourceAdmission(
-      highWaterOperation,
-      signal,
-      operationContext.remainingBudgetMs(),
-      () => operationContext.abandon()
-    ).finally(() => operationContext.dispose())
-    if (
-      highWaterAdmission?.status === 'unavailable' &&
-      highWaterAdmission.reason === 'high_water_admission_capacity'
-    ) {
-      return null
-    }
-    if (!highWaterAdmission || highWaterAdmission.status !== 'admitted') {
-      if (!operationContext.isAbandoned()) {
-        this.highWater.invalidateLease(this.key, this.leaseGeneration)
-      }
-      return null
-    }
-    if (
-      this.isClosed ||
-      this.client.isRetired ||
-      this.client.boundLedgerEpoch !== boundEpochAtStart ||
-      this.client.connectionIncarnation !== incarnationAtStart
-    ) {
+    if (!this.hasExactReadOwner(candidate.context)) {
       this.retireLease()
-      return null
+      return { status: 'unavailable' }
     }
     if (
-      !this.currentness.isReadAdmissible(
-        signal,
-        clockAtStart,
-        readStartedAtMonotonicMs,
-        operationDeadlineAt
-      ) ||
-      !this.highWater.isCurrent(highWaterAdmission.facts)
+      !this.isOriginalReadCurrent(candidate.context) ||
+      !this.highWater.isCurrent(candidate.highWaterFacts)
     ) {
       this.highWater.invalidateLease(this.key, this.leaseGeneration)
-      return null
+      return { status: 'unavailable' }
     }
-
-    const snapshot = freezeResidentValue(structuredClone(admission.snapshot))
+    const snapshot = freezeResidentValue(structuredClone(candidate.snapshot))
     const read = Object.freeze({
       snapshot,
       evidence: Object.freeze({
         binding: freezeResidentValue(structuredClone(this.expectedBinding)),
-        ledgerEpoch: boundEpochAtStart,
-        connectionIncarnation: incarnationAtStart,
-        readStartedAtMonotonicMs,
+        ledgerEpoch: candidate.context.boundLedgerEpoch,
+        connectionIncarnation: candidate.context.connectionIncarnation,
+        readStartedAtMonotonicMs: candidate.context.readStartedAtMonotonicMs,
         source: snapshot.source,
         currentnessToken: issueTicketWorkspaceCurrentnessToken()
       })
     })
     if (
-      !this.currentness.isReadAdmissible(
-        signal,
-        clockAtStart,
-        readStartedAtMonotonicMs,
-        operationDeadlineAt
-      ) ||
-      !this.highWater.isCurrent(highWaterAdmission.facts)
+      !this.isOriginalReadCurrent(candidate.context) ||
+      !this.highWater.isCurrent(candidate.highWaterFacts)
     ) {
       this.highWater.invalidateLease(this.key, this.leaseGeneration)
-      return null
+      return { status: 'unavailable' }
     }
-    this.currentness.issue(read, highWaterAdmission.facts, readStartedAtMonotonicMs, clockAtStart)
-    return read
+    this.currentness.issue(
+      read,
+      candidate.highWaterFacts,
+      candidate.context.readStartedAtMonotonicMs,
+      candidate.context.started
+    )
+    const currentnessRemainingMs = this.currentness.getCurrentnessRemainingMs(read)
+    if (
+      !this.currentness.isCurrent(read) ||
+      !this.isOriginalReadCurrent(candidate.context) ||
+      !this.highWater.isCurrent(candidate.highWaterFacts)
+    ) {
+      return { status: 'unavailable' }
+    }
+    return {
+      status: 'admitted',
+      read,
+      currentnessRemainingMs
+    }
+  }
+
+  getCurrentnessRemainingMs(read: CurrentTicketOwnerRead): number {
+    return this.currentness.getCurrentnessRemainingMs(read)
+  }
+
+  private hasExactReadOwner(context: ResidentSourcePresentationReadContext): boolean {
+    if (
+      this.isClosed ||
+      context.signal.aborted ||
+      this.client.isRetired ||
+      this.client.boundLedgerEpoch !== context.boundLedgerEpoch ||
+      context.boundLedgerEpoch !== this.ledgerEpoch ||
+      this.client.connectionIncarnation !== context.connectionIncarnation ||
+      context.connectionIncarnation !== this.connectionIncarnation
+    ) {
+      return false
+    }
+    return true
+  }
+
+  private isOriginalReadCurrent(context: ResidentSourcePresentationReadContext): boolean {
+    return (
+      this.hasExactReadOwner(context) &&
+      this.currentness.isReadAdmissible(
+        context.signal,
+        context.started,
+        context.readStartedAtMonotonicMs,
+        context.operationDeadlineAt
+      )
+    )
   }
 
   isCurrent(read: CurrentTicketOwnerRead): boolean {
@@ -285,12 +244,6 @@ class ResidentSourceAdapter implements TicketWorkspaceResidentSourceAdapter {
     if (!this.isClosed) {
       this.isClosed = true
       this.client.close()
-      this.retireLease()
-    }
-  }
-
-  private retireIfClientClosed(): void {
-    if (this.client.isRetired) {
       this.retireLease()
     }
   }

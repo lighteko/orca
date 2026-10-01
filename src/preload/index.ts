@@ -84,6 +84,7 @@ import { mobileApi } from './api/mobile-bridge'
 import { agentStatusApi } from './api/agent-status-bridge'
 import { speechApi } from './api/speech-bridge'
 import { ticketWorkspaceFixtureApi } from './api/ticket-workspace-fixture-bridge'
+import { ticketWorkspaceLiveApi } from './api/ticket-workspace-live-bridge'
 
 installNativeFileDropHandlers()
 installBrowserFindListener()
@@ -182,6 +183,7 @@ const api = {
   mobile: mobileApi,
   agentStatus: agentStatusApi,
   ticketWorkspace: ticketWorkspaceFixtureApi,
+  ticketWorkspaceLive: ticketWorkspaceLiveApi,
   speech: speechApi
 } satisfies PreloadApi
 

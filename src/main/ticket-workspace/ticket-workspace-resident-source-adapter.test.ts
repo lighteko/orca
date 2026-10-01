@@ -1,20 +1,17 @@
-import {
-  digestNavigatorSnapshotV1,
-  serializeTicketNavigatorSnapshotUtf8V1,
-  type TicketNavigatorSnapshotV1
-} from '@lighteko/ticket-workspace-contracts/navigator-snapshot-v1'
 import { describe, expect, it, vi } from 'vitest'
 import {
   binding,
-  parseProtectedRequestId,
-  protectedFrames,
   randomSource,
   setupKey,
   ScriptedDuplex,
-  snapshotMessages,
   sourceBoundWire,
   vector
 } from './ticket-workspace-resident-test-peer'
+import {
+  connectSource,
+  snapshot,
+  sourceLeaseIdentity
+} from './ticket-workspace-resident-source-adapter-test-fixture'
 import { connectTicketWorkspaceResidentSourceAdapter } from './ticket-workspace-resident-source-adapter'
 import {
   createResidentSourceHighWaterKey,
@@ -24,6 +21,217 @@ import {
 import { MemoryResidentSourceHighWaterStore } from './ticket-workspace-resident-high-water-test-store'
 
 describe('resident source adapter', () => {
+  it('keeps the nullable read as a single delegated operation and floors its original lifetime', async () => {
+    let now = 8_000
+    const value = snapshot()
+    const { source } = await connectSource(
+      [value],
+      () => now,
+      () => 0,
+      () => null
+    )
+    const detailedRead = vi.spyOn(source, 'readCurrentPresentationSnapshot')
+
+    const read = await source.readCurrentSnapshot(new AbortController().signal, 2_500)
+    expect(read).not.toBeNull()
+    expect(detailedRead).toHaveBeenCalledTimes(1)
+    if (!read) {
+      return
+    }
+
+    expect(source.getCurrentnessRemainingMs(read)).toBe(30_000)
+    now = 37_999.5
+    expect(source.getCurrentnessRemainingMs(read)).toBe(0)
+    expect(source.isCurrent(read)).toBe(true)
+    now = 38_000
+    expect(source.getCurrentnessRemainingMs(read)).toBe(0)
+    expect(source.isCurrent(read)).toBe(false)
+    source.close()
+  })
+
+  it('requires its final lease stamp before reporting unsupported and revokes old currentness', async () => {
+    const connected = await connectSource(
+      [snapshot(), snapshot({ unsupportedTicket: true }), snapshot({ unsupportedTicket: true })],
+      () => 100,
+      () => 0,
+      () => null
+    )
+    const admitted = await connected.source.readCurrentPresentationSnapshot(
+      new AbortController().signal,
+      5_000
+    )
+    if (admitted.status !== 'admitted') {
+      throw new Error('Expected an admitted source read')
+    }
+    const readsBeforeUnsupported = [...connected.store.readCounts.values()]
+    const comparesBeforeUnsupported = connected.store.compareCandidates.length
+    expect(connected.source.isCurrent(admitted.read)).toBe(true)
+
+    await expect(
+      connected.source.readCurrentPresentationSnapshot(new AbortController().signal, 5_000)
+    ).resolves.toEqual({ status: 'unsupported' })
+    expect(connected.source.isCurrent(admitted.read)).toBe(false)
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const leaseGeneration = connected.highWater.registerLease(key, sourceLeaseIdentity())
+    const originalIsLeaseCurrent = connected.highWater.isLeaseCurrent.bind(connected.highWater)
+    let checks = 0
+    vi.spyOn(connected.highWater, 'isLeaseCurrent').mockImplementation(
+      (checkedKey, checkedGeneration, invalidationGeneration) => {
+        checks += 1
+        if (checks === 2) {
+          connected.highWater.invalidateLease(key, leaseGeneration)
+        }
+        return originalIsLeaseCurrent(checkedKey, checkedGeneration, invalidationGeneration)
+      }
+    )
+
+    await expect(
+      connected.source.readCurrentPresentationSnapshot(new AbortController().signal, 5_000)
+    ).resolves.toEqual({ status: 'unavailable' })
+    expect([...connected.store.readCounts.values()]).toEqual(readsBeforeUnsupported)
+    expect(connected.store.compareCandidates).toHaveLength(comparesBeforeUnsupported)
+    connected.source.close()
+  })
+
+  it('rejects a lease invalidated while the authenticated transport read is in flight', async () => {
+    const store = new MemoryResidentSourceHighWaterStore()
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const connected = await connectSource(
+      [snapshot()],
+      () => 100,
+      () => 0,
+      () => null,
+      store,
+      (highWater) => {
+        const leaseGeneration = highWater.registerLease(key, sourceLeaseIdentity())
+        highWater.invalidateLease(key, leaseGeneration)
+      }
+    )
+
+    await expect(
+      connected.source.readCurrentPresentationSnapshot(new AbortController().signal, 5_000)
+    ).resolves.toEqual({ status: 'unavailable' })
+    expect(store.readCounts.size).toBe(0)
+    expect(store.compareCandidates).toHaveLength(0)
+    connected.source.close()
+  })
+
+  it('rejects a lease invalidated during a raw HWM read before candidate publication', async () => {
+    const store = new MemoryResidentSourceHighWaterStore()
+    const connected = await connectSource(
+      [snapshot()],
+      () => 100,
+      () => 0,
+      () => null,
+      store
+    )
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const leaseGeneration = connected.highWater.registerLease(key, sourceLeaseIdentity())
+    store.beforeRead = async () => {
+      connected.highWater.invalidateLease(key, leaseGeneration)
+    }
+
+    await expect(
+      connected.source.readCurrentPresentationSnapshot(new AbortController().signal, 5_000)
+    ).resolves.toEqual({ status: 'unavailable' })
+    expect(store.compareCandidates).toHaveLength(0)
+    expect(store.committedCandidates).toHaveLength(0)
+    connected.source.close()
+  })
+
+  it('keeps the original lease stamp across an admission queued behind raw storage', async () => {
+    const value = snapshot()
+    const store = new MemoryResidentSourceHighWaterStore()
+    const connected = await connectSource(
+      [value, value],
+      () => 100,
+      () => 0,
+      () => null,
+      store
+    )
+    const first = await connected.source.readCurrentPresentationSnapshot(
+      new AbortController().signal,
+      5_000
+    )
+    expect(first.status).toBe('admitted')
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const leaseGeneration = connected.highWater.registerLease(key, sourceLeaseIdentity())
+
+    let markReadStarted = (): void => undefined
+    const readStarted = new Promise<void>((resolve) => {
+      markReadStarted = resolve
+    })
+    let releaseRead = (): void => undefined
+    const readGate = new Promise<void>((resolve) => {
+      releaseRead = resolve
+    })
+    store.beforeRead = async () => {
+      markReadStarted()
+      await readGate
+    }
+    const active = connected.highWater.admit(
+      key,
+      {
+        ledgerRevision: value.source.ledgerRevision,
+        projectionSequence: value.source.projectionSequence,
+        catalogDigest: value.source.catalogDigest
+      },
+      leaseGeneration
+    )
+    await readStarted
+
+    let markAdmissionQueued = (): void => undefined
+    const admissionQueued = new Promise<void>((resolve) => {
+      markAdmissionQueued = resolve
+    })
+    const originalAdmit = connected.highWater.admit.bind(connected.highWater)
+    vi.spyOn(connected.highWater, 'admit').mockImplementation(
+      (admissionKey, candidate, generation, canContinue, context) => {
+        if (context) {
+          markAdmissionQueued()
+        }
+        return originalAdmit(admissionKey, candidate, generation, canContinue, context)
+      }
+    )
+    const nextWriteCount = connected.duplex.writes.length + 1
+    const pending = connected.source.readCurrentPresentationSnapshot(
+      new AbortController().signal,
+      5_000
+    )
+    await connected.duplex.waitForWriteCount(nextWriteCount)
+    await admissionQueued
+    connected.highWater.invalidateLease(key, leaseGeneration)
+    releaseRead()
+
+    await expect(pending).resolves.toEqual({ status: 'unavailable' })
+    await expect(active).resolves.toMatchObject({ status: 'unavailable' })
+    expect([...store.readCounts.values()]).toEqual([3])
+    expect(store.compareCandidates).toHaveLength(1)
+    connected.source.close()
+  })
+
+  it('rejects a candidate invalidated at the adapter terminal check after helper settlement', async () => {
+    const connected = await connectSource(
+      [snapshot()],
+      () => 100,
+      () => 0,
+      () => null
+    )
+    const key = createResidentSourceHighWaterKey(binding, 'epoch-a')
+    const leaseGeneration = connected.highWater.registerLease(key, sourceLeaseIdentity())
+    const originalIsCurrent = connected.highWater.isCurrent.bind(connected.highWater)
+    vi.spyOn(connected.highWater, 'isCurrent').mockImplementation((facts) => {
+      connected.highWater.invalidateLease(key, leaseGeneration)
+      return originalIsCurrent(facts)
+    })
+
+    await expect(
+      connected.source.readCurrentPresentationSnapshot(new AbortController().signal, 5_000)
+    ).resolves.toEqual({ status: 'unavailable' })
+    expect(connected.store.committedCandidates).toHaveLength(1)
+    connected.source.close()
+  })
+
   it('captures its own lease and monotonic read evidence and exposes only the presented current baseline', async () => {
     const now = 8_000
     let displayedRevision: string | null = null
@@ -494,113 +702,3 @@ describe('resident source adapter', () => {
     connected.source.close()
   })
 })
-
-type SnapshotChanges = Readonly<{
-  catalogDigest?: string
-  generatedAt?: string
-  ledgerRevision?: number
-  unsupportedTicket?: boolean
-}>
-
-function snapshot(changes: SnapshotChanges = {}): TicketNavigatorSnapshotV1 {
-  const value: TicketNavigatorSnapshotV1 = {
-    schemaId: 'ticket-navigator-snapshot',
-    schemaVersion: 1,
-    producer: {
-      name: 'ticket-workspace',
-      version: binding.expectedService.releaseId,
-      contractVersion: 1
-    },
-    profile: { ...binding.profile },
-    generatedAt: changes.generatedAt ?? '2026-01-01T00:00:00.000Z',
-    staleAfter: changes.generatedAt
-      ? new Date(Date.parse(changes.generatedAt) + 60_000).toISOString()
-      : '2026-01-01T00:01:00.000Z',
-    snapshotRevision: '0'.repeat(64),
-    source: {
-      authorityId: binding.authorityId,
-      ledgerEpoch: 'epoch-a',
-      ledgerRevision: changes.ledgerRevision ?? 7,
-      projectionSequence: 0,
-      catalogDigest: changes.catalogDigest ?? 'a'.repeat(64)
-    },
-    tickets:
-      changes.unsupportedTicket === true
-        ? [
-            {
-              ticketKey: 'SEL-1',
-              label: 'Unsupported ticket',
-              lifecycle: 'ready',
-              availability: 'unsupported',
-              orchestration: {
-                executionHostId: 'wsl:machine-a:distro-a',
-                runId: 'run-1',
-                dispatchIds: [],
-                requestIds: []
-              },
-              enrichment: { issue: 'unknown', mergeRequests: 'unknown' },
-              workspaces: [],
-              actions: []
-            }
-          ]
-        : []
-  }
-  return { ...value, snapshotRevision: digestNavigatorSnapshotV1(value) }
-}
-
-async function connectSource(
-  snapshots: TicketNavigatorSnapshotV1[],
-  now: () => number,
-  suspendGeneration: () => number,
-  getDisplayedSnapshotRevision: () => string | null,
-  store = new MemoryResidentSourceHighWaterStore(),
-  beforeSnapshotResponse?: () => void
-) {
-  let sequence = 1
-  let nextSnapshotIndex = 0
-  const duplex = new ScriptedDuplex((index, frame, push) => {
-    if (index === 0) {
-      push(Buffer.from(vector.hello.serverHello.wireHex, 'hex'))
-    }
-    if (index === 2) {
-      push(sourceBoundWire)
-    }
-    if (index >= 3) {
-      beforeSnapshotResponse?.()
-      const value = snapshots[nextSnapshotIndex]
-      if (!value) {
-        throw new Error('No synthetic resident snapshot remains')
-      }
-      nextSnapshotIndex += 1
-      const frames = protectedFrames(
-        snapshotMessages(
-          Buffer.from(serializeTicketNavigatorSnapshotUtf8V1(value), 'utf8'),
-          parseProtectedRequestId(frame)
-        ),
-        sequence
-      )
-      sequence += frames.length
-      for (const frame of frames) {
-        push(frame)
-      }
-    }
-  })
-  const highWater = new TicketWorkspaceResidentHighWater(store, {
-    authorizeFirstAdoption: async () => true,
-    authorizeRebind: async () => true,
-    authorizeRecovery: async () => true
-  })
-  const connected = await connectTicketWorkspaceResidentSourceAdapter({
-    duplex,
-    setupKey,
-    expectedBinding: binding,
-    highWater,
-    clock: { now, suspendGeneration },
-    getDisplayedSnapshotRevision,
-    randomBytes: randomSource()
-  })
-  if (connected.status !== 'connected') {
-    throw new Error(`Resident source setup failed: ${connected.reason}`)
-  }
-  return { source: connected.source, duplex, store, highWater }
-}
