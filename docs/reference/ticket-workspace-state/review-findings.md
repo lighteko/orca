@@ -2,6 +2,12 @@
 
 Snapshot date: 2026-10-01. This is a concise carry-forward of valid reviewer conclusions, not a reasoning transcript. See [project-state.md](./project-state.md) for current code/test evidence.
 
+## Published C1 CLI compatibility — 2026-10-01
+
+- **FACT / OPEN:** Published `2f00e82e6` failed CLI compilation on Windows and Linux with TS1479: the new shared C1 boundary imports an ESM runtime constant while the CLI checks all shared code as CommonJS. Node/Web tests and reviews did not cover this CLI gate. All eight PR unit shards passed; affected e2e jobs stopped at build setup.
+- **REVIEW / NEXT_APPROVE:** Fresh Astra independently matched the already-public JSON artifact's `snapshotMaxUtf8Bytes` to the runtime cap, compiled the one-file candidate in memory, loaded emitted CommonJS and bundled/executed a browser IIFE. Use a static default JSON import without attributes; the attribute variant failed TS2823. No cap literal, main-layer import, config exclusion or module change is needed.
+- **REVIEW / CODE_APPROVE:** Existing C Luna's one-file repair passed actual CLI/Node/full Web checks, 11 existing tests, finite CLI emit/load and exact quality/format. Fresh Astra verified source SHA-256 `fb069f4280f25e805718e2a794c46bfe788e561e6923064ffe7585bdbe628492` and independently loaded actual CommonJS output, checking both authoritative caps, synchronous parse/extra-field rejection and response correlation. Root commit/publication follow; a new remote commit needs separate user approval and published CI is not green yet.
+
 ## Execution-gate correction — 2026-10-01
 
 - **FACT:** `TicketWorkspaceResidentClientOptions` already injects a duplex stream, setup key, expected binding and clock; the existing owner selector and runtime capture also expose separate boundaries. Production artifact publication and real endpoint provisioning are not dependencies of those injected interfaces.

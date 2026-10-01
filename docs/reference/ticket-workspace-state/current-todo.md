@@ -45,7 +45,9 @@
   - [x] **C2 계약 준비·다음 경계 리뷰:** 같은 C Luna의 보고를 Fresh Astra가 검토했다. detailed source와 channel/오류 계약을 고정한 IPC·preload는 다음 코드 후보이며, 표시 owner는 receipt 교체·stale 수명·A2와 repository 결합을 먼저 결정해야 한다. 구현은 아직 배정하지 않았다.
   - [x] **D0 로컬 산출물 검증 완료:** 새 CLI·contracts와 Zod·noble 네 tarball의 잠금·오프라인 설치, 파일·SHA/SRI 폐쇄성 및 Linux Node 입력 서명을 Astra가 독립 검증해 EVIDENCE_APPROVE했다. 수정된 증거 manifest 해시는 `9a2bc679e38933e267549971dafe41a36a44cce982e2dcc591352c11ca1b9c1f`다. Windows 로컬 빌드이며 Linux 실행·네트워크 차단·생산 신뢰·실제 설치 증명은 아니다.
   - 준비 조사는 병렬 가능하다. A/C strict Run·owner 파일과 B/C/D setup·admission·등록 통합은 소유권 분리 또는 직렬화한다. [전체 계약](./task-graph.md#reviewed-next-preparation-frontier--2026-10-01).
-- [x] **이번 로컬 통합 마감:** A1·A2·C1·B0 관련 9개 파일/108개 테스트, 동결 코드 16개 전후 해시 일치, 최종 전체 Node 타입 검사와 Fresh Astra의 유한 주입형 통합 CODE_APPROVE를 확인했다. 네 코드 커밋은 현재 로컬이며 새 원격 게시 승인은 별도다.
+- [x] **이번 통합·게시:** A1·A2·C1·B0 관련 9개 파일/108개 테스트, 동결 코드 16개 해시와 Node/Web 타입 검사를 확인했다. Fresh Astra 리뷰와 사용자 승인 후 코드 4개·문서 1개 커밋을 `2f00e82e6`까지 게시했다.
+- [x] **TW-PILOT-C1-CLI-F1 — 로컬 수정:** 기존 C Luna가 한 파일의 import를 공개 계약 JSON 재사용으로 바꿨다. CLI·Node·전체 Web 타입 검사, 기존 DTO 테스트 11개, 실제 CLI 출력 로딩과 품질·형식 검사 및 Astra CODE_APPROVE를 통과했다. 제한 값과 parser 동작은 같다.
+- [ ] **수정 게시·CI:** `2f00e82e6`의 [PR Checks](https://github.com/lighteko/orca/actions/runs/36832917047)는 20개 성공·6개 skip·6개 실패다. ESM/CommonJS 오류를 놓친 이전 로컬 검증에 CLI 검사를 추가했다. 검토된 추가 커밋의 게시 승인을 받은 뒤 새 정확한 커밋의 CI를 확인한다.
 - [ ] **후속 pilot 통합:** 실제 티켓과 기존 Run/workspace의 엄격한 연결, durable HWM, live DTO·preload·Tickets·클릭 재검증을 연결한다. 완료 기준은 실제 티켓 한 건의 표시와 정확한 workspace 이동이다. 누락된 관측은 unavailable이며 effect·공개 `clear`는 비활성이다.
 
 **다음 실행 경계:** C2A 상세 결과/남은 수명 packet, C2B receipt·공통 owner 결합 계약, C2C/D 채널·오류·preload 계약, C3 refresh/expiry 준비, B1 내구성 결정, D1 승인 실행서 준비는 파일·보고 소유권을 나눠 진행할 수 있다. injected C2 통합은 실제 WSL·운영 키·durable 구현을 기다릴 필요가 없다. 실제 pilot 활성화는 별도 운영·내구성·제품 연결 게이트다.
@@ -128,4 +130,4 @@ Fixture 완료는 live `current`, 외부 효과 또는 공개 `clear`를 뜻하�
 - [ ] **M2/M3 후속:** 생산용 adapter·역할 수렴(TW-04B/C)과 coordinator folder·root gateway(TW-05/05G)는 미착수다. 효과 실행은 승인·소유권·재시도 계약을 충족한 뒤에만 연결한다.
 - [ ] **M6–M8:** 기존 workspace/agent action 연결(TW-08), 실제 ticket 상태와 Sellmate 통합(TW-09), 배포·파일럿(TW-10)을 완료한다.
 
-**운영 규칙:** 사용자 승인에 따라 기존 계획 범위의 독립 리뷰를 통과한 가역적 로컬 구현·테스트·통합·커밋은 배정마다 다시 묻지 않고 계속 진행한다. 외부 게시·운영 설정 변경·실제 키와 보안 정책 결정은 Sol이 승인을 요청한다. 관련 작업은 같은 Luna workstream 세션을 이어 쓰며 독립 리뷰는 새 **Sol 6.1 xhigh**가 수행한다.
+**운영 규칙:** 사용자 승인에 따라 기존 계획 범위의 독립 리뷰를 통과한 가역적 로컬 구현·테스트·통합·커밋은 배정마다 다시 묻지 않고 계속 진행한다. 외부 게시·운영 설정 변경·실제 키와 보안 정책 결정은 Sol이 승인을 요청한다. 관련 작업은 같은 Luna workstream 세션을 이어 쓰며 독립 리뷰는 새 **Astra xhigh**가 수행한다.

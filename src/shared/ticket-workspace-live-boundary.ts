@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { TICKET_SNAPSHOT_MAX_UTF8_BYTES_V1 } from '@lighteko/ticket-workspace-contracts/navigator-snapshot-v1'
+import ticketNavigatorSnapshotArtifact from '@lighteko/ticket-workspace-contracts/artifacts/ticket-navigator-snapshot-v1.json'
 import type { TicketNavigatorSnapshotV1 } from '@lighteko/ticket-workspace-contracts/navigator-snapshot-v1' with {
   'resolution-mode': 'import'
 }
@@ -17,7 +17,8 @@ export const TICKET_WORKSPACE_LIVE_MAX_WORKSPACES = 2_000
 export const TICKET_WORKSPACE_LIVE_MAX_IDENTIFIER_UTF8_BYTES = 255
 export const TICKET_WORKSPACE_LIVE_MAX_LABEL_UTF8_BYTES = 1_024
 export const TICKET_WORKSPACE_LIVE_MAX_CURRENTNESS_MS = 30_000
-export const TICKET_WORKSPACE_LIVE_MAX_UTF8_BYTES = TICKET_SNAPSHOT_MAX_UTF8_BYTES_V1
+export const TICKET_WORKSPACE_LIVE_MAX_UTF8_BYTES =
+  ticketNavigatorSnapshotArtifact.semanticConstraints.snapshotMaxUtf8Bytes
 
 const requestIdSchema = z.string().refine(isCanonicalRequestId)
 const digestSchema = z.string().regex(/^[a-f0-9]{64}$/)
