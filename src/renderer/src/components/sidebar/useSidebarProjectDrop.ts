@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   NATIVE_FILE_DROP_TARGET,
@@ -19,7 +19,7 @@ type SidebarProjectDropHandlers = {
   onDragLeave: (event: React.DragEvent<HTMLElement>) => void
 }
 
-export function useSidebarProjectDrop(): {
+export function useSidebarProjectDrop(enabled = true): {
   nativeDropTarget: typeof NATIVE_FILE_DROP_TARGET.projectSidebar
   dropHandlers: SidebarProjectDropHandlers
   affordance: ReturnType<typeof getSidebarProjectDropAffordance>
@@ -29,8 +29,20 @@ export function useSidebarProjectDrop(): {
   const [isDragOver, setIsDragOver] = useState(false)
   const [isHandlingDrop, setIsHandlingDrop] = useState(false)
   const dragDepthRef = useRef(0)
+  const enabledRef = useRef(enabled)
+  const operationGenerationRef = useRef(0)
   const remoteRuntimeActive = isRemoteRuntimeActive(settings)
   const mountedRef = useMountedRef()
+
+  useLayoutEffect(() => {
+    enabledRef.current = enabled
+    if (!enabled) {
+      operationGenerationRef.current += 1
+      dragDepthRef.current = 0
+      setIsDragOver(false)
+      setIsHandlingDrop(false)
+    }
+  }, [enabled])
 
   const clearDragState = useCallback(() => {
     dragDepthRef.current = 0
@@ -48,6 +60,12 @@ export function useSidebarProjectDrop(): {
 
   const handleProjectDropPaths = useCallback(
     async (paths: readonly string[]) => {
+      if (!enabledRef.current) {
+        return
+      }
+      const operationGeneration = operationGenerationRef.current
+      const isCurrentOperation = (): boolean =>
+        enabledRef.current && operationGenerationRef.current === operationGeneration
       const pathResolution = resolveSidebarProjectDropPath(paths)
       if (pathResolution.status === 'empty') {
         return
@@ -80,8 +98,11 @@ export function useSidebarProjectDrop(): {
       setIsHandlingDrop(true)
       try {
         await window.api.fs.authorizeExternalPath({ targetPath: pathResolution.path })
+        if (!mountedRef.current || !isCurrentOperation()) {
+          return
+        }
         const stat = await window.api.fs.stat({ filePath: pathResolution.path })
-        if (!mountedRef.current) {
+        if (!mountedRef.current || !isCurrentOperation()) {
           return
         }
         if (!stat.isDirectory) {
@@ -95,7 +116,7 @@ export function useSidebarProjectDrop(): {
         }
         openModal('add-repo', { droppedLocalPath: pathResolution.path })
       } catch (error) {
-        if (mountedRef.current) {
+        if (mountedRef.current && isCurrentOperation()) {
           toast.error(
             translate(
               'auto.components.sidebar.useSidebarProjectDrop.f34a286c0d',
@@ -107,7 +128,7 @@ export function useSidebarProjectDrop(): {
           )
         }
       } finally {
-        if (mountedRef.current) {
+        if (mountedRef.current && isCurrentOperation()) {
           setIsHandlingDrop(false)
         }
       }
@@ -117,7 +138,7 @@ export function useSidebarProjectDrop(): {
 
   useEffect(() => {
     return window.api.ui.onFileDrop((data) => {
-      if (data.target !== NATIVE_FILE_DROP_TARGET.projectSidebar) {
+      if (!enabledRef.current || data.target !== NATIVE_FILE_DROP_TARGET.projectSidebar) {
         return
       }
       void handleProjectDropPaths(data.paths)
@@ -127,14 +148,14 @@ export function useSidebarProjectDrop(): {
   const dropHandlers = useMemo<SidebarProjectDropHandlers>(
     () => ({
       onDragEnter: (event) => {
-        if (!hasNativeFileDragTypes(event.dataTransfer.types)) {
+        if (!enabledRef.current || !hasNativeFileDragTypes(event.dataTransfer.types)) {
           return
         }
         dragDepthRef.current += 1
         setIsDragOver(true)
       },
       onDragOver: (event) => {
-        if (!hasNativeFileDragTypes(event.dataTransfer.types)) {
+        if (!enabledRef.current || !hasNativeFileDragTypes(event.dataTransfer.types)) {
           return
         }
         event.preventDefault()
@@ -142,7 +163,7 @@ export function useSidebarProjectDrop(): {
         setIsDragOver(true)
       },
       onDragLeave: (event) => {
-        if (!hasNativeFileDragTypes(event.dataTransfer.types)) {
+        if (!enabledRef.current || !hasNativeFileDragTypes(event.dataTransfer.types)) {
           return
         }
         dragDepthRef.current = Math.max(0, dragDepthRef.current - 1)

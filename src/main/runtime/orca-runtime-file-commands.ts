@@ -1,9 +1,19 @@
 // @ts-nocheck -- mechanically split from OrcaRuntimeService; behavior is covered by AST equivalence and characterization tests.
-import { OrcaRuntimeWithPreservedBranchCleanup } from './orca-runtime-preserved-branch-cleanup'
+import { OrcaRuntimeWithTicketWorkspaceOwnerBinding } from './orca-runtime-ticket-workspace-owner-binding'
 import { RuntimeFileCommands } from './orca-runtime-files'
 import { nativeChatTranscriptIncludesPath } from '../native-chat/native-chat-file-provenance'
 import { createRuntimeFileWatcherRemoval } from './runtime-file-watcher-removal'
 import { RuntimeGitCommands } from './orca-runtime-git'
+import type { ExactLocalNativeGitWorktreeBinding } from './runtime-worktree-catalog-binding'
+import type {
+  WorktreeCatalogBindingRequest,
+  WorktreeCatalogBindingSourceSnapshot
+} from '../persistence/loading-store/worktree-catalog-binding-types'
+import { readNativeGitEffectiveWorktreeSubject } from '../git/native-worktree-subject-attestation'
+import { RuntimeGitSubjectAttestationCommands } from './runtime-git-subject-attestation'
+import { RuntimeGitStatusRecordCaptureCommands } from './runtime-git-status-record-capture'
+import { readNativeGitWorktreeStatusRecords } from '../git/native-worktree-status-record-capture'
+import { readNativeGitOperationMarkers } from '../git/native-git-operation-marker-capture'
 import type { GlobalSettings } from '../../shared/global-settings-types'
 import type { RuntimeTerminalAgentStatus } from '../../shared/runtime-types'
 import { RuntimeHostedReviewCommands } from './runtime-hosted-review-commands'
@@ -23,7 +33,13 @@ import { getRuntimeBrowserPageRegistry } from './runtime-browser-page-registry'
 import { getBrowserHostLeaseRegistry } from './browser-host-lease-registry-instance'
 import type { RuntimeLeafRecord } from './runtime-terminal-state-records'
 
-export class OrcaRuntimeWithFileCommands extends OrcaRuntimeWithPreservedBranchCleanup {
+export class OrcaRuntimeWithFileCommands extends OrcaRuntimeWithTicketWorkspaceOwnerBinding {
+  protected getTicketWorkspaceOwnerBindingSourceSnapshot(
+    request: WorktreeCatalogBindingRequest
+  ): WorktreeCatalogBindingSourceSnapshot | null {
+    return this.store?.getWorktreeCatalogBindingSourceSnapshot(request) ?? null
+  }
+
   protected readonly fileCommands = new RuntimeFileCommands({
     getRuntimeId: () => this.runtimeId,
     requireStore: () => this.requireStore(),
@@ -109,6 +125,38 @@ export class OrcaRuntimeWithFileCommands extends OrcaRuntimeWithPreservedBranchC
       store.setWorktreeMeta(worktreeId, { pushTarget })
     }
   })
+
+  protected readonly gitSubjectAttestationCommands = new RuntimeGitSubjectAttestationCommands({
+    isBindingCurrent: (binding, signal) =>
+      this.revalidateExactLocalNativeGitWorktreeCatalogBinding(binding, signal),
+    readEffectiveSubject: (binding, signal) =>
+      readNativeGitEffectiveWorktreeSubject(binding.target.worktree.path, signal)
+  })
+
+  protected readonly gitStatusRecordCaptureCommands = new RuntimeGitStatusRecordCaptureCommands({
+    attestSubject: (binding, signal) =>
+      this.attestExactLocalNativeGitWorktreeSubject(binding, signal),
+    readStatusRecords: (binding, signal) =>
+      readNativeGitWorktreeStatusRecords(binding.target.worktree.path, signal),
+    readOperationMarkers: (subject, signal) => readNativeGitOperationMarkers(subject, signal)
+  })
+
+  protected attestExactLocalNativeGitWorktreeSubject(
+    binding: ExactLocalNativeGitWorktreeBinding,
+    signal?: AbortSignal
+  ) {
+    return this.gitSubjectAttestationCommands.attestExactLocalNativeGitSubject(binding, signal)
+  }
+
+  protected captureExactLocalNativeGitWorktreeStatusRecords(
+    binding: ExactLocalNativeGitWorktreeBinding,
+    signal?: AbortSignal
+  ) {
+    return this.gitStatusRecordCaptureCommands.captureExactLocalNativeGitStatusRecords(
+      binding,
+      signal
+    )
+  }
 
   /** Set by pty IPC: fires when a PTY gains/loses remote view subscribers so
    *  the daemon background mark (keep-tail stream thinning) can resync — a

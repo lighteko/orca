@@ -358,11 +358,25 @@ exports.loadNativeModule = function loadNativeModule(nativeName) {
 }
 
 export function writeFakeWindowsRegistry(projectDir) {
+  writeFakeWindowsPathEvidence(projectDir)
   const registryDir = join(projectDir, 'node_modules', '@orca', 'windows-registry')
   mkdirSync(registryDir, { recursive: true })
   writeFileSync(
     join(registryDir, 'index.js'),
     'exports.HK = { CU: 0x80000001 }; exports.getRegistryKey = () => ({})\n'
+  )
+}
+
+export function writeFakeWindowsPathEvidence(projectDir) {
+  const pathEvidenceDir = join(projectDir, 'node_modules', '@orca', 'windows-path-evidence')
+  mkdirSync(pathEvidenceDir, { recursive: true })
+  writeFileSync(
+    join(pathEvidenceDir, 'package.json'),
+    '{"name":"@orca/windows-path-evidence","main":"index.js"}\n'
+  )
+  writeFileSync(
+    join(pathEvidenceDir, 'index.js'),
+    'exports.queryDosDeviceTarget = async () => null\n'
   )
 }
 

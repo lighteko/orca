@@ -1,0 +1,1147 @@
+# Ticket Workspace — Recovery-Verified Task DAG
+
+Snapshot: 2026-10-01. This graph refines the [master milestones](./master-plan.md) using the current Orca checkout and the separately published private ticket source. TW-00's source provenance/test gate has passed; task-specific contracts still govern downstream allocation. Task IDs describe deliverables, not automatic authorization to implement them.
+
+## Dependency graph
+
+```text
+TW-00 ──> TW-00C + TW-00F; TW-00 ──> TW-00N ──> TW-00C (optional narrow route)
+TW-00C + TW-00F ──> TW-06F; TW-06F + TW-02F ──> TW-07F (original M4/M5 fixture checkpoint)
+M0 ──> TW-01; TW-00C + TW-01 ──> TW-02F
+TW-00 + reviewed logical-v1 protocol and vectors ──> TW-06P injected projector/handler
+TW-06P injected tests + approved vector bytes ──> TW-06P-F1 private fixture portability ──> TW-00-R1 Windows test isolation ──> TW-00-R2 clean-Linux CI
+TW-00-R2 first native-Linux run ──> TW-00-R3A SQLite test boundary + TW-00-R3B state-root test boundary ──> native-Linux full-suite rerun
+TW-00-R3A + TW-00-R3B ──> TW-00-R4 real-WSL replay in isolated temporary roots
+TW-00 ──> TW-M1P-C1 offline runtime artifact closure; TW-00 + owner delivery decisions ──> TW-M1P base runtime/profile delivery
+reviewed logical-v1 protocol and vectors ──> TW-06T fake-duplex client
+approved pinned developer runtime/profile + actual resident entrypoint + host/key/endpoint proofs ──> TW-06T explicit pilot setup (not full updater/recovery)
+reviewed logical-v1 + TW-06-B1 source port ──> TW-02L-I injected owner composition + TW-06-I injected admission/cache
+TW-M1P-D1 verifier contract ──> TW-M1P-I private artifact verifier
+TW-M1P-I + reviewed L1 contract ──> TW-M1P-L1 injected unbound release transitions
+TW-M1P-L1 + reviewed descriptor adapter contract ──> TW-M1P-L2 root/active/fence adapters (fake I/O proof)
+TW-02L-I + TW-06-I + production TW-06P service/TW-06T setup and owner proofs ──> TW-02L production activation
+TW-06F + production TW-06P service/TW-06T authenticated lease + P3/P6 currentness ──> TW-06
+TW-06 snapshot core + TW-02L ──> TW-06 live matched-overlay publication
+TW-07F + TW-06 + TW-02L ──> TW-07         (live Tickets and owner-status cutover)
+TW-00 ──> TW-04A + TW-05; TW-05 ──> TW-05G
+TW-04A + ratified read-side owner contracts ──> TW-04R (discover/inspect, no effects)
+TW-04A + TW-05G ──> TW-04B (external effects)
+TW-02L + TW-04R + other owner-source contracts ──> TW-03 (complete read-only evidence)
+TW-05G + TW-06 + TW-07 ──> TW-08 (ticket effects only); TW-04B + TW-08 ──> TW-04C
+TW-03 + TW-04C + TW-05 + TW-06 + TW-08 ──> TW-09 ──> TW-10
+```
+
+TW-01, TW-02F and TW-06F passed independent review; TW-00's private publication, fresh-clone hashes, isolated Linux test replay and Orca submodule integration passed. Orca's reviewed and CI-verified commit `fa4e622f4` pins private source `54477c2`, including the reviewed TW-04A common contract. The user approved the exact seven-file public copy; its delivery and M4 fixture integration passed independent review and PR CI. Original M4 and M5 accept fixture-backed read-only results before live producer/transport. TW-06F completed M4, and TW-07F's M5 fixture UI/navigation, hidden CDP and same-head PR CI passed; TW-06 and TW-07 remain later live cutovers. No fixture snapshot can claim live `current`, enable ticket mutation/effects, or support public `clear`; existing workspace navigation requires TW-02F click-time revalidation. TW-02F does not satisfy TW-02L's production owner-evidence gate. Every implementation allocation requires a reviewed next step within the user's approved scope. The 2026-10-01 authorization covers continued reversible local implementation, tests, integration and commits within this project; external publication, operational changes and actual key/security policy choices still require Sol-routed approval.
+
+Independent code, integration, plan and direction reviews use fresh **Astra xhigh** (`gpt-6-astra`, `xhigh`), as the user requested on 2026-10-01. Review correctness and whether the work advances the agreed usable milestone. Related implementation and verification tasks continue in their Luna workstream sessions; Sol owns global orchestration and shared state. Continued reviewed reversible local work is authorized; external publication, operational changes and actual credential/security policy decisions require approval routed through Sol. Historical review receipts identify the reviewer that actually performed them.
+
+## Direction correction — Astra xhigh, 2026-10-01
+
+### Completed CI repair gate — TW-PILOT-C1-CLI-F1
+
+- **STATUS:** Complete and published `823c918ea` after separate user approval. Existing C Luna's one-file repair has Astra CODE_APPROVE; CLI/Node/full Web, 11 tests, actual CLI emit/load and quality passed. Exact-head PR Checks passed 26/six skips/zero failures and all three other workflows succeeded. Earlier `2f00e82e6` failed CLI TS1479 after local verification omitted CLI types.
+- **GOAL:** Restore CLI CommonJS compatibility without changing C1 semantics.
+- **DEPENDENCIES:** Published C1; reproduced `tc:cli` failure; independent public-artifact reuse review.
+- **OWNERSHIP:** C Luna edits; Sol owns shared state, commits and approval routing.
+- **FILES / MODULES LIKELY INVOLVED:** Only `src/shared/ticket-workspace-live-boundary.ts`.
+- **INPUT CONTRACT:** Existing public JSON artifact export and its `semanticConstraints.snapshotMaxUtf8Bytes`; static default import without attributes.
+- **OUTPUT CONTRACT:** Same authoritative cap and synchronous exact DTO parsers; existing type-only resolution-mode import remains.
+- **CONSTRAINTS:** No cap duplication, asynchronous parser, CLI exclusion, main import or package/module change. Skip install-dev scripts.
+- **DO_NOT_TOUCH:** Other product/test/config files, private source/pin, installed CLI, user state and operational inputs.
+- **ACCEPTANCE CRITERIA:** CLI types and finite emitted module load pass; cap and parser behavior remain equivalent.
+- **VERIFICATION:** Focused C1 tests; CLI/Node/Web types; task-temp CLI emit/load; exact quality/format/diff; Astra code review. Background launch applies.
+- **PARALLELIZATION SAFETY:** Serial with C2 under C ownership; disjoint A/B/D read-only preparation is safe.
+- **POTENTIAL CONFLICTS:** Shared module participates in all TypeScript targets. Publication after the reviewed local commit remains separately approved.
+
+Independent [direction audit](./review-findings.md#astra-direction-audit--2026-10-01) found PARTIAL_DRIFT. Preserve completed code, but defer L2/staging/runtime-recovery expansion. Full updater/rollback and multi-machine delivery are not prerequisites for the first approved developer read-only pilot. A trusted pinned executable/profile, actual resident entrypoint and explicit setup still require proof; this correction supplies no credentials or production authority.
+
+The next acceptance is one actual ticket associated with an existing Orca Run/workspace, actual catalog/resident data in Tickets, and exact-owner navigation. Missing external/agent/test/lease observations stay unavailable; public `clear` and ticket effects stay disabled. Sol owns this single integration result. Before code allocation, freeze a finite pilot packet covering actual record creation/minimal enrollment, approved target/trust inputs, retained lifecycle, presentation DTO and HWM policy. None of those packets is CODE_READY from this audit alone.
+
+The subsequent fresh Astra next-step review returned **NEXT_APPROVE / CODE_READY** for **TW-PILOT-ENTRY** and **TW-PILOT-LEASE** after their shared launch/deadline/retirement contract was frozen. The continuing private and public Luna workstreams implemented the disjoint packets. The launch envelope is separate from unchanged logical-v1; reuse the existing readers across launch/protocol boundaries. Actual record/strict Run association and durable HWM/live presentation require their own finite packets and are not included in these allocations. The current integration receipt is in project-state.
+
+Read-only `discover/inspect` is TW-04R, independent of the TW-05G effect gateway. Existing navigation is already covered by TW-02F/TW-07F; other existing Orca action seams can have their own exact-target/authority packets without waiting for unrelated external effects. The ticket-effect subset of TW-08 retains live/root/confirmation dependencies. Fixtures never authorize effects or impersonate a coordinator Run.
+
+One combined CLI/resident release and a separation of durable HWM persistence from deadline-bounded current publication are **design proposals awaiting review**. Existing wire, trust, source-order, precommit and currentness contracts are unchanged.
+
+## Actual-ticket pilot entry and lease cycle — 2026-10-01
+
+```text
+reviewed launch contract ──> TW-PILOT-ENTRY ──┐
+                        └─> TW-PILOT-LEASE ─┴─> focused verification + fresh Astra + paired-path integration
+actual record/strict Run association + durable HWM + live view contracts remain later pilot dependencies
+```
+
+Fresh Astra reproduced terminal-loss and queued stream-error defects, corrected by the same private/public Luna owners through ENTRY-F2 and LEASE-F2. Both have CODE_APPROVE; the finite actual-implementation pairing passed 2/2 and fresh Astra issued INTEGRATION_APPROVE after independently auditing its receipts. Sol owns local private-first/public-gitlink commits. [Review findings](./review-findings.md#pilot-entry-and-lease-code-review--2026-10-01) retain the correction and harness evidence.
+
+### TW-PILOT-ENTRY
+
+- **STATUS:** Published private `86b8e49`; ENTRY-F2 CODE_APPROVE, paired 2/2, INTEGRATION_APPROVE and exact-main Ubuntu CI success. Operational activation remains separate.
+- **GOAL:** Connect the existing private CLI to the real read-only catalog capability/reader and existing resident server.
+- **DEPENDENCIES:** Frozen [foreground launch contract](./resident-ticket-transport.md#first-ticket-pilot-foreground-launch-contract); existing logical-v1 producer.
+- **OWNERSHIP:** Continuing Luna artifact-delivery workstream, private CLI only.
+- **FILES / MODULES LIKELY INVOLVED:** CLI dispatch; new resident entry module/test; narrow server optional reader/budget inputs; focused existing CLI/server tests. Split the new entry's launch parsing/process adaptation into private `ticket-workspace-resident-launch-v1.ts` to satisfy the enforced 300-line source limit. F1's three process-terminal regressions move to `ticket-workspace-resident-entry-terminal-v1.test.ts` because the combined test exceeded the enforced 800-line limit. Existing CLI/server baseline lint debt is compared against `b556834`; no suppressions or unrelated legacy rewrite are allocated.
+- **INPUT CONTRACT:** Explicit profile/machine config paths; strict bounded bootstrap frame with exact binding, ephemeral key, separate sorted allowlists and positive relative budget.
+- **OUTPUT CONTRACT:** Bounded ready frame and unchanged logical-v1 server on the same buffered reader; real loader/identity/read-capability/catalog path.
+- **CONSTRAINTS:** Initial entry deadline bounds missing prelude; bounded preparation/ready and synchronous timer handoff; no renewed overall budget; sticky retirement suppresses late preparation; resident-prefixed failures keep stdout protocol-only. Compare canonical original bytes and reject BOM. Preserve ordinary CLI/default protocol behavior.
+- **DO_NOT_TOUCH:** Public source/docs, schema/packages/dependencies, config/authority/catalog semantics or writes, real roots/keys/WSL/services and operational activation.
+- **ACCEPTANCE CRITERIA:** Reject malformed envelopes before config access; split/coalesced framing; failure/timeout/EOF/late resolve/reject at preparation boundaries; bounded writes/cleanup; correct timer handoff; healthy residence beyond startup limit; existing protocol regressions.
+- **VERIFICATION:** Focused entry/CLI/server tests, CLI types, exact-file quality/format/diff; fresh Astra code/integration review. Synthetic/native tests do not prove real WSL/catalog activation.
+- **PARALLELIZATION SAFETY:** Private-only edits independent of public LEASE after contract freeze. Pair actual implementations only after both candidates are stable; no concurrent cross-repository build reads.
+- **POTENTIAL CONFLICTS:** Only this workstream modifies private CLI/server. Necessary loader/schema deviations return to root before expansion.
+
+### TW-PILOT-LEASE
+
+- **STATUS:** Published public LEASE `ad16f44c2` with state `4d5a9630e` and test-only repair `70b0c763b`; LEASE-F2 CODE_APPROVE, paired 2/2, INTEGRATION_APPROVE and all four repaired exact-SHA workflows succeeded. Operational activation remains separate.
+- **GOAL:** Adapt one explicitly started foreground resident child into the existing client/source adapter with a retained lifetime.
+- **DEPENDENCIES:** Same frozen launch contract; existing process wrapper, WSL argv builder, logical client/source adapter. Production trust/host/HWM gates remain separate.
+- **OWNERSHIP:** Continuing Luna transport workstream, public main source only; root owns shared state/docs.
+- **FILES / MODULES LIKELY INVOLVED:** New resident-process-lease module/test; narrow client/client-contract/source-adapter/source-adapter-contract setup seams; byte stream only as needed; focused existing tests. The enforced 300-line source limit requires concrete launch-bootstrap, process-lease-child, source-adapter-connection and client-setup splits in the same ticket-workspace directory; existing connector exports/private token-issuer class and the client's same-deadline hello/auth/bind/default behavior stay unchanged.
+- **INPUT CONTRACT:** Already-resolved independently trusted launch inputs, binding/allowlists and existing HWM/clock ports; no renderer paths or self-attested artifact/host selection.
+- **OUTPUT CONTRACT:** Explicit setup returns an established retained source lease or unavailable; reads never spawn, reconnect or respawn.
+- **CONSTRAINTS:** One parent 10-second deadline through registration; existing reader consumes ready; capped remaining hello/bind budget; synchronous guard immediately before adapter/HWM lease construction. Retire before cleanup awaits, reject late results, bound exact-child cleanup and stderr/backpressure, handle all stream errors. WSL wrapper loss stays unverifiable.
+- **DO_NOT_TOUCH:** Private source, owner/admission/HWM semantics, IPC/preload/UI, packages/dependencies, user configuration/keys/WSL/services and production registration.
+- **ACCEPTANCE CRITERIA:** One spawn on explicit setup and zero on reads; strict control framing; no budget renewal or late HWM registration; abort/EOF/stream/child errors; stalled writes/cleanup; idempotent retirement/binding isolation; unchanged old client/source defaults.
+- **VERIFICATION:** Focused lease/client/source/byte-stream and logical regressions, Node types, exact-file quality/format/diff; fresh Astra code/integration review. Paired-path verification uses both frozen candidates; no new public test dependency on unpublished private source.
+- **PARALLELIZATION SAFETY:** Disjoint from private ENTRY; do not import or test its changing build. Serialize final paired-path integration and root commits.
+- **POTENTIAL CONFLICTS:** Only this workstream modifies client/source-adapter setup paths. Reuse current implementation; a second store/client/provider or admission change requires a new reviewed packet.
+
+## Reviewed next preparation frontier — 2026-10-01
+
+Fresh integration Astra approved **four disjoint preparation lanes**, not four new code allocations. They can run concurrently with read-only source access and separate reports; Sol integrates durable documents. Each implementation packet still needs exact ownership, contracts, acceptance and fresh review before CODE_READY. Do not treat real provisioning as a prerequisite of independent local module preparation.
+
+```text
+ENTRY + LEASE integration ──> A/B/C/D finite packet preparation in parallel
+A strict enrollment + B durable admission + C live view + D trusted explicit setup
+    └─> approved pilot activation ──> one actual ticket displayed ──> exact workspace navigation
+```
+
+### TW-PILOT-A-PREP — actual ticket and strict existing Run/workspace association
+
+- **GOAL:** Freeze the smallest enrollment packet using an existing Run/workspace and strict caller verification.
+- **DEPENDENCIES:** Existing catalog/CAS and Orca caller verifier; coordinate public owner contracts with C before implementation.
+- **OWNERSHIP:** Continuing private Luna proposes catalog/enrollment changes; Sol assigns exclusive public strict-Run ownership in the output packet.
+- **FILES / MODULES LIKELY INVOLVED:** Private catalog/ledger/enrollment CLI; public `orca-runtime-verify-orchestration-compatibility-caller.ts` and `orchestration-caller-workspace.ts` for read-only seam checks.
+- **INPUT CONTRACT:** Current schema/CAS compatibility, strict non-null caller evidence, exact host/workspace/Run generation and retry boundaries.
+- **OUTPUT CONTRACT:** Finite implementation packet with catalog compatibility decision, exact file ownership, failure cases and synthetic verification.
+- **CONSTRAINTS:** Reuse existing verifier; path coincidence or ordinary Run calls are insufficient authority. Separate minimal enrollment from folder creation and external effects.
+- **DO_NOT_TOUCH:** Product source, schema, catalog contents, user Runs/workspaces and configuration during preparation.
+- **ACCEPTANCE CRITERIA:** Record every unresolved authority/compatibility choice; specify exact association and stale/host/generation rejection criteria without inventing an actual target.
+- **VERIFICATION:** Read current readers/writers and strict verifier; fresh Astra packet review before implementation.
+- **PARALLELIZATION SAFETY:** Read-only preparation is independent of B/C/D; only this lane proposes private catalog/CAS edits.
+- **POTENTIAL CONFLICTS:** Public strict-Run and C owner wiring require nonoverlapping files or serial allocation; version changes also affect existing catalog readers.
+
+### TW-PILOT-B-PREP — durable high-water admission
+
+- **GOAL:** Freeze a durable store packet that preserves the existing history, epoch and atomic precommit contracts.
+- **DEPENDENCIES:** Frozen high-water/currentness contracts and existing process/worker isolation mechanisms.
+- **OWNERSHIP:** Continuing public transport Luna, HWM storage proposal only.
+- **FILES / MODULES LIKELY INVOLVED:** Resident high-water contract/implementation and existing isolated storage mechanisms located by source search.
+- **INPUT CONTRACT:** Known-history marker, exact source partition, atomic `canCommit`, cancellation/deadline, quarantine and restart/uncertain outcomes.
+- **OUTPUT CONTRACT:** Bounded adapter packet with ownership, isolation mechanism, persistence/commit semantics and meaningful failure tests.
+- **CONSTRAINTS:** Preserve ordering/currentness; no synchronous FULL-sync SQLite on the main thread, serialized commit boolean or new generic SAB framework. Policy simplification remains a separate proposal.
+- **DO_NOT_TOUCH:** Product source, existing currentness semantics, real user storage, setup/registration and UI during preparation.
+- **ACCEPTANCE CRITERIA:** Explain the precommit race boundary and restart/lost-history behavior; identify concrete existing isolation reuse and unresolved design choices.
+- **VERIFICATION:** Compare existing tested HWM invariants with proposed storage behavior; fresh Astra packet review before implementation.
+- **PARALLELIZATION SAFETY:** Read-only proposal beside A/C/D; later storage adapter files may be disjoint after the startup/registration interface freezes.
+- **POTENTIAL CONFLICTS:** B/C/D all touch admission or setup integration; assign the join serially and preserve synchronous pre-registration guards.
+
+### TW-PILOT-C-PREP — live presentation and exact-owner click
+
+- **GOAL:** Freeze current/stale/unavailable/unsupported presentation and source-correlated owner navigation contracts.
+- **DEPENDENCIES:** Existing live owner composition/currentness and fixture semantic validator; coordinate A's strict association and B's admission port.
+- **OWNERSHIP:** Luna owner/presentation workstream after explicit allocation; Sol owns DTO and main/preload/renderer boundaries.
+- **FILES / MODULES LIKELY INVOLVED:** `runtime-ticket-workspace-owner-binding.ts`, `ticket-workspace-live-owner-composition*.ts`, fixture bridge/API and Tickets components located by source search.
+- **INPUT CONTRACT:** Same admitted source/owner identity, immutable presentation receipt and existing exact click rechecks; no ticket-supplied navigation target.
+- **OUTPUT CONTRACT:** Frozen live DTO and finite main/preload/renderer packets with exclusive files and an integration order.
+- **CONSTRAINTS:** Reuse semantic validation without weakening fixture pinning; freeze DTO before splitting main/preload and renderer; missing evidence is unavailable and effects/public clear stay disabled.
+- **DO_NOT_TOUCH:** Product source, IPC/UI, fixture bytes/validation policy, owner/currentness semantics and actual navigation during preparation.
+- **ACCEPTANCE CRITERIA:** Define all state mappings, request/response correlation and click-time revalidation; identify exact reusable live owner seams and source-trust gates.
+- **VERIFICATION:** Read existing UI/IPC/owner implementations and tests; fresh Astra packet review before implementation or UI validation.
+- **PARALLELIZATION SAFETY:** Read-only preparation beside A/B/D; main/preload and renderer implementation only separate after DTO freeze.
+- **POTENTIAL CONFLICTS:** A strict-Run seam and C owner composition, plus B/D admission/registration joins, need exclusive ownership or serialization.
+
+### TW-PILOT-D-PREP — operational launch and trust evidence
+
+- **GOAL:** Define the smallest approved pinned runtime/profile and actual Linux/WSL launch evidence for the developer pilot.
+- **DEPENDENCIES:** Implemented ENTRY/LEASE and existing artifact verifier; actual host/profile/artifact/key choices require Sol-routed user approval.
+- **OWNERSHIP:** Continuing verification Luna prepares evidence/operation packet; Sol selects no real target or security policy implicitly.
+- **FILES / MODULES LIKELY INVOLVED:** Entry/lease/verifier source and existing runtime/profile/WSL evidence, read-only.
+- **INPUT CONTRACT:** Exact artifact/runtime/profile identity, approved paths/host/distro, independent allowlists and pipe/key privacy, explicit start/quit/stop boundaries.
+- **OUTPUT CONTRACT:** Finite approval and verification packet separating local preparation from actual operations, with hashes, byte-conformance cases and bounded cleanup.
+- **CONSTRAINTS:** Synthetic pairing is not WSL/host trust. Transport loss stays unverifiable; no read-triggered start/replacement, broad distro termination or full updater/recovery prerequisite.
+- **DO_NOT_TOUCH:** Product source, keys, user configuration/services/WSL and actual host/profile selection during preparation.
+- **ACCEPTANCE CRITERIA:** List exactly which inputs are known, unverified or owner-selected; specify actual Linux/WSL byte, cleanup and trust receipts required before activation.
+- **VERIFICATION:** Review current code/evidence; fresh Astra packet review and root approval before operational execution.
+- **PARALLELIZATION SAFETY:** Read-only evidence preparation beside A/B/C; actual activation joins their completed contracts serially.
+- **POTENTIAL CONFLICTS:** Startup/registration/quit integration may share public owner files; freeze explicit ownership before code or operations.
+
+### Reviewed candidate readiness after preparation
+
+Fresh Astra independently inspected all four Luna reports and source, preserving existing modules and first-pilot direction. It approved the corrected frontier; no blanket CODE_READY. Root assigned the four contract refinements below in parallel. The one-file CI observation repair passed eight tests/types/default lint and Astra CODE_APPROVE and user-approved `70b0c763b` is now published with all four exact-SHA workflows successful. A1 and D0 subsequently passed their corrected packet gates; readiness below records the current state.
+
+| Candidate                                    | Current readiness                        | Ownership / dependency                                                                                                                                   |
+| -------------------------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TW-PILOT-LEASE-CI-F1                         | Published; exact-SHA CI success          | Transport Luna; only lease test. No product/pairing changes.                                                                                             |
+| A1 strict runtime attestation                | CODE_APPROVE; published a909f7a69        | A Luna; two new public runtime files. Synchronous internal facts; injected existing-DB readonly lookup, no RPC/mutation/lazy DB.                         |
+| A2 minimum pilot association                 | CODE_APPROVE; published `61c8ebe04`      | Existing A Luna; join/facts/test files. V1 per-invocation join, final original-owner and displayed-baseline checks; no enrollment or restart relink.     |
+| A3 catalog v2 / durable enrollment           | NEEDS_CONTRACT; code deferred            | Private schema/validation/readers/CAS/projector rollout together; first-pilot necessity unproved.                                                        |
+| A4 protected enrollment-write capability     | Deferred; necessity/contract unproved    | Cross-repository negotiated wire ownership; no demonstrated read-only pilot necessity.                                                                   |
+| B1 store/commit/history                      | Decision packet prepared; NEEDS_DECISION | Transport Luna; late persistence/publication and independent adoption witness are proposals. Current policy unchanged.                                   |
+| B0 internal budget/queue                     | CODE_APPROVE; published c010f3a66        | Transport Luna; no post-abandon reads; raw ownership and original terminal cleanup preserved. Node gate passed; frozen before C2.                        |
+| B2 durable HWM                               | Not CODE_READY; follows B1               | Ticket-specific adapter/client/protocol/worker/tests; serial build registrations. No orchestration v42 migration without necessity.                      |
+| C1 exact live DTO/validators                 | Published CLI-F1; exact-head CI success  | Owner/presentation Luna; three bounded shared files. Prior injected CODE_APPROVE omitted CLI compatibility; repair gate above. No production exposure.   |
+| C2 detailed source + main/preload            | Published `77c940a56`; all four CI green | Source/bridge published; common join and lifecycle/publication seams now locally approved and verified. Parent receipt owner and full C2E remain.        |
+| C3 live view/navigation                      | NEEDS_CONTRACT; follows C1               | Renderer may use an injected typed API after C1. Product sidebar cutover follows C2; fixture remains historical.                                         |
+| D0 current offline candidate                 | EVIDENCE_APPROVE; local closure complete | Verification then existing artifact Luna; source/tree/lock and cached inputs verified. OS-temp-only unsigned Windows-built candidate.                    |
+| D1 actual WSL conformance                    | Run sheet prepared; review/inputs open   | Natural HOME/XDG/default UID require exact read-path approval or a narrow seam. Memory HWM conformance is not pilot acceptance; no WSL action allocated. |
+| D2 target/profile/trust                      | OWNER_INPUT                              | Root selects no actual host/profile/artifact/key/allowlist implicitly. Developer trust policy need not implement full publisher/update infrastructure.   |
+| Registration/start/stop/API cutover          | NEEDS_CONTRACT; serial join              | One integration owner after A/B/C/D contracts/modules; exclusive startup/source/HWM/presentation lifecycle ownership.                                    |
+| Actual ticket display → exact navigation     | Downstream acceptance                    | Approved activation plus durable admission; missing evidence unavailable, effects/public clear disabled.                                                 |
+| L2/updater/recovery/folder/documents/effects | Deferred or separately gated             | Preserve existing work; no first-pilot prerequisite added.                                                                                               |
+
+**Critical path:** published/CI-verified A1/A2/B0/C1/source/bridge plus locally code/integration-approved common join and lifecycle/publication → exact receipt policy/owner packet → owner implementation → full C2E and C3 live view. C3 and finite-case preparation may overlap B1 durable history/commit decisions and D1/D2/association inputs under disjoint ownership. One serial source/HWM/lease/provider registration join leads to actual display/navigation. Injected module/integration work does not wait for operational provisioning; actual activation does. Additional publication requires separate authorization; schema or policy proposals are not decisions.
+
+### TW-PILOT-A1 — synchronous strict runtime facts
+
+- **STATUS:** Fresh Astra CODE_APPROVE after independently passing five tests/types/quality and verifying both frozen hashes. Commit `a909f7a69` contains only the helper/test and is now published under `2f00e82e6`; no product caller is included. Current publication CI gate is above.
+- **GOAL:** Derive a verified caller's current Run and server-observed runtime facts for the later pilot association.
+- **DEPENDENCIES:** Existing default compatibility verifier, live dispatch authority, runtime ID and already-selected DB's readonly current-Run lookup.
+- **OWNERSHIP:** Continuing A enrollment Luna; root owns shared state/integration/commits.
+- **FILES / MODULES LIKELY INVOLVED:** Only new `src/main/runtime/ticket-workspace-root-run-attestation.ts` and its test.
+- **INPUT CONTRACT:** Runtime Pick of verifier/dispatch/runtime ID only; nullable separate main-owned lookup returning readonly Run `id`, `legacy`, coordinator handle/pane and generation. Existing nullable compatibility evidence.
+- **OUTPUT CONTRACT:** Frozen main-internal available runtime/Run/generation/pane/handle/process/worktree/host-scope facts, or bounded unavailable. No secrets/hashes, host translation, WorkspaceRef or authority token.
+- **CONSTRAINTS:** Default verifier without options must return non-null; compare exact dispatch/runtime/handle/pane/process/host; require `legacy === 0`, equivalent coordinator pane, exact handle and safe nonnegative generation. No await or unnecessary stability loop. Facts are an observation, not a lock, exact Git owner or durable enrollment; later awaited joins must re-attest and revalidate.
+- **DO_NOT_TOUCH:** Existing runtime/verifier/DB accessors and mutations, schema/CAS/wire/source/currentness, RPC/UI/config/packages, private source and operational state. No protected-accessor exposure or casts.
+- **ACCEPTANCE CRITERIA:** Valid frozen secret-free facts; null/invalid evidence, missing/throwing lookup, dispatch/Run/coordinator mismatch, legacy/invalid generation reject; all host scopes preserved without local fallback; no lazy DB initialization or mutation.
+- **VERIFICATION:** Focused helper tests, Node types, exact default/applicable native/type-aware lint, format/diff; new fresh Astra code checkpoint. Background launch policy applies.
+- **PARALLELIZATION SAFETY:** Two new public runtime files are disjoint from B/C contract work and D0 private candidate outputs. Final integration/commits belong to root.
+- **POTENTIAL CONFLICTS:** A2/C later consume runtime facts; no product caller or async exact-owner join is included here. `getOrchestrationDb()` creates/migrates/federates and is explicitly excluded.
+
+### TW-PILOT-A2-JOIN — current ticket / Run / coordinator observation
+
+- **STATUS:** Published `61c8ebe04` under `2f00e82e6`; fresh Astra CODE_APPROVE after 14 actual-module settlement probes against matching hashes. Worker 36 tests/full Node/quality and integrated 108 tests passed. Current publication CI gate is above; actual host mapping, setup/CAS, durable admission and activation remain separate gates.
+- **GOAL:** Verify one selected ticket/repository against current A1 Run facts and an exact local coordinator owner for this invocation.
+- **DEPENDENCIES:** A1, existing admitted owner source/displayed-baseline port, exact Git binder and injected main-owned fresh-A1/host-mapping callbacks. No production provisioning prerequisite for the injected module.
+- **OWNERSHIP:** Existing A Luna; root owns contracts, integration, commits and operational approvals.
+- **FILES / MODULES LIKELY INVOLVED:** New `src/main/runtime/ticket-workspace-root-run-join.ts`, `ticket-workspace-root-run-join-facts.ts` and the join test. Root verified the initial module had 393 nonblank lines against the 300 cap and authorized only this facts split; no lint suppression.
+- **INPUT CONTRACT:** Selected ticket/repository/displayed revision; existing source/binder/monotonic clock/signal; main-owned fresh A1 and trusted orchestration-host-to-full-host-scope mapping. No supplied snapshot, Run, workspace ref or authority claim.
+- **OUTPUT CONTRACT:** Frozen MAIN-only available per-invocation observation with safe ticket/repository/Run/generation/coordinator identifiers and original displayed revision, or bounded unavailable. Original binding/tokens remain private and nonserialized; no continuing authority.
+- **CONSTRAINTS:** Reuse the 30-second operation wrapper and source budgets `floor(min(10,000, remaining))`. Sequence read1 → coordinator resolve → exact-current → read2 → exact-current on the original binding → terminal synchronous checks. Initially and terminally resolve `getDisplayedBaseline`; compare baseline/read1/read2 existing full profile/source/repository facts plus orchestration Run/host and complete coordinator target. Timestamp-only regenerated revisions may pass. After the outer wrapper's final await, re-attest all A1 facts and trusted mapping and check source currentness, baseline, cancellation and original deadline. Coordinator target must already be literal local Git and match A1 worktree; an independently eligible repository row may differ. Full owner lease remains required; resident WSL authority is separate from orchestration host mapping.
+- **DO_NOT_TOUCH:** Existing source/ports/binder/verifier/DB/schema/CAS/wire/CLI/UI/configuration, D0 artifacts or user state. No enrollment, persistence, session cache, automatic relinking, effects, clear or read-triggered launch.
+- **ACCEPTANCE CRITERIA:** Valid distinct coordinator/repository case passes. Reject missing/duplicate/suppressed/stale evidence, wrong Run/host/ref/repository, folders/nonlocal targets, changed source/lease/map/A1/display correlation, owner replacement during read2 and changes during final wrapper settlement. Late/cancelled/expired work cannot return an available candidate.
+- **VERIFICATION:** Focused join/A1/owner regressions, Node types, actual default/native/type-aware lint, format/diff and fresh Astra code review. Background launch policy applies; no actual host claim.
+- **PARALLELIZATION SAFETY:** Two new runtime files are disjoint from B0 internal files, C1 shared files and completed D0 temp artifacts. Final integration and later product registration are serial.
+- **POTENTIAL CONFLICTS:** Existing across-reads helper binds a repository and checks owner after read2; it cannot alone satisfy this coordinator join. Current selected-fact comparison omits Run/coordinator fields. Preserve exact original owner and add those comparisons without expanding schemas or presentation lifecycle.
+
+### TW-PILOT-C1 — pure live boundary
+
+- **STATUS:** Published `9077430c2` under `2f00e82e6`; prior Astra CODE_APPROVE covered 14 tests, 266 browser checks, Node/Web types and quality/format. Omitted CLI compatibility is repaired by published `823c918ea`, with exact-head CI success above. No production exposure; stateful receipt policy remains C2.
+- **GOAL:** Define strict live presentation/selection DTOs and a standalone typed API, without exposing navigation authority.
+- **DEPENDENCIES:** Existing public contract primitives and owner boundary; reviewed exact DTO proposal.
+- **OWNERSHIP:** C Luna; root owns state, integration and commits.
+- **FILES / MODULES LIKELY INVOLVED:** New `src/shared/ticket-workspace-live-boundary.ts`, its test and the narrow `ticket-workspace-live-boundary-shape.ts`. Root authorized the third module after verifying 431 nonblank lines against the 300 cap; keep exact/nested record guards there and API/schema/correlation in the boundary. No private-source runtime dependency or lint suppression.
+- **INPUT CONTRACT:** Exact request/receipt IDs: canonical 16-byte base64url including trailing-bit validation. Existing identifier grammars/UTF-8 limits, nonempty labels, safe revisions and lowercase digests. At most 500 tickets/2,000 total workspaces and 2 MiB serialized UTF-8 envelope.
+- **OUTPUT CONTRACT:** Stateless request/status-specific response parsers and correlation checks; current/stale/unsupported/unavailable presentation, matched/unavailable/unsupported selection and rebound/unavailable/unsupported click response. Only rebound carries an existing bounded Orca worktree ID matching the repository.
+- **CONSTRAINTS:** Current/stale rows exclude unsupported ticket availability. Current TTL is advisory 1..30,000 ms; stale has no TTL; unavailable/unsupported have no rows. Malformed data yields validation failure without minted correlation IDs. Folder/wrong-host owner failures remain unavailable; whole-source unsupported is positive admission only.
+- **DO_NOT_TOUCH:** API exposure, preload, adapter/admission, renderer, fixtures/pins/vendor/dependencies, stateful receipt generation/retention/aging, actual navigation or operations.
+- **ACCEPTANCE CRITERIA:** Reject extra/target/path/token fields, malformed/correlation-mismatched/status-invalid data, excessive UTF-8/counts and unsupported successful rows. Preserve fixture parser and reuse rebound bounds. No receipt/cache or product behavior.
+- **VERIFICATION:** Focused boundary tests, applicable node/web types, exact default/native/type-aware quality/format/diff and new fresh Astra code review. Background launch policy applies.
+- **PARALLELIZATION SAFETY:** New shared files are disjoint from A1/A2, B contract preparation and D0 temp outputs. C2/C3 may prepare against the frozen type after completion; product cutover waits for the bridge.
+- **POTENTIAL CONFLICTS:** C2 must freeze ordinary-disconnect stale retention versus navigation invalidation, unsupported retention and stale-age policy. C1 does not decide these lifecycles.
+
+### TW-PILOT-D0 — pinned temporary unsigned candidate
+
+- **STATUS:** Complete local unsigned candidate; Fresh Astra EVIDENCE_APPROVE after independent source, full package payload, SHA/SRI/lock/tool and signature checks. Corrected manifest SHA-256 `9a2bc679e38933e267549971dafe41a36a44cce982e2dcc591352c11ca1b9c1f`. No operational activation or network-denial claim.
+- **GOAL:** Build a finite unsigned CLI/runtime package candidate from the reviewed private commit without operating a real host.
+- **DEPENDENCIES:** Private `86b8e49`, tree `2ad055cb196207e7bcae1567b34ad4968b2c0c96`, lock SHA-256 `0574298903b7144d5df460325d07dcca61cfb4d643c25a115611d32dd27ea3f2`; verified cached inputs.
+- **OWNERSHIP:** Verification Luna froze inputs and built the temp source. Its completed target became inaccessible with repeated agent-thread-limit errors; existing artifact Luna finishes only temp packing/evidence serially. Root owns review/state; no new worker.
+- **FILES / MODULES LIKELY INVOLVED:** Named Git source export, temporary build/pack/consumer manifests and logs; cached Node signature/keyring and Zod/noble tarballs.
+- **INPUT CONTRACT:** Windows build tools Node 22.23.2/npm 10.9.8/pnpm 12; separate signed Linux Node 22.23.3 input. Reuse only Zod 4.5.4/noble 1.8.0 matching the current lock; rebuild CLI/contracts. Old consumer lock is excluded.
+- **OUTPUT CONTRACT:** Fresh CLI/contracts packs, exactly four local consumer tarballs and fresh consumer lock, SHA/SRI closure checks, tool/source/input provenance and commands/logs.
+- **CONSTRAINTS:** Offline frozen scripts-disabled install from existing store; stop on cache miss, no download fallback. Build contracts then CLI. Reviewed correction uses cached pnpm 12 `--config.ignore-scripts=true pack` with workspace discovery, requiring rewritten contracts dependency `1.0.0`; preserve failed npm packs. Fresh offline consumer lock/ci resolves only four local tarballs. Use existing Git gpgv with task-local home/pinned keyring and authenticated checksum. No Linux runtime extraction/run.
+- **DO_NOT_TOUCH:** Repository/index/HEAD, user authority/configuration, WSL, actual host/profile/allowlist/key selection, signing or remote publication.
+- **ACCEPTANCE CRITERIA:** Builds and exact four-file closure pass, input/source state remains unchanged. Unsigned candidate is not live trust; offline mode is not egress isolation, reproducibility or Linux execution proof.
+- **VERIFICATION:** Exact source/tree/lock/package/archive membership, cached SHA/SRI, signature, tool versions/hashes and pre/post checks; independent Astra evidence review. Background environment applies.
+- **PARALLELIZATION SAFETY:** Temp outputs are independent of public A/C files and B preparation. D1 conformance/activation remains separately gated.
+- **POTENTIAL CONFLICTS:** Missing cached tools/dependencies stop execution. Current lease cannot select UID/environment; D1 needs an exact isolation mechanism and approved operation sheet.
+
+### TW-PILOT-B0-BUDGET — internal queue progress
+
+- **STATUS:** Published `c010f3a66` under `2f00e82e6`; fresh Astra CODE_APPROVE / F2 supersedes F1: 49 focused tests/eight probes verify no post-abandon ordinary reads, raw slot ownership and original failure/three-conflict cleanup. Final full Node and 108-test integrated gate passed. Current publication CI gate is above; eight files are frozen before C2 edits and B2 remains NOT_CODE_READY.
+- **GOAL:** Carry original deadline/abort state through bounded admission queues without changing HWM ordering or physical commit policy.
+- **DEPENDENCIES:** Verified context/queue gap, frozen live `canCommit` and owner source port/wire, reviewed raw-operation ownership.
+- **OWNERSHIP:** Existing transport Luna; C2 source-adapter disposition edits wait for B0 freeze.
+- **FILES / MODULES LIKELY INVOLVED:** Source adapter, HWM manager/contract/admission and focused tests; two narrow new modules: `ticket-workspace-resident-high-water-operation-context.ts` and `ticket-workspace-resident-high-water-admission-queue.ts`. Root verified adapter 277 and modified manager 334 nonblank lines against the 300 cap; separate only these domain responsibilities, with no generic framework or suppression.
+- **INPUT CONTRACT:** One main-owned monotonic budget/signal captured at valid read entry. All enqueue/dispatch/storage/permission checks consume its original remaining time, never a fresh subdeadline.
+- **OUTPUT CONTRACT:** Capacity eight active-plus-queued admissions per exact HWM key across lease generations. Expired/aborted queued entries are removed with zero port calls; overflow is unavailable. Caller settlement is separate from the active raw admission promise.
+- **CONSTRAINTS:** Timeout does not release the active slot: retain raw engine/port awaits until actual settlement, including required failure cleanup. Lease replacement cannot bypass outstanding work. Late completion rechecks abandonment/live precommit before further work. Actual storage-failure quarantine/rebind/recovery behavior is preserved; timeout/overflow alone creates no persistent quarantine/history loss.
+- **DO_NOT_TOUCH:** Wire/client/OwnerSourcePort, owner/runtime/UI/registration, private source, worker/backend/SQLite/build entries, history/reopen mechanisms, currentness/durability policy or user state.
+- **ACCEPTANCE CRITERIA:** Original budget decreases across transport/queue; queued abort/expiry and overflow call no ports; stalled read/permission/CAS/readback settles caller on time without releasing the raw slot or producing late currentness. Preserve late-CAS zero-mutation and ordering/equal-source regressions.
+- **VERIFICATION:** Focused adapter/HWM/admission/currentness tests, Node types, exact default/native/type-aware quality/format/diff and new fresh Astra code/integration review. Background environment applies.
+- **PARALLELIZATION SAFETY:** Public internal files are disjoint from C1 shared files and D0 temp outputs. Serialize C2 adapter edits afterward.
+- **POTENTIAL CONFLICTS:** No actual I/O cancellation, worker death/reopen or bounded physical commit is established. B1 trusted history/durability decisions still gate B2 and activation.
+
+### Reviewed C2 / renderer continuation
+
+Source/shared/main/preload are published and CI-verified through `77c940a56`. Common-join and lifecycle/publication increments now have independent code/integration approval and final local gates; parent C2B receipt-owner policy/signatures remain preparation only. Existing C prepares that exact owner packet read-only; full C2E follows its freeze and implementation. The following packets preserve each completed scope and remaining dependency; unclosed contracts confer no code permission. B1 and D1/D2 preparation retain TW-PILOT-B-PREP/TW-PILOT-D-PREP. No injected integration depends on actual provisioning.
+
+```text
+B0 frozen ──> C2A detailed source / lifetime
+C1 + channel/provider/error boundary freeze ──> C2C main IPC
+                                           └─> C2D preload (parallel with main IPC)
+C2A + receipt/stale/common-owner contract ──> C2B presentation owner
+C2A/B/C/D frozen ──> C2E injected integration
+C1 + refresh/expiry/stale contract ──> C3 injected renderer ──> bridge/sidebar join
+B1 decision, D1 run sheet and D2 owner inputs may prepare alongside these lanes
+actual source/HWM/lease registration remains one serial activation join
+```
+
+#### TW-PILOT-C2A — detailed source and remaining lifetime
+
+- **STATUS:** Complete at `0abb7c5d6`, published under user-approved `77c940a56` with all four exact-head CI workflows successful. Source F1 CODE_APPROVE and final INTEGRATION_APPROVE; independent 49 tests/15 actual-source probes resolved both terminal P1 findings. Minimal Node type repairs preserve behavior; final CLI/Node/Web gates passed.
+- **GOAL:** Distinguish complete positively unsupported source evidence from ordinary unavailable and expose existing remaining currentness lifetime privately.
+- **DEPENDENCIES:** B0 freeze, existing semantic admission/currentness and frozen detailed result.
+- **OWNERSHIP:** Existing C owner/presentation Luna after exclusive transfer of frozen B0 adapter/HWM files; B owns only disjoint C2C0 files during this allocation.
+- **FILES / MODULES LIKELY INVOLVED:** Nine files under `src/main/ticket-workspace/`: original seven existing `ticket-workspace-resident-source-adapter-contract.ts`, `ticket-workspace-resident-source-adapter.ts`, `ticket-workspace-resident-source-currentness.ts`, `ticket-workspace-resident-high-water.ts`, `ticket-workspace-resident-source-adapter.test.ts`; new `ticket-workspace-resident-source-presentation-read.ts` and `ticket-workspace-resident-high-water-lease.test.ts`. F1 adds exactly test-only `ticket-workspace-resident-source-settlement.test.ts` and reusable `ticket-workspace-resident-source-adapter-test-fixture.ts`; preserve old assertions while extracting existing setup. The 781/800 adapter test's 19-line headroom cannot absorb the meaningful terminal regressions without this reviewed amendment. No production scope expansion or cap exceptions.
+- **INPUT CONTRACT:** Same signal/original 1–10,000 ms budget and authenticated canonical full-source read. Add non-mutating `captureLeaseInvalidationGeneration(key, leaseGeneration): number | null` and `isLeaseCurrent(key, leaseGeneration, expectedInvalidationGeneration): boolean`, using existing partition lookup only, active identity/generation, no pending rebind or quarantine.
+- **OUTPUT CONTRACT:** `readCurrentPresentationSnapshot(signal, deadlineBudgetMs)` returns admitted `CurrentTicketOwnerRead` plus `currentnessRemainingMs`, status-only unsupported, or unavailable. Existing nullable method delegates one operation and maps only admitted to a read. Adapter's main-private `getCurrentnessRemainingMs(read): number` uses existing weak token/clock/HWM/client facts, zero invalid/expired, otherwise floored original lifetime.
+- **CONSTRAINTS:** Original lease/stamp guards transport and every pre-publication admission continuation, including queued/raw waits. Unsupported checks original signal/deadline/clock/client/lease/stamp, then preserves local invalidation and returns without an await or store/CAS/token. Admitted uses returned HWM facts after its own authorized stamp update plus original context checks; never recapture a stamp to excuse unrelated invalidation. Preserve terminal checks after admission cleanup and any added internal await. See [exact branch rules](./review-findings.md#exact-c2-implementation-packet-review--2026-10-01). No new clock/cache/token/TTL; preserve fractional boolean currentness and B0 raw ownership/cleanup.
+- **DO_NOT_TOUCH:** Owner source port, wire, setup/launch, renderer, private source, actual targets or currentness policy. Do not present/renew during ordinary reads.
+- **ACCEPTANCE CRITERIA:** First adoption/advancement succeeds despite its own stamp update; timestamp-only rereads preserve earlier currentness. Unrelated transport/queue/raw/final-settlement invalidation fails. Unsupported revokes prior tokens with zero store/CAS/token work. Original signal/deadline/exact owner/returned HWM validity must survive the final lifetime observation, and nullable delegation must recheck original cancellation/deadline and token/lease after its additional await without restarting or renewing. Include getter-triggered original expiry/abort and wrapper microtask invalidation/expiry/abort regressions. Fractional boolean/getter behavior, clock/suspend and missing/replaced/rebinding/quarantined leases stay fail-closed.
+- **VERIFICATION:** Focused adapter/currentness/lease/HWM and B0 queue/abandonment/cleanup regression; Node and CLI impact checks; exact default/native/type-aware lint/format/diff and fresh Astra code review. Tests use background launch policy.
+- **PARALLELIZATION SAFETY:** Serial after B0; disjoint from new IPC/preload files and B1/D1 read-only preparation.
+- **POTENTIAL CONFLICTS:** Different quarantine/disconnect stale policies would need a minimal private invalidation distinction; freeze receipt policy before introducing it.
+
+#### TW-PILOT-C2B — presentation receipt and common owner settlement
+
+- **STATUS:** NEEDS_CONTRACT for receipt-owner policy/composition. The two common-join and lifecycle/publication subpackets below have completed code/integration reviews; this does not ratify receipt arbitration or stale retention. Existing C completed the minimum proposal read-only; a new fresh Astra contract review is in progress. No parent-owner implementation before exact signatures, policy, ownership and review.
+- **GOAL:** Publish bounded C1 views and authorize match/click through one current source and a final common association/repository check.
+- **DEPENDENCIES:** C2A, reviewed A2, existing repository owner composition and explicit receipt/stale/common-join policy.
+- **OWNERSHIP:** C Luna; root freezes presentation policy and shared runtime edits.
+- **FILES / MODULES LIKELY INVOLVED:** New live presentation owner/test; exact runtime composition seam only after exclusive allocation.
+- **INPUT CONTRACT:** Valid C1 requests, trusted sender/provider/source partition, current source and fresh A1/owner dependencies; no renderer target authority.
+- **OUTPUT CONTRACT:** Correlated current/stale/unavailable/unsupported view and match/click results; only successful rebound exposes the existing bounded worktree ID.
+- **CONSTRAINTS:** Reuse the source's one presentedRead authority. Freeze global receipt replacement/sender destruction, stale age/unsupported/quarantine handling and A2/repository common final rechecks. Owner finalizes after awaiting the common join before receipt mutation; main synchronously rechecks the same witness after provider await and C1 validation, before its final caller checks/publication. Missing/false/throwing private guards suppress positive results. Preserve two source reads and original budget; publication guard starts no read/rebind/receipt rotation/presentation. Internal equal-source reads never renew display. No new authority token or filesystem-lock claim; public C1 remains unchanged.
+- **DO_NOT_TOUCH:** New source/currentness store, cached A2 continuing authority, effects, fixture semantics or actual launch. Do not independently await two owners and treat the earlier observation as current.
+- **ACCEPTANCE CRITERIA:** Sender/receipt/partition mismatch, supersession/out-of-order completion, expiry/disconnect/retirement and owner changes fail safely; stale navigation impossible; valid combined join is rechecked after final awaits.
+- **VERIFICATION:** Meaningful projection/receipt/race/combined-owner tests, Node types and exact quality; fresh Astra contract and code checkpoints.
+- **PARALLELIZATION SAFETY:** Preparation beside C2A/C/D; implementation beside preload only after contracts and runtime ownership freeze.
+- **POTENTIAL CONFLICTS:** One global sender-bound slot replaces another renderer's receipt; this is an unratified arbitration choice. Three-state source disposition cannot express different unavailable-retention policies by itself.
+
+**PREPARATION RESULT / PROPOSAL ONLY:** Same C completed the next owner proposal read-only. Candidate ownership is exactly four new files: `src/main/runtime/ticket-workspace-live-presentation-owner.ts`, `ticket-workspace-live-presentation-receipt.ts`, and their two `.test.ts` counterparts. One factory binds the source and receipt slot for its lifetime:
+
+```ts
+type TicketWorkspaceLivePresentationOwnerDependenciesV1 = Readonly<{
+  source: TicketWorkspaceResidentSourceAdapter
+  commonJoin: Omit<CommonJoinDependenciesV1, 'sourcePort'>
+  clock: TicketWorkspaceOwnerClock
+}>
+
+export function createTicketWorkspaceLivePresentationOwnerV1(
+  dependencies: TicketWorkspaceLivePresentationOwnerDependenciesV1
+): TicketWorkspaceLiveApiForTrustedSender
+```
+
+Unratified policies: one global sender/document-bound slot; new presentation supersedes pending work; same-revision presentation rotates the receipt; unavailable refresh may reuse an exact still-current old read only with a fresh source lifetime; unsupported clears; stale retention requires proved same document/source/lease partition. The assumption that a fixed adapter alone proves that last partition is unverified. Contract review must freeze mutation checks before both `presentSnapshot` and slot installation, original operation/lifetime handling, positive publication guards and DTO sanitization. No four-file owner implementation is allocated or CODE_READY from this proposal; source/HWM/bootstrap/renderer changes are excluded.
+
+#### TW-PILOT-C2B-COMMON-JOIN — exact common binding increment
+
+- **STATUS:** COMPLETE_LOCAL at `511c35412`; CODE_APPROVE / F2 and fresh INTEGRATION_APPROVE. Independently passed 70 tests/expiry-abort probes; final 159-test/Node/CLI gates and nine composed probes passed. Post-hook six hashes match (test 799/800). State documents/publishing remain separate; parent receipt policy and actual activation are excluded.
+- **GOAL:** Generalize A2's existing two-read operation to prove coordinator and selected repository together, exposing a repeatable synchronous main-private settlement witness.
+- **DEPENDENCIES:** Reviewed A1/A2/C1/C2A, existing owner-operation context and native Git catalog snapshot authority. Caller supplies the exact original presented read and original caller signal; no provider/WSL/durable provisioning dependency.
+- **OWNERSHIP:** Existing C Luna; root explicitly transferred former A join ownership. Exactly `src/main/runtime/ticket-workspace-root-run-join.ts`, `ticket-workspace-root-run-join-facts.ts`, `ticket-workspace-root-run-join.test.ts`, new `ticket-workspace-root-run-join-operation.ts`, `runtime-worktree-catalog-binding.ts` and its test. B owns only disjoint lifecycle/IPC contract preparation.
+- **INPUT CONTRACT:** `prepareTicketWorkspaceRootRunCommonJoinV1(dependencies: CommonJoinDependenciesV1, input: CommonJoinInputV1): Promise<TicketWorkspaceRootRunCommonJoinWitnessV1 | null>` with the exact types below. Retain the supplied operation context and original caller signal; never start another operation or deadline. Check both signals before and after `context.check()`, including final settlement. Separately validate the older original presentation through source currentness and matching facts; do not add it to `context.reads`, whose timestamps describe operation reads.
+- **OUTPUT CONTRACT:** `Readonly<{ finalize(): TicketWorkspaceRootRunCommonJoinCandidateV1 | null }>`; candidate is `Readonly<{ rootRun: TicketWorkspaceRootRunJoinCandidateV1; selectedRepositoryWorktreeId: string }>`. Each synchronous result is valid at that observation only. Reuse original facts/context/bindings without another read, binding, receipt mutation or token; never send witness/private context through IPC.
+- **CONSTRAINTS:** Extract one shared flow into the named operation module, not a parallel implementation. Generalize the existing finalizer to captured `checkOriginalOperation(): boolean`; common path uses original context/direct caller checks, while legacy A2 additionally keeps its earlier `invocationStartedAt` deadline. Preserve legacy dependency/function signature, result shape and coordinator-only event order. Deduplicate only identical complete five-field binding requests. Both bindings still need async exact validation and final synchronous catalog-token checks; the latter is not a filesystem lock. Source cap 300/test cap 800, no suppression or seventh production file.
+- **DO_NOT_TOUCH:** Source/HWM/admission, private source, renderer/preload/shared IPC, B lifecycle/context files, persistence schema, receipt/stale policies, fixture authority, actual setup/keys/host/provider activation or effects/public clear. Worker does not edit shared state documents.
+- **ACCEPTANCE CRITERIA:** Legacy compatibility; same/distinct complete requests; exact original-read identity/facts; wrong host/folder/SSH/WSL/missing/mismatched bindings unavailable without fallback; A1/map/baseline/source/token changes rejected; both cross-binding race orderings; repeatable finalization without reads/renewal. Explicit regressions: caller abort after operation cleanup, deadline expiry after cleanup, abort during final clock/check and legacy earlier-deadline boundary. Owner finalizes after JOIN await; future main publication guard reuses the same witness after provider await/C1 validation.
+- **VERIFICATION:** Focused join/catalog tests plus existing owner/source regression, Node types, exact default/native/type-aware lint, formatting/diff and fresh Astra code review. Background launch flag for all tests. Root verifies final hashes and integration before commit.
+- **PARALLELIZATION SAFETY:** B lifecycle/publication and finite integration contracts may prepare read-only; implementation is exclusive to C's six files. Other code increments require their own exact freeze/review. Actual activation is a later serial join.
+- **POTENTIAL CONFLICTS:** Retained context's cleanup removes the original caller abort listener; context signal alone is insufficient afterward. Legacy A2 has an earlier outer deadline which must not be relaxed. Receipt owner must retain original read privately; source port returns only its snapshot baseline. Lifetime/shared instance/positive publication policy remains separately gated.
+
+```ts
+type CommonJoinDependenciesV1 = Omit<
+  TicketWorkspaceRootRunJoinDependenciesV1,
+  'clock' | 'worktreeBindings'
+> &
+  Readonly<{
+    worktreeBindings: Pick<
+      RuntimeWorktreeCatalogBindingCommands,
+      | 'resolveExactLocalNativeGitTarget'
+      | 'isExactLocalNativeGitBindingCurrent'
+      | 'isExactLocalNativeGitBindingCatalogCurrent'
+    >
+  }>
+
+type CommonJoinInputV1 = Readonly<{
+  selection: TicketWorkspaceOwnerSelection
+  presentedRead: CurrentTicketOwnerRead
+  context: TicketWorkspaceOwnerOperationContext
+  callerSignal: AbortSignal | undefined
+}>
+
+// Existing private snapshot lookup; false for missing/throwing lookup.
+isExactLocalNativeGitBindingCatalogCurrent(
+  binding: ExactLocalNativeGitWorktreeBinding
+): boolean
+```
+
+#### TW-PILOT-C2B-LIFETIME — document and final-publication seam
+
+- **STATUS:** COMPLETE_LOCAL at `511c35412`; CODE_APPROVE / F1/type correction and fresh INTEGRATION_APPROVE. Astra passed 63 tests/nine handler probes and verified type-only reversal. Root final 159-test/Node/CLI gates and nine composed probes passed; post-hook four hashes match. State documents/publishing remain separate; receipt-owner/serial wiring remain gated.
+- **GOAL:** Reuse the one existing desktop sender lifecycle and convey invocation-private document/signal/publication checks to an injected owner without activating a provider.
+- **DEPENDENCIES:** Existing C1/C2C0, trusted UI/frame and request-lifetime guards; frozen same-witness boolean callback contract. Common-join completion, receipt retention policy and actual runtime wiring are not prerequisites for these injected helpers/tests.
+- **OWNERSHIP:** Existing B Luna; exactly `src/main/ipc/desktop-runtime-sender-lifecycle.ts`, new `desktop-runtime-sender-lifecycle.test.ts`, `ticket-workspace-live-ipc.ts` and `ticket-workspace-live-ipc.test.ts`. Disjoint from C's six common-join files.
+- **INPUT CONTRACT:** Exact signatures below. Parse one C1 request and verify original non-null current main frame/UI trust before accessing lifecycle getter. Obtain existing injected lifecycle, enroll through existing `connectionIdFor`, then lookup-only capture. Missing lifecycle/capture returns original correlated unavailable without provider work. Context checks original signal/frame/trust/captured generation before resolver/provider and again after synchronous resolver work.
+- **OUTPUT CONTRACT:** Same C1 one-request-argument API/channels, validated response or original correlated unavailable. Capture returns only a main-private lookup guard over original state identity/generation/frame; checks create no state/listeners. Positive current/matched/rebound requires the invocation-local publication guard; validated negatives keep final caller/document checks without evaluating that guard.
+- **CONSTRAINTS / REGISTRATION:** Fresh cell per invocation. Accept at most one guard while resolver/provider is pending. Seal immediately on main's provider-await continuation before C1 validation, and on every terminal path. Duplicate or post-seal registration invalidates that invocation's positive result, never replaces the first guard and never throws asynchronously; completed/other results cannot change. For validated positives evaluate once, require exactly true, check invalidation and final context/caller observations, then recheck the live invalid-registration latch immediately before return, without await. Missing/false/throwing/invalid guard returns correlated unavailable. No source read/rebind/receipt/presentation mutation, token/store, second lifecycle/map or bootstrap wiring.
+- **DO_NOT_TOUCH:** C runtime/join/catalog/source files, fixture/shared/preload/renderer APIs, runtime/startup/state registration, private source, schema, receipt retention/arbitration, operational host/profile/keys/provider activation and effects/public clear. Root owns documents, integration and commits.
+- **ACCEPTANCE CRITERIA:** Missing-state lookup; explicit enrollment only after valid trusted entry; original state/sender/generation/frame identity; nav/process loss/destruction/replacement rejection; same-document/blocked-navigation compatibility; old sender events cannot retire same-ID replacement; repeated capture/check never enroll/mint. Existing C1 channels/correlation and cleanup preserved. Duplicate/late guard registration and concurrent invocation isolation. One parameterized receipt/source/catalog microtask invalidation after provider resolves, guard after C1 validation, all ten selection scalars correlated; invalid response never evaluates guard. Dispose request listeners only; persistent lifecycle listeners remain.
+- **VERIFICATION:** Focused new class/live IPC plus existing lifetime/runtime/bridge regression; Node and CLI impact checks, exact quality/format/diff, fresh Astra code/integration review. All tests background; no apps needed.
+- **PARALLELIZATION SAFETY:** Independent implementation beside C common join after this signature/registration freeze. One boolean closure avoids coupling to C's concrete witness imports. Actual single-reference runtime/bootstrap wiring remains serial and separately allocated.
+- **POTENTIAL CONFLICTS:** Owner must separately prevent late receipt installation/reuse; IPC response suppression is not that proof. Early bootstrap precedes local lifecycle construction; later wiring shares the same instance without handler re-registration. No defaults imply actual provider/source startup.
+
+```ts
+captureCurrentDocument(
+  sender: WebContents
+): Readonly<{ isCurrent(): boolean }> | null
+
+export type TicketWorkspaceLiveRequestContext = Readonly<{
+  signal: AbortSignal
+  isCurrentDocument(): boolean
+  setFinalPublicationGuard(guard: () => boolean): void
+}>
+
+export type TicketWorkspaceLiveApiForTrustedSender = (
+  sender: WebContents,
+  context: TicketWorkspaceLiveRequestContext
+) => TicketWorkspaceLiveApi | null
+
+type SenderLifecycle = Pick<
+  DesktopRuntimeSenderLifecycle,
+  'connectionIdFor' | 'captureCurrentDocument'
+>
+type GetSenderLifecycle = () => SenderLifecycle | null
+
+registerTicketWorkspaceLiveIpcHandlers(
+  getApiForTrustedSender: TicketWorkspaceLiveApiForTrustedSender = () => null,
+  getSenderLifecycle: GetSenderLifecycle = () => null
+): void
+```
+
+#### TW-PILOT-C2C0 — shared live IPC contract
+
+- **STATUS:** Complete at `0abb7c5d6`, published under user-approved `77c940a56` with all four exact-head CI workflows successful. Fresh Astra CODE_APPROVE with independent 13-test, CommonJS and browser probes; B changed only two shared files. Final shared types and integration passed.
+- **GOAL:** Freeze the shared bridge contract needed by separate main and preload implementations.
+- **DEPENDENCIES:** Published and CI-verified C1; no C2A/B implementation, durable store or WSL prerequisite.
+- **OWNERSHIP:** Existing B transport Luna; only two new shared files. C retains exclusive C2A ownership.
+- **FILES / MODULES LIKELY INVOLVED:** Only `src/shared/ticket-workspace-live-ipc-boundary.ts` and its test.
+- **INPUT CONTRACT:** Parsed C1 presentation/selection requests; derive method request/response mappings from the existing C1 API/types, without another schema.
+- **OUTPUT CONTRACT:** Exactly `ticketWorkspaceLive:getPresentation`, `ticketWorkspaceLive:matchSelection`, `ticketWorkspaceLive:rebindSelectionAtClick`; three correlated-unavailable builders. Presentation copies request ID; match/rebind copy every selector field and nested source identity from the original parsed request.
+- **CONSTRAINTS:** Callers reject invalid input before provider/getter/IPC; valid-call failures use the original parsed request. No fabricated IDs or exception details. Preserve synchronous shared JSON/CJS/browser compatibility.
+- **DO_NOT_TOUCH:** Main/provider/sender lifecycle, preload/API exposure, renderer, fixture surfaces, receipt/stale policy, source/HWM, private files and operational state.
+- **ACCEPTANCE CRITERIA:** Unique exact channels, C1-derived method mapping, full correlation and actual C1 acceptance of all three unavailable shapes; no new authority or fixture fallback.
+- **VERIFICATION:** Focused C1/boundary tests; CLI/Node/Web types, actual browser execution and CommonJS load; exact quality/format/diff and fresh Astra code review. All tests background.
+- **PARALLELIZATION SAFETY:** Two new files are disjoint from C2A's seven files and A's common-join preparation. Main/preload branch only after this boundary freezes and their separate provider/handler packets are ready.
+- **POTENTIAL CONFLICTS:** This packet does not freeze provider/sender/lifecycle signatures or register handlers. B must not edit the transferred C2A/HWM files.
+
+#### TW-PILOT-C2C — live channels and injected main IPC
+
+- **STATUS:** Complete at `0abb7c5d6`, published under user-approved `77c940a56` with all four exact-head CI workflows successful. Fresh Astra CODE_APPROVE with independent 39 tests/five suites and 67 actual-module probes; test-only type repairs passed Node/final integration. No positive provider wiring is included. Future positive-provider publication guard is a separately frozen amendment.
+- **GOAL:** Register exact live requests against an injected presentation provider without activation.
+- **DEPENDENCIES:** Frozen C1/C2C0 channels/types/builders and existing UI frame/lifetime guards; not C2A/B implementation or actual provisioning.
+- **OWNERSHIP:** Existing B transport Luna; exclusive main IPC/bootstrap files, disjoint from C source/preload.
+- **FILES / MODULES LIKELY INVOLVED:** Exactly new `src/main/ipc/ticket-workspace-live-ipc.ts` and its test, plus additive `src/main/startup/main-process-ipc-bootstrap.ts` registration. C2C0 files remain immutable.
+- **INPUT CONTRACT:** Exactly one C1-parsed request; malformed arity/shape rejects generically before provider resolution. Inject `(trustedSender: WebContents) => TicketWorkspaceLiveApi | null`. After parsing, require existing `isTrustedUIRenderer` and non-null `event.senderFrame` equal to the sender's current main frame before resolving. Wrong-frame or untrusted valid requests return original correlated unavailable.
+- **OUTPUT CONTRACT:** Matching C1-validated response or the original parsed request's C2C0 unavailable response for missing/throwing provider, invalid/cross-correlated reply or lost caller. Preserve valid C1 stale/unsupported/rebound results, including the bounded Orca `worktreeId` exception. No exception details or fabricated IDs.
+- **CONSTRAINTS:** Attach existing `abortWhenRendererGone` before resolver/provider work; after final await and response validation, synchronously recheck its signal, original frame/current main frame and renderer trust. Dispose in `finally`; preserve same-document and blocked-navigation semantics. Reuse existing guards without editing their files or adding a lifecycle store. Bootstrap resolves only `null`; real provider construction/registration remains a later serial join. No fixture fallback, resident construction, local substitution for unavailable remote authority or receipt policy.
+- **DO_NOT_TOUCH:** Fixture IPC, source/lease startup, operational state, preload-owned files or presentation authority.
+- **ACCEPTANCE CRITERIA:** Exact channels; invalid arity/shape and queued old-frame/subframe calls access no resolver; valid missing/throwing/malformed/cross-correlated cases retain correlation; committed document replacement, process loss/destruction and final trust change suppress positive results; lifetime listeners clean up. Same-document/blocked navigation and valid C1 statuses remain unchanged. Null-provider registration starts nothing.
+- **VERIFICATION:** Focused IPC/provider tests, Node types and exact quality; independent review.
+- **PARALLELIZATION SAFETY:** New IPC files can overlap C2B and preload after shared channel freeze; bootstrap edits serialize.
+- **POTENTIAL CONFLICTS:** Provider construction/startup belongs to the later single registration owner; harmless unavailable registration is separable.
+
+#### TW-PILOT-C2D — preload live API
+
+- **STATUS:** Complete at `0abb7c5d6`, published under user-approved `77c940a56` with all four exact-head CI workflows successful. C passed 25 focused/related tests; final Astra CODE_APPROVE / INTEGRATION_APPROVE includes 105 actual main/preload probes and 12 browser probes. All type gates passed; fixture API is preserved.
+- **GOAL:** Expose the separate C1 live API with complete input/result/correlation validation.
+- **DEPENDENCIES:** C1 and frozen C2C boundary; not production provider or WSL.
+- **OWNERSHIP:** Existing C owner/presentation Luna; preload declaration/exposure are one exclusive ownership unit, disjoint from B main/bootstrap.
+- **FILES / MODULES LIKELY INVOLVED:** Exactly new `src/preload/api/ticket-workspace-live-bridge.ts` and its test, `src/preload/api-types.ts`, and `src/preload/index.ts`.
+- **INPUT CONTRACT:** Exactly one runtime argument on every method; zero or extra arguments, including a second undefined, reject with a fixed generic error before IPC. Parse through C1 before invoking the exact channel with the parsed request. No invented identifiers.
+- **OUTPUT CONTRACT:** Separate `ticketWorkspaceLive: TicketWorkspaceLiveApi` surface; valid IPC rejection/malformed/cross-correlated result uses the original parsed request's C2C0 unavailable builder. Validate full C1 results and all selection fields. Preserve validated rebound's bounded Orca `worktreeId`.
+- **CONSTRAINTS:** Reuse C1 validators and C2C0 builders; preserve fixture API. No additional private targets/paths/tokens, error details, source/provider/receipt authority or fixture fallback. API declaration/exposure join together; no full CLI build/global installation.
+- **DO_NOT_TOUCH:** Main IPC/bootstrap, fixture methods/pins, renderer, source/owner state or operations.
+- **ACCEPTANCE CRITERIA:** Direct runtime zero/extra-argument tests access no IPC; each valid method invokes only its exact channel and parsed request; complete status/nested correlation checks and valid-call errors preserve original fallback correlation; fixture/live remain distinct and validated rebound ID survives.
+- **VERIFICATION:** Focused bridge tests, applicable types/exact quality and independent review.
+- **PARALLELIZATION SAFETY:** Beside C2B/C2C after contract freeze with disjoint files; API declaration/exposure remain one ownership unit.
+- **POTENTIAL CONFLICTS:** Channel or invalid-input changes require coordinated freeze before either worker edits.
+
+#### TW-PILOT-C2E — injected live read / receipt / click join
+
+- **STATUS:** Existing B Luna completed the read-only four-case packet; fresh Astra approved preparation and identified exact race refinements. Propose one new integration-only `ticket-workspace-live-pilot-join-integration.test.ts` for successful join, selected-repository change, receipt supersession and source/A1 change across final awaits. Exact file/cases remain unallocated until C2B contract/module freeze and review; the completed injected bridge is not full C2E.
+- **GOAL:** Verify actual adapter/currentness, receipt, main/preload and common A2/repository seams together.
+- **DEPENDENCIES:** Relevant C2A/B/C/D and association composition; not B1 durable implementation, D1 real WSL, real keys, C3 or activation.
+- **OWNERSHIP:** One integration owner; root selects exact test files after module freeze.
+- **FILES / MODULES LIKELY INVOLVED:** Finite integration test/harness only; product edits return to their owners.
+- **INPUT CONTRACT:** Frozen actual modules and injected trusted dependencies, synthetic local owner/source facts explicitly labelled.
+- **OUTPUT CONTRACT:** Bounded correlated presentation/navigation integration receipt and stable code hashes.
+- **CONSTRAINTS:** No renderer authority, stale navigation, duplicate source or redundant status capture; no real pilot claim.
+- **DO_NOT_TOUCH:** Operational storage, targets/keys/WSL, product source without separate allocation or fixture authority.
+- **ACCEPTANCE CRITERIA:** Valid join works; source/receipt/A1/owner changes across awaits fail closed; private evidence absent from DTOs. Catalog races alter an already validated binding while the other final await is held, beyond ordinary resolver rejection. Focused join tests cover both orderings; integration needs one representative branch. Owner/seam tests must prove retired documents cannot install/reuse receipt state, not only suppress IPC output. One focused microtask regression changes receipt/source/catalog between provider resolution and IPC continuation and verifies correlated unavailable; do not duplicate transport suites.
+- **VERIFICATION:** Finite integration plus relevant regression/type/quality and fresh Astra review; background only.
+- **PARALLELIZATION SAFETY:** Read-only case preparation can overlap modules; final integration follows freeze and is serial.
+- **POTENTIAL CONFLICTS:** Common owner composition and bootstrap/source construction have exclusive integration ownership.
+
+#### TW-PILOT-C3 — live renderer preparation and later view
+
+- **STATUS:** Preparation ready; implementation needs refresh/expiry/stale behavior freeze.
+- **GOAL:** Display C1 live states and request click-time owner rebind using existing Tickets and workspace activation.
+- **DEPENDENCIES:** C1 plus frozen renderer lifecycle; injected UI may overlap C2, product sidebar cutover follows bridge.
+- **OWNERSHIP:** Exclusive renderer workstream after packet; C proposes boundary, root avoids shared files with preload/main.
+- **FILES / MODULES LIKELY INVOLVED:** Existing Tickets components, list/selection cancellation/workspace activation and focused UI tests.
+- **INPUT CONTRACT:** Injected typed live API and correlated DTOs, with no source/target authority or fixture-to-current promotion.
+- **OUTPUT CONTRACT:** Current/stale/unavailable/unsupported view; navigation only from validated rebound.
+- **CONSTRAINTS:** Deduct elapsed request/IPC time from remaining lifetime; expiry, selection/source changes and superseded response invalidate navigation. Follow STYLEGUIDE and hidden background validation.
+- **DO_NOT_TOUCH:** Source/currentness store, runtime/main/preload ownership, fixture pins, effects or visible/focus tests on user desktop.
+- **ACCEPTANCE CRITERIA:** Safe refresh/expiry/ordering/selection UX, no stale click and correct unavailable fallback; existing navigation reused.
+- **VERIFICATION:** Focused renderer tests, web types/changed quality/design gates and hidden Electron CDP when rendered checks apply.
+- **PARALLELIZATION SAFETY:** Preparation beside all other lanes; injected UI beside main/preload after lifecycle freeze and exclusive renderer ownership.
+- **POTENTIAL CONFLICTS:** Sidebar cutover waits for bridge; no second ticket list/navigation implementation or premature fixture replacement.
+
+## Bounded module cycle — 2026-10-01
+
+**Status: four code packets independently approved by Sol 6.1 xhigh and authorized by the user on 2026-10-01.** Source inspection found that actual production publisher/key/host provisioning is not a dependency of the existing injected transport, owner-selection and capture interfaces. The packets below separate module implementation from production activation. They retain the reviewed logical-v1 wire, fixture UI/IPC, and all live evidence/effect gates. Detailed contracts are owned by the continuing delivery, transport and owner workstreams in their existing documents.
+
+### TW-06-B1 — Propagate the caller's remaining read budget
+
+- **STATUS:** Complete in published code checkpoint `5b39c5963`; 33 focused tests, Node typecheck, quality/format and fresh Sol 6.1 review passed. Both dependent modules and their IJ integration are complete; current published CI receipts are in project-state.
+
+- **GOAL:** Extend the local resident read API to honor one caller deadline without changing wire v1.
+- **DEPENDENCIES:** Reviewed logical-v1 client; final budget/source-port contract review and user scope approval.
+- **OWNERSHIP:** Continuing Luna transport workstream.
+- **FILES / MODULES LIKELY INVOLVED:** Existing resident client/contract and focused tests; one transport-owned internal source-port declaration; byte-stream write/expiry guard and focused regression tests.
+- **INPUT CONTRACT:** Optional integer read budget of 1–10,000 ms; omitted budget preserves existing callers; captured client lease and the same monotonic clock.
+- **OUTPUT CONTRACT:** One deadline established at call entry, remaining budget sent in the existing field, bounded cancellation/retirement, and the frozen main-only source-port type.
+- **CONSTRAINTS:** No new wire shape or production source admission claim.
+- **DO_NOT_TOUCH:** Fixture IPC/sidebar, private source, real endpoint/key provisioning, user configuration or services.
+- **ACCEPTANCE CRITERIA:** Default compatibility; smaller and elapsed budgets propagate; invalid/expired budgets send no read; abort and late responses settle or retire within the same bound.
+- **VERIFICATION:** Focused client/security tests, Node typecheck and changed-code quality; independent integration review.
+- **PARALLELIZATION SAFETY:** Complete this shared API/type seam before TW-02L-I and TW-06-I integration.
+- **POTENTIAL CONFLICTS:** Only the transport owner may edit this client or source-port declaration.
+
+### TW-02L-I — Compose owner evidence through an injected admitted source
+
+- **STATUS:** Complete in published code checkpoint `5b39c5963`; 47 focused owner/binder/selector/capture tests, Node typecheck, quality/format and fresh Sol 6.1 review passed. Actual owner/source integration is complete in IJ; production registration remains unimplemented.
+
+- **GOAL:** Implement the exact owner join and source rechecks without registering a production provider.
+- **DEPENDENCIES:** TW-06-B1 frozen port; reviewed P4/P5 source-policy admission; user scope approval. Test sources inject admitted evidence; production construction later requires TW-06-I plus real setup proofs.
+- **OWNERSHIP:** Continuing Luna owner workstream.
+- **FILES / MODULES LIKELY INVOLVED:** New runtime live-owner composition modules and focused tests; reuse existing selector, resolver and capture.
+- **INPUT CONTRACT:** Main-captured admitted snapshot, immutable lease/binding/policy/currentness evidence, exact selectors, monotonic budget, resolver and capture ports.
+- **OUTPUT CONTRACT:** Separate invocation-bound Orca match/evidence or unavailable; timestamps and regenerated snapshot revision are not source-identity substitutes.
+- **CONSTRAINTS:** One outer deadline brackets two fresh source reads around match/click binding; status/evidence adds capture and a third read. Same profile/source/ref/lease and currentness survive every boundary; click rechecks the existing exact owner binding before returning its ID.
+- **DO_NOT_TOUCH:** Shared port declaration, cache/store, fixture navigation/IPC/sidebar, product registration, private schema or effects.
+- **ACCEPTANCE CRITERIA:** Whole-snapshot unsupported and all P4 suppression fail closed; valid current refs during non-excluded transitions survive; source/lease/owner changes, incomplete capture, abort and late settlement remain unavailable; owner timestamps remain source-owned; no public clear.
+- **VERIFICATION:** Focused composition tests and fixture regression, Node typecheck and changed-code quality; independent integration review.
+- **PARALLELIZATION SAFETY:** Independent of TW-06-I and TW-M1P-I after the source-port contract is frozen.
+- **POTENTIAL CONFLICTS:** Consumes the transport-owned port; production wiring is a later serialized task.
+
+### TW-06-I — Admit snapshots with injected high-water and monotonic policy
+
+- **STATUS:** Complete locally; 71 focused tests, Node typecheck, exact default/type-aware quality/format and fresh Sol 6.1 code review passed. Eighteen independent actual-source probes passed; scoped hashes are stable. Production storage/host/activation proof is not claimed.
+
+- **GOAL:** Implement internal semantic admission/cache state transitions independently of real storage and provisioning.
+- **DEPENDENCIES:** TW-06-B1 frozen port, final P3/P6 experimental policy, user scope approval.
+- **OWNERSHIP:** Continuing Luna transport workstream, after TW-06-B1.
+- **FILES / MODULES LIKELY INVOLVED:** New resident admission/high-water modules and focused tests in `src/main/ticket-workspace/`.
+- **INPUT CONTRACT:** Exact captured bytes/binding/lease/read-start, full semantic validator, injected atomic high-water store, explicit adoption/rebind authorization and monotonic/suspend clock.
+- **OUTPUT CONTRACT:** Immutable internal admitted snapshot/currentness evidence or unavailable/quarantine; commit validated high-water before exposing positive admission.
+- **CONSTRAINTS:** Missing known history is not first adoption; wall timestamps do not mint freshness; durable source order is keyed by exact host/profile/authority/epoch and survives service release changes; cache/lease identity additionally binds release/artifact/incarnation; producer matched/actions remain forbidden.
+- **DO_NOT_TOUCH:** Owner composition, fixture IPC/UI, real durable-store path, setup/credentials/services or production current publication.
+- **ACCEPTANCE CRITERIA:** Canonical semantic validation and policy precede store updates; regression/equivocation, lost/corrupt history, CAS/storage faults and epoch changes fail safely; fresh reads, TTL, suspend and clock anomalies follow the frozen experimental policy.
+- **VERIFICATION:** Focused admission/high-water state-transition tests, Node typecheck and changed-code quality; independent integration review.
+- **PARALLELIZATION SAFETY:** Independent of TW-02L-I and TW-M1P-I after the shared port freezes; only this owner changes admission/currentness semantics.
+- **POTENTIAL CONFLICTS:** Real store/rebind/production current wiring remain subsequent reviewed integration tasks.
+
+### TW-M1P-I — Verify release artifacts against injected trust
+
+- **STATUS:** Complete at private `052fa3b`, now published as an ancestor of `b556834` and pinned by Orca. Verifier checkpoint passed contracts 59, CLI 257/45 skipped, typecheck/quality/format, fresh Sol 6.1 review and five-input C1 replay. Current exact-SHA CI receipts are in project-state.
+
+- **GOAL:** Implement a private pure manifest/signature/digest verifier before provisioning a publisher or installer.
+- **DEPENDENCIES:** TW-M1P-D1 exact manifest bytes/schema and verifier-policy review; user scope approval.
+- **OWNERSHIP:** Continuing Luna artifact-delivery workstream.
+- **FILES / MODULES LIKELY INVOLVED:** New private contracts release-manifest schema and synthetic tests, narrow contract export, and CLI artifact-verification modules/tests.
+- **INPUT CONTRACT:** Canonical manifest, detached signature, externally supplied trusted key and expected source/profile/target; supplied artifact bytes.
+- **OUTPUT CONTRACT:** Verified artifact closure or explicit rejection; no artifact publication, extraction, installation or authority mutation.
+- **CONSTRAINTS:** Trust cannot originate inside the supplied manifest; source/build fields remain publisher claims rather than reproducible-build proof.
+- **DO_NOT_TOUCH:** Public contract/fixture bytes, authority/config/state, real keys, release channel, WSL/services, staging/activation or rollback writers.
+- **ACCEPTANCE CRITERIA:** Strict schema/canonical bytes, signer/source/profile/target equality and every closure digest reject malformed or substituted inputs; synthetic valid vectors pass.
+- **VERIFICATION:** Focused private tests and CLI typecheck; independent review; no new dependencies without demonstrated need.
+- **PARALLELIZATION SAFETY:** Independent of the two Orca modules with a disjoint private source boundary.
+- **POTENTIAL CONFLICTS:** Production manifest publication/profile selection and key custody require separate owner decisions; no production selection is inferred from these tests.
+
+### TW-02L-06-IJ — Verify the admitted source and owner composition together
+
+- **STATUS:** Complete at published code checkpoint `5b39c5963`; fresh Sol 6.1 issued `INTEGRATION_APPROVE`. Seven integrated tests, Root 18 suites/143 regression, Node types and 175-file quality passed. Publication and CI are complete; current exact-SHA receipts are in project-state.
+- **GOAL:** Exercise the real injected resident source adapter and owner composition together through an authenticated fake duplex.
+- **DEPENDENCIES:** TW-06-B1 complete; TW-02L-I and TW-06-I focused verification and independent code approval.
+- **OWNERSHIP:** Continuing Luna owner workstream owns one new integration test; transport workstream owns any demonstrated source-module correction.
+- **FILES / MODULES LIKELY INVOLVED:** New `src/main/runtime/ticket-workspace-live-owner-source-integration.test.ts`; read existing resident protocol test support, source adapter/high-water, owner composition and binder/capture ports.
+- **INPUT CONTRACT:** Real authenticated resident client/source adapter, injected atomic high-water store and trusted adoption, shared monotonic clock, explicitly presented admitted read and trusted displayed-revision getter, exact owner resolver and complete capture doubles.
+- **OUTPUT CONTRACT:** Reproducible positive match/click/evidence and fail-closed integrated rejection; no provider registration or production-host claim.
+- **CONSTRAINTS:** Preserve the original displayed selection during equal-source timestamp/revision regeneration; latest admission does not silently change the view or renew its presentation receipt, even for identical revisions. An expired displayed read stays unavailable until explicitly presented again. Exercise final owner and displayed-baseline rechecks after asynchronous settlement. Keep two source reads for match/click and three for evidence under one deadline.
+- **DO_NOT_TOUCH:** Fixture IPC/UI, public contract/fixture bytes, private source, real durable storage, WSL/services, credentials, operational configuration or external publication.
+- **ACCEPTANCE CRITERIA:** Actual admitted source supports valid owner operations; suppression and any unsupported peer reject; source change/regression/equivocation, lease/view/owner retirement, timeout/abort and incomplete capture cannot return positive evidence. Reuse module tests for exhaustive fault matrices rather than duplicating them.
+- **VERIFICATION:** Focused integrated tests plus relevant existing transport/owner/fixture regression, Node typecheck and changed-code quality; fresh Sol 6.1 integration review checks code, completed scope and the next DAG frontier.
+- **PARALLELIZATION SAFETY:** New test file has sole owner; begin after the two reviewed module interfaces settle. Unrelated private delivery packet preparation may continue.
+- **POTENTIAL CONFLICTS:** Any production correction stays with its module owner and requires focused re-verification; serialize shared-interface changes and do not commit while writers are active.
+
+### TW-M1P-L1 — Implement injected unbound release transitions
+
+- **STATUS:** Complete and published at private `b556834`; fresh Sol 6.1 xhigh approved the stable ten-file candidate. Focused state tests passed 16, independent regression 35, Root Windows contracts 59/CLI 273 with 45 skips, and exact-main Ubuntu CI contracts 59/CLI 297 with 21 skips. Type/quality/format and reviewed hashes passed; this is not production activation proof.
+- **GOAL:** Implement install/update/rollback preview, apply and explicit reconciliation over an already staged release and injected stores.
+- **DEPENDENCIES:** Reviewed private verifier `052fa3b`; corrected [L1 contract](./profile-delivery.md#l1-candidate--unbound-active-release-transitions). Actual staging or ext4 activation retains separate prerequisites.
+- **OWNERSHIP:** Continuing Luna artifact-delivery workstream exclusively owns the new private state module and tests.
+- **FILES / MODULES LIKELY INVOLVED:** Seven new private `runtime-release-` source modules: state, state-ports, active-record, input, preview, apply and reconcile (`-v1.ts`); one focused test and test-only state-harness/state-fakes modules. Mechanical splits satisfy existing 300-line source and 800-line test gates. Existing verifier, fence and fixed-name publication helper remain unchanged.
+- **INPUT CONTRACT:** Raw staged artifact bytes, external current trust/expectations/policy, bounded active bytes plus file incarnation, root identity, observed binding state, root-scoped fence and shared recovery-generation ports.
+- **OUTPUT CONTRACT:** Issuer-owned one-use confirmation; `activated`, `conflict`, `rejected` or `unverifiable`; explicit read-only old/new/unknown reconciliation. No public command or operational adapter is registered.
+- **CONSTRAINTS:** Recompute requested manifest digest and invoke the actual verifier at preview/apply/reconcile; bind operation/root/incarnation/policy/binding/recovery generation; preserve one activation pointer and retained releases. All sessions share ambiguity blocking; initial reconciliation accepts no prior attempt.
+- **DO_NOT_TOUCH:** Existing verifier/contracts/dependencies, CLI commands, config, authority, ledger, publisher/fence implementation, public owner/cache/UI/IPC, real runtime roots, WSL/services or keys.
+- **ACCEPTANCE CRITERIA:** Valid pure install/update/rollback; forged/replayed/stale/ABA confirmations and policy/binding changes reject; competing writers serialize; ambiguous publish or release failures block all sessions until explicit reconciliation; no automatic repair, second pointer or deletion.
+- **VERIFICATION:** Focused fake-store/verification/fault tests, private CLI typecheck and scoped quality/format; new fresh Sol 6.1 code review. Synthetic inputs do not establish production trust, installed-tree provenance or durable restart recovery.
+- **PARALLELIZATION SAFETY:** Independent private files; public owner/source integration can continue concurrently. Commit only verified owned files after code review.
+- **POTENTIAL CONFLICTS:** No overlap with existing private verifier or CLI/config/ledger writers; any real storage adapter or staging implementation requires a separately reviewed packet.
+
+### TW-M1P-L2 — Implement descriptor-backed unbound runtime adapters
+
+- **STATUS:** Technically reviewed finite packet, deferred after Astra's direction audit because it does not complete the first actual-ticket user path. Worker was frozen before any edit; no source changes. Resume only when a reviewed pilot or later delivery acceptance requires this adapter.
+- **GOAL:** Implement the existing L1 root-observation, active-record and per-root fence ports, reusing the current descriptor filesystem, durable publisher and SQLite process fence.
+- **DEPENDENCIES:** Reviewed verifier/L1 at private `b556834`; frozen L1 port shapes. Staged-byte storage, durable shared restart recovery and actual activation remain separate successors.
+- **OWNERSHIP:** Continuing Luna artifact-delivery workstream, private adapter files and exact impacted descriptor-stat fakes only.
+- **FILES / MODULES LIKELY INVOLVED:** New private `ticket-workspace-runtime-release-root-v1.ts`, `ticket-workspace-runtime-release-active-store-v1.ts`, `ticket-workspace-runtime-release-fence-v1.ts` and a focused storage/fence test. Add `uid`/`mode` only to descriptor `TrustedLedgerStatV1` in `trusted-wsl-ledger-file-v1.ts`; update stat records in `test/support/memory-trusted-ledger-filesystem.ts` and `test/trusted-wsl-ledger-file-v1.test.ts`. Mechanical concrete adapter/test-support splits require root notice; no generic helper subsystem.
+- **INPUT CONTRACT:** Injected filesystem/fence/environment observations; already selected root and expected device/inode, UID and configured distro. Independently sampled effective UID must match expected UID and root owner. Root selection/creation is not performed.
+- **OUTPUT CONTRACT:** Authenticated descriptor-scoped root observation, bounded canonical active record or trusted absence, unchanged fixed-name durable publication and caller-label-independent runtime fence; errors and close/release uncertainty are unverifiable.
+- **CONSTRAINTS:** Root no-follow directory open; exact identity, ext4, owner and mode `0700`, effective UID and natural/configured distro agreement. Active filename is only `active-runtime-v1.json`; no-follow regular/same-device/owner/mode `0600` read, 4 KiB cap and existing record validation. Only `ENOENT` under a proven root is absence. Hold root/child descriptors through I/O/publication/fence release; never let `/proc/self/fd/N` escape lifetime. Publish through unchanged `durablyReplaceTrustedLedgerV1`. Use constant runtime-domain machine ID, fixed fence key, `createStateRoot: false` and pinned lock root; reject alternate distro access. Observed `dev:ino` is object identity, not proof of non-reuse or durable ABA protection.
+- **DO_NOT_TOUCH:** Existing L1/verifier contracts, filesystem `lstat` shape, publisher/fence algorithms, dependencies, CLI/config/catalog/ledger/authority, public source/owner/IPC/UI, actual roots, WSL/services/keys or remote publication.
+- **ACCEPTANCE CRITERIA:** Fake-I/O tests cover good/bad root identity/type/owner/mode/filesystem/distro/effective UID, active absence/presence/corruption/read failure/incarnation, size limit and close uncertainty, pre/post-publication outcomes and label-independent lock scope. No second pointer, deletion, extraction, process launch or unrelated state write. Shared restart recovery remains required before activation.
+- **VERIFICATION:** Focused adapter plus existing descriptor publisher, initializer/CAS and L1 regressions; private CLI typecheck, exact changed-file quality/format and diff checks; fresh Astra xhigh code review if this deferred packet is resumed. Reuse the published baseline CI; fake tests do not prove physical WSL/ext4 or durable restart behavior.
+- **PARALLELIZATION SAFETY:** Private-only ownership, disjoint from public high-water/presentation work; root may monitor existing commit CI concurrently. Serialize any other private descriptor/fence/stat writer and shared build mutations.
+- **POTENTIAL CONFLICTS:** Exactly two existing test fakes share the descriptor-stat extension. Production backend registration, staging and recovery ports require separate reviewed packets; do not silently expand into them.
+
+## Tasks
+
+### TW-M1P — Deliver a provenance-bound ticket profile and CLI runtime
+
+- **STATUS:** Full delivery track open; verifier/L1 are complete, while real install/update/rollback are unimplemented. Further L2/staging/recovery expansion is deferred by Astra audit. A limited explicit developer runtime/profile path is a separate pilot contract, not completion of this full delivery task.
+- **GOAL:** Make the configured ticket profile and a source-pinned Linux Node 22.13+ CLI/base runtime reproducibly installable, updatable and recoverable for explicit Orca setup. TW-06P separately supplies the future resident service artifact.
+- **DEPENDENCIES:** Full delivery needs TW-00 source/profile schema and decisions on artifact provenance, execution host, install target, version binding and rollback. First developer pilot needs only its separately approved pinned executable/profile and actual resident entrypoint with explicit setup/host/trust proof; updater/rollback/recovery are not pilot prerequisites. Whether CLI/resident share one release is an unadopted proposal.
+- **OWNERSHIP:** One ticket-domain delivery workstream for private package/profile artifacts; Orca setup integration owns only the separately agreed host/authority handoff. Do not have both workstreams edit the private CLI or the same setup seam concurrently.
+- **FILES / MODULES LIKELY INVOLVED:** `ticket-workspace/packages/cli/`, profile/config contracts, private packaging/install tests and later Orca explicit setup integration. The seven approved public fixture files are unrelated.
+- **INPUT CONTRACT:** Source-pinned private package and strict profile/config schema, explicit install authority, exact WSL machine/distro target, verified Node runtime and artifact identity.
+- **OUTPUT CONTRACT:** A versioned installed profile plus Node/CLI base-runtime provenance that TW-06T can attest during explicit setup, with explicit update/rollback and fail-closed unavailable on missing or mismatched provenance. This output does not claim a resident service binary.
+- **CONSTRAINTS:** No private source copied into the public Orca package beyond separately approved bytes; no WSL/CLI/process launch from read-only status/snapshot paths; no overwrite or silent migration of existing user state.
+- **DO_NOT_TOUCH:** TW-07F fixture IPC/UI, ticket mutation/effects, Orca agent-status/Run ownership, approved public fixture bytes.
+- **ACCEPTANCE CRITERIA:** Freeze the install authority, source/artifact hash, profile/authority/host binding, Node version, update and rollback recovery rules; then prove fresh base install, mismatch rejection, update and rollback against isolated WSL/ext4 fixtures. TW-06T production setup admits only this verified base runtime/profile joined to an independently pinned TW-06P service artifact. No installation success is inferred from a contract tarball or a path string.
+- **VERIFICATION:** Offline/frozen artifact replay, profile and executable hash checks, before/after filesystem assertions, WSL-host identity and wrong-profile tests, focused independent review.
+- **PARALLELIZATION SAFETY:** Contract/evidence research is independent of TW-07F and TW-05/TW-04A audits. Private CLI implementation must serialize with TW-05/06P edits to shared profile/catalog modules; the reviewed TW-06T injected transport cannot activate production setup before the verified runtime delivery.
+- **POTENTIAL CONFLICTS:** This machine's WSL shell lacked Linux Node at recovery; the earlier offline package test ran in an isolated Node/ext4 environment. Orca packaging and private-source access do not by themselves deliver an installed ticket service.
+
+### TW-M1P-C1 — Replay the complete runtime artifact closure offline
+
+- **STATUS:** Complete within experimental artifact-verification scope. Sol 6.1 xhigh independently approved locally rebuilt four-package closure, signed Node 22.23.3/npm 10.9.9, denied-egress fresh-cache lock/install, honest incomplete scratch CLI output and both scoped guest cleanups. Production delivery decisions remain open.
+- **GOAL:** Prove that locally rebuilt exact-source CLI artifacts run from a complete locked local tarball closure with a verified experimental Node runtime and denied network access.
+- **DEPENDENCIES:** Published clean private `14c69a1`, reviewed profile-delivery candidate, signed Node archive verification, and a task-owned ext4 runner with a working network namespace.
+- **OWNERSHIP:** Continuing Luna artifact-delivery workstream owns source/build/pack preparation and freezes the four-artifact handoff. The existing Luna WSL-verification workstream then owns only a distinct temporary replay root, scripts and evidence; it rehashes frozen inputs without rebuilding, repacking or modifying the producer root. Sol owns shared state and integration. Sol 6.1 xhigh approved this serialized handoff after producer harness errors.
+- **FILES / MODULES LIKELY INVOLVED:** Task-local scripts and archived copies of private package/build inputs. No tracked implementation file changes.
+- **INPUT CONTRACT:** Exact source/tree/lock; experimental Node `22.23.3` with npm `10.9.9`; CLI, contracts, `zod@4.5.4`, and `@noble/hashes@1.8.0` local tarballs. Existing ignored `dist` and historical three-package smoke are insufficient provenance.
+- **OUTPUT CONTRACT:** Pinned source/build/artifact manifest, external keyring commit/hash and signer fingerprint, signed-checksum verification, local-file-only npm lock, empty-cache offline install, and scratch-only read-only CLI smoke evidence.
+- **CONSTRAINTS:** Rebuild only a separate archived source copy; normalize `workspace:*` only in temporary package staging. Verify signature and archive checksum before extraction. Use absolute candidate Node/npm paths and `npm ci --offline --ignore-scripts --no-audit --no-fund --update-notifier=false`. Generate the final lock and install with separate explicitly created empty caches inside a distinct verified network namespace; record owner/non-symlink/empty-inventory evidence and a failed external-connect control. Stop if unavailable; an initial notifier request is not zero-network proof.
+- **DO_NOT_TOUCH:** Tracked source/lockfiles, user config/authority/state, services, Docker, WSL registrations, R4 roots, public fixture bytes, product setup/update/rollback.
+- **ACCEPTANCE CRITERIA:** All four packages resolve through relative local tarballs, fresh cache is empty, install and read-only smoke pass within scratch scope, source/lock/artifact input hashes stay unchanged, and all trust/network controls have evidence.
+- **VERIFICATION:** Sol 6.1 xhigh reviewed source/build/pack provenance, signatures, exact four tarball SHA/SRI values, distinct namespaces/no routes/ENETUNREACH controls, separate empty caches, actual generated lock/install and CLI outputs, unchanged scratch/runtime/input hashes and both cleanup logs. All 99 replay-export and 43 producer-handoff manifest entries match after cleanup. Initial notifier and task-harness failures are preserved; no production selection is inferred.
+- **PARALLELIZATION SAFETY:** Preparation could run beside R4 with separate source/build/cache/output roots. R4 is now complete; the C1 producer must finish and freeze before the continuing WSL worker copies inputs and executes replay. No overlapping writers. Producer and replay together stay within C1's 3 GiB budget; prefer at least 8 GiB free before large writes.
+- **POTENTIAL CONFLICTS:** Native online pnpm CI is not offline npm closure. Candidate Node is not a production selection. This closes no publisher/channel/profile/host-binding/install/update/rollback/service gate.
+
+### TW-00 — Verify the ticket-domain source and publish its contracts
+
+- **STATUS:** Complete within its bounded publication scope. Initial private commit `2045808ffdb6baead2e659855cefb02f7b36491c` (128 files) was fresh-cloned and hash-verified; isolated Linux tests passed 314 with one skipped, plus typecheck. The later snapshot-delivery commit `31b3768e8043b6aeef66f0fe0fe648439ba80b2b` (tree `150b23c5c7380f255c86d229a04e8f97c3366987`; 157 files) is covered by [the published Git-blob manifest](./ticket-published-source.sha256) and passed 51 contract tests plus source/fixture VM replay. Private pin `54477c2371094f1cbc438845fdfde0ca3584e2aa` added the reviewed TW-04A common contract; its contract package passed 53 tests and typecheck. Private `f0b3181` added reviewed injected producer code; `f7d66d1` added its source-local test fixture; `9f10125` isolated a Windows preflight test and passed 250 Windows CLI tests with 41 skipped plus typecheck. Orca PR HEAD `c4e87fa3b` pins `9f10125` and passed 31 checks with eight skipped. Private `8322dbf` added clean-Ubuntu CI: installation, build, typecheck and ext4 checks passed, while the full CLI suite found 12 WSL-assumption test failures. The exact-main `14c69a1` native Ubuntu/ext4 run passed frozen install, build, typecheck, 53 contract tests and 274 CLI tests with 21 skipped; TW-00-R4 later passed genuine WSL test replay with 53 contract and 292 CLI passes, three skips and no failures.
+- **GOAL:** Verify the located WSL ticket checkout's M1 contract, ledger/CAS, doctor/status/plan, and fixture claims against its current source and tests, then make their content provenance portable.
+- **DEPENDENCIES:** None; historical plan and current Orca checkout are inputs.
+- **OWNERSHIP:** Sol Orchestrator for source identification and shared-state update; a fresh Luna worker may perform bounded read-only inventory once the source is identified.
+- **FILES / MODULES LIKELY INVOLVED:** Ticket-domain package/CLI in its own checkout; `docs/ticket-workspace-*` and `docs/contracts/`, `docs/fixtures/` here; these shared-state documents.
+- **INPUT CONTRACT:** Historical M1 checklist was a claim. The recovery baseline was `/home/sellmate/ticket-workspace` on Ubuntu-24.04 at `cf184eaa` with 90 untracked source/test files; published commit `2045808` now captures that content with an updated README.
+- **OUTPUT CONTRACT:** Bounded content manifest **and** retrievable tracked/archived source plus fixtures, verified versus missing M1 slices, portable contract location, and corrected dependencies in shared state. Until the archive/revision exists, a manifest supports only local audit, not fresh-clone allocation.
+- **CONSTRAINTS:** Read-only until ownership and repository boundary are established; preserve user changes and worktree isolation.
+- **DO_NOT_TOUCH:** Ticket product code, external resources, Orca runtime/UI, and unrelated repositories during inventory.
+- **ACCEPTANCE CRITERIA:** Every M1 completion claim needed by TW-02F/TW-02L/TW-04A/TW-05/TW-06T has content provenance and a current test or is explicitly unresolved; fresh workers can access the required source and contracts without depending on the old Luna session.
+- **VERIFICATION:** Fresh clone commit/tree and 128 hashes matched; exact audited source replay passed 32 test files, 314 passed/one skipped, and typecheck under Node 22.23.2/pnpm 12.0.0 in an ext4-backed Linux container. The WSL shell itself lacks Linux Node.
+- **PARALLELIZATION SAFETY:** Safe beside TW-01 while read-only; contract publication must finish before dependent work.
+- **POTENTIAL CONFLICTS:** The source checkout is now clean, but local ignored documents may diverge from the package. The approved seven public contract/fixture files are tracked in Orca; private submodule access and future ticket CI policy remain separate integration constraints.
+
+### TW-00-R1 — Isolate the Windows missing-ledger preflight test
+
+- **STATUS:** The user approved a one-file test correction; continuing Luna implemented it in published private commit `9f10125366f878cab66a9912d6b5b88b8f86c942`, and fresh Sol independently approved the diff. The Windows CLI suite passed 250 tests with 41 skipped, CLI typecheck passed, and the independent preflight run passed 34/34. Orca PR HEAD `c4e87fa3b` pins it and passed 31 checks with eight skipped after a Windows package job rerun. The later exact-main `14c69a1` native-Linux full-suite gate passed; genuine WSL replay remains separate.
+- **GOAL:** Make the missing-ledger classification test independent of the host filesystem and UID while preserving production fail-closed behavior.
+- **DEPENDENCIES:** Published private `f7d66d1`, the reproduced Windows-only test failure, a reviewed one-file fix and explicit user approval.
+- **OWNERSHIP:** Continuing Luna ticket producer workstream, restricted to the private preflight test; Sol owns cross-repository publication and state.
+- **FILES / MODULES LIKELY INVOLVED:** `ticket-workspace/packages/cli/test/ticket-workspace-preflight-v1.test.ts` only.
+- **INPUT CONTRACT:** The test's existing host boundary and injectable authority-ledger discovery; the missing-ledger case expects an absent backup directory.
+- **OUTPUT CONTRACT:** Deterministic absent-discovery result for that case only; unchanged production preflight and all original verdict/reason/no-write assertions.
+- **CONSTRAINTS:** No platform skip, weakened assertion, production behavior change, or alternate schema owner.
+- **DO_NOT_TOUCH:** Private `packages/cli/src/`, other tests, lockfiles, Orca code/UI, active WSL/Docker state.
+- **ACCEPTANCE CRITERIA:** One-file diff; focused Windows preflight and full filtered CLI suite plus CLI typecheck pass; independent review approves. Publication and the later clean native Linux/ext4 replay are complete; genuine WSL replay remains separately tracked.
+- **VERIFICATION:** Worker focused case 1/1, full CLI 250 passed/41 skipped and typecheck; fresh Sol preflight 34/34 and diff review; `git diff --check` passed.
+- **PARALLELIZATION SAFETY:** Test-only path is disjoint from Orca runtime/contract research; serialize private test edits and publication with the current-pin replay baseline.
+- **POTENTIAL CONFLICTS:** The corrected unit test no longer exercises real filesystem discovery; its production fail-closed cases remain in separate tests. Windows inherited dependencies do not prove a clean Linux install or full Linux/ext4 CLI suite.
+
+### TW-00-R2 — Verify a clean native-Linux CLI installation and full suite
+
+- **STATUS:** Complete for clean native Linux. Workflow `verify-linux-cli.yml` was independently reviewed and published at `8322dbf`. Its first run found 12 WSL-assumption test failures; reviewed R3A/R3B corrections at private `14c69a1` closed them. The [exact-main fresh Ubuntu 24.04 run](https://github.com/lighteko/ticket-workspace/actions/runs/36691726008) verified ext4, Node 22.23.2, pnpm 12.0.0, frozen install, build, typecheck, 53/53 contract tests and 274 CLI passes with 21 skips and no failures. Genuine WSL acceptance is separate.
+- **GOAL:** Prove the current private source can be installed and exercised from a clean native Linux/ext4 checkout, with explicit skip and failure counts.
+- **DEPENDENCIES:** The first run used the published TW-00-R1 pin and a fresh hosted runner. Closure depends on TW-00-R3A and TW-00-R3B corrections before rerun.
+- **OWNERSHIP:** Private CI workflow is owned by the M1P delivery workstream; the two test files have separate existing Luna workstream owners. Sol owns integration, publication and evidence claims.
+- **FILES / MODULES LIKELY INVOLVED:** `ticket-workspace/.github/workflows/verify-linux-cli.yml`; two test files specified below. No Orca product code.
+- **INPUT CONTRACT:** Fresh Ubuntu 24.04 VM, Node 22.23.2, pnpm 12.0.0, ext4 checkout and Node temporary path, exact checkout SHA, frozen lockfile.
+- **OUTPUT CONTRACT:** Reproducible build/typecheck/full native-Linux test result. This output does not attest actual WSL, offline Node/npm artifact closure, profile delivery or resident setup.
+- **CONSTRAINTS:** No dependency cache, secrets, submodules, WSL spoofing in CI, production WSL-guard bypass or lockfile policy relaxation.
+- **DO_NOT_TOUCH:** Production CLI/runtime behavior, user's active WSL distro, stopped Docker engine, Orca UI and live ticket seams.
+- **ACCEPTANCE CRITERIA:** Clean frozen install, build and typecheck pass; full native-Linux suite reaches zero failures with reported native and WSL-only skips; a separate genuine WSL run remains required for positive WSL setup flows.
+- **VERIFICATION:** [First CI run](https://github.com/lighteko/ticket-workspace/actions/runs/36680256035) records the 12-test failure baseline. PR [corrected run](https://github.com/lighteko/ticket-workspace/actions/runs/36690932094) passed on a merge ref; [main push run](https://github.com/lighteko/ticket-workspace/actions/runs/36691726008) passed on exact `14c69a1`. Fresh Sol reviewed the integrated diff, assertion correction and promotion.
+- **PARALLELIZATION SAFETY:** R3A/R3B edits are disjoint and may run in parallel; serialize shared local build/test and integrate before the CI rerun.
+- **POTENTIAL CONFLICTS:** Native Ubuntu correctly fails the production WSL kernel gate. A green native run cannot be presented as actual WSL coverage.
+
+### TW-00-R3A — Isolate the SQLite coordination tests' WSL host witness
+
+- **STATUS:** Test-only implementation complete at private `14c69a1` after explicit user approval, fresh Sol review and exact-main native CI. Six coordination cases execute with a narrowly mocked kernel-release read while real SQLite/ext4 remain in use; native host rejection, missing/mismatched distro and missing-root controls passed. Actual WSL host acceptance remains separate.
+- **GOAL:** Exercise real SQLite/ext4 contention and identity behavior on native Linux while separately proving that the real host guard rejects native Ubuntu.
+- **DEPENDENCIES:** TW-00-R2 failure baseline and explicit user approval.
+- **OWNERSHIP:** Existing Luna authority/fence workstream; `ticket-workspace/packages/cli/test/sqlite-process-fence.test.ts` only.
+- **FILES / MODULES LIKELY INVOLVED:** That test file only.
+- **INPUT CONTRACT:** Exact-path test witness for `/proc/sys/kernel/osrelease` in Linux coordination and isolated boundary cases, except the explicit unmocked native-host rejection; real SQLite, statfs and temporary ext4 roots.
+- **OUTPUT CONTRACT:** Coordination cases execute their intended lock behavior; an unmocked native rejection and missing-root assertion cover the distinct fail-closed cases.
+- **CONSTRAINTS:** No production override, broad `/proc` mock, hidden platform skip, altered lock implementation or assertion weakening.
+- **DO_NOT_TOUCH:** Production source, state-root preparation test, workflow, Orca repository files.
+- **ACCEPTANCE CRITERIA:** Six coordination cases pass on native ext4; native forged-WSL descriptor rejects before root creation; missing/mismatched distro and missing-root behavior remain explicit. Real WSL acceptance remains separate.
+- **VERIFICATION:** [Exact-main native CI](https://github.com/lighteko/ticket-workspace/actions/runs/36691726008) passed build, typecheck, real SQLite/ext4 coordination tests and the full suite; fresh Sol reviewed the integrated test diff. The genuine WSL host gate is still separate.
+- **PARALLELIZATION SAFETY:** File ownership is disjoint from R3B; serialize shared build/test execution.
+- **POTENTIAL CONFLICTS:** Mock interception of Node's imported file read must be exact and restored; otherwise prefer a reviewed test-only seam, never a production caller bypass.
+
+### TW-00-R3B — Gate state-root preparation success cases on actual WSL
+
+- **STATUS:** Test-only implementation complete at private `14c69a1` after explicit user approval and independent review. Exact-main native CI passed the new CLI host-rejection/no-write assertion and skipped six genuine-WSL success cases. TW-00-R4 subsequently executed and passed all six cases on the genuine selected WSL host and passed independent completion review.
+- **GOAL:** Retain native preview and negative coverage while running WSL setup and CLI success expectations only on a real WSL host.
+- **DEPENDENCIES:** TW-00-R2 failure baseline and explicit user approval.
+- **OWNERSHIP:** Existing Luna M1P delivery workstream; `ticket-workspace/packages/cli/test/ticket-workspace-state-root-preparation-v1.test.ts` only.
+- **FILES / MODULES LIKELY INVOLVED:** That test file only.
+- **INPUT CONTRACT:** Actual Microsoft kernel signature plus matching WSL distro evidence for six confirmation-dependent cases.
+- **OUTPUT CONTRACT:** Native Linux retains preview/early rejection cases and asserts child CLI blocks forged WSL_DISTRO_NAME without creating state root; six positive cases run on genuine WSL.
+- **CONSTRAINTS:** No production host-guard bypass, injected child-CLI backdoor, broad file skip or assertion weakening.
+- **DO_NOT_TOUCH:** Production source, SQLite fence test, workflow, Orca repository files.
+- **ACCEPTANCE CRITERIA:** Native job has no false WSL-positive expectation; positive preparation and CLI cases execute on genuine WSL; production default still fails closed on native Linux.
+- **VERIFICATION:** Exact-main native CI passed build, typecheck and the full suite with six WSL preparation success cases skipped; fresh Sol reviewed the combined diff and CLI assertion correction. TW-00-R4 subsequently executed all six cases in its isolated temporary-root WSL run; Sol 6.1 xhigh independently approved that evidence.
+- **PARALLELIZATION SAFETY:** File ownership is disjoint from R3A; serialize shared build/test execution.
+- **POTENTIAL CONFLICTS:** Checking only `process.platform` or setting WSL_DISTRO_NAME is insufficient; a native green job does not verify successful real WSL confirmation.
+
+### TW-00-R4 — Replay the exact source on genuine WSL
+
+- **STATUS:** Complete within test-replay scope; Sol 6.1 xhigh independently approved the exported evidence. Contracts passed 53; CLI passed 292 with three skips and no failures. All ten named WSL cases passed. Task-only tool-shim correction resolved an initial invocation failure; original source stayed clean and the guest root was removed after scoped verification.
+- **GOAL:** Execute the ten genuine-WSL-gated cases and the full pinned suite without changing user state or production host checks.
+- **DEPENDENCIES:** Reviewed R3A/R3B at private `14c69a1`; verified Node `22.23.2`, pnpm `12.0.0`; explicitly selected already-running `Ubuntu-24.04` WSL2.
+- **OWNERSHIP:** Continuing Luna WSL-verification workstream owns only unique host temporary inputs/logs and `/tmp/tw-00-r4.*` guest roots; Sol owns global state.
+- **FILES / MODULES LIKELY INVOLVED:** Task-local harness and archived private source/test/build inputs. No tracked implementation edits.
+- **INPUT CONTRACT:** Controlled Windows Git archive of private `14c69a1`, tree `097f942cb0db231593710dcde883e102d04ca3f5`, archive SHA-256 `ac1ac9c8f9723f87cd54b4209ff1c4244027a26ca3e469740fbe6f68e80c9483`. Independent comparison covered all 185 files: eight LF-protected fixture/artifact members were byte-exact; 177 differed only by CRLF export representation. Natural distro/kernel, Ubuntu 24.04, UID 1000 and ext4 were recorded; no raw Git-byte identity across line-ending forms is claimed.
+- **OUTPUT CONTRACT:** Frozen install/build/typecheck/full-suite logs, actual pass/skip/failure counts, explicit passes for six preparation and four CLI WSL cases, before/after input hashes and clean source status.
+- **CONSTRAINTS:** Use explicit distro/user and `--exec`, clean isolated HOME/XDG/TMP/tool caches and restricted Linux PATH. Verify signed Node checksums from a pinned external release keyring before extraction. Task roots must be canonical, owned, non-symlink and mode 0700. Refresh running inventory before entry; do not claim an atomic no-start guarantee.
+- **DO_NOT_TOUCH:** User config/authority/state, services/Docker, WSL registration/start-stop operations, tracked source/lockfiles, M1P-C1 roots. Fixture authority/state operations must remain under the test temporary roots.
+- **ACCEPTANCE CRITERIA:** Zero failures; all ten named WSL cases execute and pass; no spoofed distro/kernel witness; isolated filesystem effects and exact-source provenance verified. Other skips and counts are reported honestly.
+- **VERIFICATION:** Frozen install/build/typecheck/full-suite logs, ten individual passes, unchanged host/guest input hashes and private source status, verified Node signature, and canonical-owned-root cleanup passed independent completion review. Three skips were two native-Linux rejection cases and one root-UID-only ownership case. SQLite coordination still uses its test kernel mock and is not independent real-host evidence.
+- **PARALLELIZATION SAFETY:** Safe beside M1P-C1 with disjoint roots/caches/builds and the shared disk-budget precheck; no shared artifact mutation.
+- **POTENTIAL CONFLICTS:** Only the user's active `Ubuntu-24.04` is available; this is temporary-filesystem isolation in that selected running guest, not a disposable guest. VHDX may grow. The inventory-to-entry race prevents an absolute no-start claim. Production host identity, setup and service acceptance remain separate.
+
+### TW-00C — Deliver the ticket-owned semantic contract to Orca
+
+- **STATUS:** Private preparation passed fresh Sol review at `31b3768`. The user approved the exact derived 18,108-byte archive and six fixture files; Orca has their byte-exact copy, local `file:` devDependency and CI fixture replay. Local hash, TypeScript, Node/browser VM, code-quality, independent code/shared-state review and PR #1 CI at `cde43160f` passed. Actual Orca main/preload integration later passed separately in TW-06F. The source pin `d27fe24` also produced an earlier private 17,941-byte archive (SHA-256 `d88d083399865def40f2181da0c81e8fe0616f69b82bde62a1f2f5002ace723b`) that remains historical; the approved bytes are [pinned separately](./public-redistribution-proposal.md).
+- **GOAL:** Make the canonical ticket `WorkspaceRefV1` and navigator snapshot types, runtime semantic validator, and corpus reproducibly consumable by Orca main and sandboxed preload without a handwritten second schema owner.
+- **DEPENDENCIES:** TW-00 published the pinned private source and corpus. The user approved the exact public distribution scope and local `file:` delivery channel; its public PR CI verification passed.
+- **OWNERSHIP:** Ticket-contract worker owns source-derived build/artifact generation; Orca integration worker owns consumption and CI wiring after one reviewed artifact contract. Sol Orchestrator prepares the scoped distribution decision for user approval and owns the resulting cross-repository pin.
+- **FILES / MODULES LIKELY INVOLVED:** Private `packages/contracts` exports/generator/tests; Orca contract artifact/verification, package or bundler wiring, main/preload boundary tests, public PR CI configuration.
+- **INPUT CONTRACT:** Pinned ticket commit and full semantic rules, including duplicate identities, SSH presentation, canonical UTF-8 cap, and snapshot digest. The current generated JSON Schema alone is insufficient.
+- **OUTPUT CONTRACT:** A source-pinned, digest-verified runtime contract consumable by Orca main and sandboxed preload. The representative preload-shaped artifact harness and later TW-06F actual main/preload bundle parity both passed.
+- **CONSTRAINTS:** Public Orca PR CI cannot require private submodule credentials. The narrow `/navigator-snapshot-v1` entry avoids Node builtins and excludes the broader `/v1` closure, but the full package root still reaches Node imports. Orca must use the accepted narrow entry and validate its actual preload bundle. Only the seven exact approved public files may be copied under this decision.
+- **DO_NOT_TOUCH:** Ticket CLI lifecycle, external effects, renderer UI, or private protocol bytes outside the exact approved scope.
+- **ACCEPTANCE CRITERIA:** Reproducible source/digest pin, full corpus parity in a Node/main-shaped harness and representative sandboxed-preload-shaped harness, fail-closed unknown version/digest, and untrusted public PR CI that does not expose private credentials. Document exactly which contract bytes are public. Integrated Orca preload parity subsequently passed in TW-06F.
+- **VERIFICATION:** Source-to-artifact reproducibility check, Node and representative preload-shaped bundle/corpus tests, public-CI-safe replay, changed-code quality, and independent privacy/semantic review.
+- **PARALLELIZATION SAFETY:** The accepted archive and fixture replay are delivered. TW-02F runtime mapping and TW-06F main/preload fixture presentation may proceed in parallel under the frozen input/output boundary below; neither edits the seven pinned files or the other's modules. Their renderer/navigation join is serial in TW-07F.
+- **POTENTIAL CONFLICTS:** A private package link would break ordinary public PR CI without scoped access; generated JSON Schema misses runtime checks; a public vendored artifact needs a distribution decision.
+
+### TW-00N — Build and test a source-owned snapshot-only artifact (optional narrow route)
+
+- **STATUS:** Complete as a **private technical candidate** at `ec2dc6739a65cb882067929ed6d6fcb9bb7df438`; fresh Sol review APPROVE after an SSH metadata correction. The clean source passed 51/51 contract tests, typecheck/build, and targeted lint. The 22-case snapshot corpus adds four duplicate-ID/SSH rejection cases; generic and narrow Node/browser-preload-shape verdict/admission results match. Multibyte raw snapshots pass exact 2 MiB/+1 boundary tests. The 25-file candidate is 68,462 expanded / 14,364 packed bytes versus 102 files / 643,839 expanded / 71,550 packed bytes for the same-commit full package. Manifest SHA-256 `747b2bd05a688af6acd455b4d7de8797b499bd11fa2f79f869ea565aaade54dd`; tarball SHA-256 `dd4a6bc8a32183b23efaaaf68b974efbcc933d0a12338d8ef1f218144febf1dd`. Two clean-pin stage/pack runs matched. The artifact remains private and unapproved for public redistribution; actual Orca main/preload integration is outside this task.
+- **GOAL:** Determine by implementation and parity tests whether a smaller source-owned package can supply `WorkspaceRefV1`, `TicketNavigatorSnapshotV1`, complete snapshot semantic validation and bounded fixture corpus without the wider `/v1` closure.
+- **DEPENDENCIES:** TW-00 pinned private source and user approval for this bounded private implementation were satisfied. The reviewed candidate is TW-00C's narrow delivery input; full-v1 remains the fallback. TW-00F boundary delivery still follows the accepted contract artifact.
+- **OWNERSHIP:** Continue the same Luna xhigh contract/fixture workstream; one owner for private contract source and selective pack generation. Sol owns cross-repository sequencing and user approval routing.
+- **FILES / MODULES LIKELY INVOLVED:** Private `packages/contracts/src/ticket-contract-validator-v1.ts`, `ticket-contract-admission-v1.ts`, `ticket-workspace-common-v1.ts`, navigator/canonical modules, source-owned narrow entry, selective schema/artifact generator and package generator, snapshot corpus and focused tests. No Orca product-code edits in this task.
+- **INPUT CONTRACT:** Pinned full `/v1` semantic validator; 18 snapshot/raw/generator cases in the 48-case schema corpus, relevant adversarial and exact-byte tests; public CI must later consume pinned bytes without private credentials.
+- **OUTPUT CONTRACT:** A deterministic, private snapshot-only artifact with exact file/byte manifest and new private source pin, plus measured runtime closure and comparative Node/sandboxed-preload parity. It is a candidate for review, not public distribution.
+- **CONSTRAINTS:** Extract/delegate snapshot validation and admission from the existing source owner; split common declarations so the narrow type surface does not expose unrelated schemas, while existing `/v1` APIs re-export/delegate the same definitions. Do not create a second handwritten Orca schema. Preserve duplicate ticket/repository checks, SSH coordinator/workspace rejection, canonical digest, multibyte UTF-8/2 MiB limits, malformed/version/limit reason order and fixture-only non-authority. Keep existing `/v1` behavior compatible.
+- **DO_NOT_TOUCH:** Public Orca artifact/package/lockfile, CLI ledger/storage, resource adapters, runtime/UI, live producer/transport and external resources.
+- **ACCEPTANCE CRITERIA:** Static/runtime and declaration surfaces exclude catalog, resource, config and plan modules; measured package is actually smaller in disclosed bytes/surface. Source-owned corpus adds rejected snapshot duplicate-ID and SSH mismatch cases and preserves relevant old cases; exact 2 MiB/+1 and semantic verdicts match the pinned generic validator. A selective artifact generator emits only the approved snapshot schemas and metadata. Existing full contract suite does not regress. No `clear` or mutation authority is inferred.
+- **VERIFICATION:** Full private contract suite/typecheck/build, source-to-artifact deterministic pack/digest, old-vs-new snapshot verdict matrix, Node and sandboxed-preload corpus parity without Node globals, package import-closure audit, fresh Sol semantic/privacy review.
+- **PARALLELIZATION SAFETY:** Serial in the continuing contract/fixture session with TW-00C source/package edits. TW-02F and TW-06F now have the accepted delivery artifact; independent implementation allocations follow their frozen interface and approval gate.
+- **POTENTIAL CONFLICTS:** The earlier generic validator/admission/corpus runner imported catalog/resource code. TW-00N extracted snapshot-owned paths and passed focused contract/parity review, but downstream CLI and actual Orca integration have not been fully replayed. Filtering JSON or adding a thin export alone would not have shrunk the closure.
+
+### TW-00F — Recover and deliver the M4/M5 fixture boundary inputs
+
+- **STATUS:** Private fixture reconciliation passed fresh Sol review at `31b3768`; six exact fixture/replay files are now copied under the user's public approval. Local replay, independent code review and PR #1 CI at `cde43160f` passed. The historical 37-case corpus is pinned at SHA-256 `52a68df5b76692bcfae3561e3f8b7d58133d924d955a2fd569675fe8b49663`, and replay checks its exact ordered IDs. The fixture boundary uses the ticket-owned semantic validator, explicit `fixture` provenance and separate `orcaMatch: not-evaluated`; 15 source semantic, two fixture wire and 11 envelope historical claims have executable replacements. Nine live producer/cache rows and three live freshness assertions are deferred to TW-06P/T. M5 action hiding later passed in TW-07F. No fixture asserts live `current`, mutation or public `clear`.
+- **GOAL:** Make the original fixture IPC contract and corpus reproducible for a fresh worker and public Orca CI under an approved distribution scope.
+- **DEPENDENCIES:** TW-00's pinned ticket source and TW-00C's exact runtime-validation artifact; the approved public copy passed integration and public PR CI verification.
+- **OWNERSHIP:** The same Luna contract/fixture workstream that owns TW-00C performs bounded audit and candidate preparation; Sol Orchestrator prepares the public distribution decision for user approval and owns the resulting pin.
+- **FILES / MODULES LIKELY INVOLVED:** The three locally ignored M4/M5 inputs above, private ticket contract/corpus source, and the approved Orca artifact/CI location.
+- **INPUT CONTRACT:** The original fixture M4/M5 acceptance criteria, pinned private snapshot corpus and semantic validator, and existing ignored IPC proposal as unverified historical evidence.
+- **OUTPUT CONTRACT:** Reviewed, source-pinned fixture IPC wire/renderer contract and corpus that a fresh clone and ordinary public PR CI can consume without private credentials; exact public bytes and provenance documented.
+- **CONSTRAINTS:** Reconcile the ignored proposal's generated-Zod-only language with the full ticket-owned runtime validator, immutable snapshot digest, and separate Orca match result. Do not copy private protocol bytes outside the user's exact scoped decision.
+- **DO_NOT_TOUCH:** Live producer/transport, renderer, mutation authority, and unrelated ignored notes.
+- **ACCEPTANCE CRITERIA:** Fresh-clone reproducibility, full semantic corpus parity, bounded fixture provenance, public-CI-safe delivery, and explicit review of exposed bytes. Unknown or stale contract versions fail closed.
+- **VERIFICATION:** Hash/source comparison, private/public artifact review, fresh-clone fixture replay and CI wiring check, independent semantic/privacy review.
+- **PARALLELIZATION SAFETY:** Serial after the TW-00C candidate review within the same contract/fixture Luna session. It may overlap only with unrelated workstreams in disjoint files; artifact/publication and shared package edits remain serial.
+- **POTENTIAL CONFLICTS:** Ignored IPC files may be stale and contain private contract data; public Orca CI cannot fetch the private submodule.
+
+### TW-01 — Add owner freshness to internal local-native Git capture
+
+- **GOAL:** Give each exact local-native status/marker capture a unique owner observation ID, immutable start time, same-owner monotonic freshness, and an overall 30-second deadline.
+- **DEPENDENCIES:** Verified M0 binding, effective-subject attestation, status-record capture, and marker reader already at `d500f2d47`.
+- **OWNERSHIP:** One fresh Luna xhigh worker owns the Orca runtime capture seam and its tests.
+- **FILES / MODULES LIKELY INVOLVED:** `src/main/runtime/runtime-git-status-record-capture.ts`, its tests, `orca-runtime-file-commands.ts`; existing Git capture types only if required.
+- **INPUT CONTRACT:** Exact `ExactLocalNativeGitWorktreeBinding`; current native status/marker owner APIs and abort signal. No ticket `WorkspaceRef` is supplied.
+- **OUTPUT CONTRACT:** Internal owner-created observation identity/start time bound to the existing exact capture; unavailable on cancellation, timeout, stale/future result, or clock anomaly.
+- **CONSTRAINTS:** Stamp once before the first status/marker I/O; every admitted invocation gets its own uncached, non-coalesced read; overlapping calls may fail unavailable while a single owner slot is occupied. Keep child/probe slots until settlement and use one owner clock.
+- **DO_NOT_TOUCH:** Ticket schema/CLI/provider, IPC/preload/renderer, WSL/SSH/folder evidence, public `clear`, external resources.
+- **ACCEPTANCE CRITERIA:** Distinct IDs and reads for each admitted capture, with no evidence reuse for overlapping calls; no adapter receipt-time refresh; 30-second admission/deadline; conservative failure; existing capture behavior preserved.
+- **VERIFICATION:** Focused timing, concurrent UI/plan, abort/timeout settlement, stale/future/clock-anomaly tests; Node typecheck and changed-code quality; fresh Sol xhigh review. Windows operation-marker native integration remains CI-owned until separately rerun locally; the C++ toolset is now available.
+- **PARALLELIZATION SAFETY:** Serial within this seam; safe beside read-only TW-00. Do not assign another worker to its runtime files.
+- **POTENTIAL CONFLICTS:** Binding/attestation already use shorter deadlines and single-slot ownership; avoid a second timeout that releases work early.
+
+### TW-02F — Bind fixture ticket `WorkspaceRef` to the exact Orca owner tuple
+
+- **STATUS:** Implemented and approved by separate and integrated Sol review; fixture-only binding does not satisfy TW-02L live evidence.
+- **GOAL:** Implement a pure ticket-to-Orca five-field mapping and a separate asynchronous exact local-native owner match for an injected validated fixture snapshot. Live ticket-source admission and Git evidence are later slices.
+- **DEPENDENCIES:** TW-00C/F delivered the canonical snapshot contract/fixture; TW-01 and M0 established internal owner evidence and identity rules. TW-06P/T live producer/transport are not prerequisites for fixture mapping.
+- **OWNERSHIP:** One continuing Luna owner-mapping workstream, exclusive to new Orca runtime selection/binding modules and focused tests. TW-06F owns the main fixture service, canonical snapshot accessor, shared IPC/preload registration and renderer projection; TW-07F wires their navigation join after both.
+- **FILES / MODULES LIKELY INVOLVED:** New `src/main/runtime/` ticket selection/binding modules and tests; read existing `runtime-worktree-catalog-binding.ts`, `worktree-catalog-binding-types.ts`, and the delivered narrow contract exports. Do not modify the ticket source or shared IPC/preload files in this packet.
+- **INPUT CONTRACT:** One injected `TicketNavigatorSnapshotV1` accepted by the delivered full semantic validator, selected `ticketKey` and `repositoryId`, and a schema-v1 local `git-worktree` target. Require `repositoryId === target.repoId`; map only `{ repositoryId, worktreeId, executionHostId, instanceId, identityKey }` into the existing Orca binder. Click-time requests contain only `{ snapshotRevision, ticketKey, repositoryId }`; main reloads its own validated fixture snapshot through TW-06F's injected accessor and checks the revision before rebinding. Renderer input never supplies a snapshot, ref or worktree ID.
+- **OUTPUT CONTRACT:** Pure mapping attempt or unavailable, then a separate Orca-owned `matched` / `unavailable` result tied to `snapshotRevision`, `ticketKey`, and `repositoryId`. Keep the binding token, target path and registration evidence in main. A click-time main-side rebind may yield only the freshly attested existing Orca worktree ID to the established navigation path; never take that ID directly from ticket input. No live currentness, Git cleanliness or public `clear` verdict.
+- **CONSTRAINTS:** Folder, WSL, SSH, paired, duplicate, cross-repository mismatch and legacy-ambiguous refs fail closed for this local-native slice. A stale fixture match means an Orca binding or selected `snapshotRevision` changed; do not compare the historical fixture's `generatedAt`/`staleAfter` to Orca wall time or relabel it live. Ticket authority host never implies the Orca execution host. The existing Orca worktree ID encodes a path, so it may cross only the established Orca navigation seam after fresh owner attestation, not the targetless TW-06F presentation DTO.
+- **DO_NOT_TOUCH:** Seven approved public files, ticket schema/source, TW-06F fixture main/IPC/preload/projection, renderer, agent-status store, worktree lifecycle, external adapters, live transport and effect paths.
+- **ACCEPTANCE CRITERIA:** Accepted `snapshot.full` renders but fails owner matching because `repositoryId: common-api` differs from `target.repoId: repo-1`; add a separate Orca-owned positive synthetic vector with recomputed canonical digest. Same path with changed `snapshotRevision`, instance, host, store incarnation/revision, route or target cannot inherit a match. Rebind at navigation click; no cached prior match authorizes activation. Owner catalog tokens and TW-01 stamps remain internal.
+- **VERIFICATION:** Focused pure mapping, mismatch/positive-vector, ABA/host isolation, selector-only click request and click-time rebind tests; changed-code quality, typecheck and independent semantic review.
+- **PARALLELIZATION SAFETY:** Safe beside TW-06F with exclusive runtime file ownership and the frozen canonical input/separate output contract. TW-07F performs the shared renderer/IPC navigation join serially after both results land.
+- **POTENTIAL CONFLICTS:** The delivered package supplies the ticket snapshot contract but no validated live ticket-to-owner transport. Do not add a duplicate serialized schema owner or treat fixture matching as live source currentness.
+
+### TW-02L — Compose authenticated live ticket-to-Orca owner evidence
+
+- **STATUS:** The 2026-10-01 Sol 6.1 review approved TW-02L-I injected composition against the frozen same-read P4/P5 target-suppression policy and TW-06 admitted source port. Actual production owner activation remains open; retained refs without admitted eligibility cannot authorize a match.
+- **GOAL:** Reuse TW-02F's exact mapper/binder for an authenticated current ticket source and TW-01 owner capture, with source-currentness checks around asynchronous reads.
+- **DEPENDENCIES:** TW-02F accepted, TW-06-B1/shared source port and the frozen P4/P5/P3/P6 admission interface permit TW-02L-I injected implementation. Actual production activation additionally requires TW-06-I durable/currentness construction and TW-06P/T service, endpoint, key and host proofs; fixture completion is not live evidence.
+- **OWNERSHIP:** The continuing Luna owner-mapping workstream with Sol integration review; coordinate the shared live ingress with the TW-06 transport owner serially after protocol freeze.
+- **FILES / MODULES LIKELY INVOLVED:** Orca main runtime owner composition, TW-01 capture integration, resident ticket ingress adapter and focused source-currentness tests.
+- **INPUT CONTRACT:** Authenticated current-source callback bound to the same lease/incarnation, full profile, authority, epoch and host on each read; reviewed source-clock/currentness and catalog-derived pruning eligibility, exact selected source tuple/ref, TW-02F five-field mapper/binder and TW-01 owner capture.
+- **OUTPUT CONTRACT:** Separate Orca-owned live match and invocation-bound Git evidence with explicit unavailable where source facts, target binding, completeness or freshness fail. No public `clear` until every other owner observation is joined in TW-03.
+- **CONSTRAINTS:** No WSL/CLI start on read; no producer `referenceState` promoted to Orca match; no cross-host wall-clock inference; same source facts must survive pre/post attestation and capture. SSH/paired/folder targets stay unavailable until separately proven.
+- **DO_NOT_TOUCH:** Ticket canonical ledger/schema, renderer state owner, effect paths and external-resource adapters.
+- **ACCEPTANCE CRITERIA:** An outer monotonic deadline and abort begin before the first source read and include binder/capture. Authenticated source-currentness and exact profile/source-facts/selected ticket/ref rechecks bracket asynchronous work under one lease; both live match and click reject catalog-pruning/pruned and excluded targets through the frozen source-bound eligibility signal. A refreshed `generatedAt`/`staleAfter` may change later `snapshotRevision` without changing owner facts, while the match stays tied to the original snapshot revision. Rechecks establish an invocation-bound observation, not atomicity after the final read or action authority. Changed/partial/unreachable source yields unavailable; TW-01 status/marker completeness is checked separately before any downstream `clear`, and callers cannot supply or refresh its observation ID/read-start time.
+- **VERIFICATION:** Mixed-version transport/source tests, ABA/host/clock/timeout/partial-failure matrix, TW-01 capture integration, typecheck and independent semantic review.
+- **PARALLELIZATION SAFETY:** Serial at the TW-06 live ingress and shared owner composition after protocol freeze; disjoint provider/adapter research may overlap without editing the same interface.
+- **POTENTIAL CONFLICTS:** TW-06P/T protocol, source-currentness and cross-process clock handoff remain open. A fixture `matched` result cannot be promoted to live evidence.
+
+### TW-03 — Compose read-only production plan evidence
+
+- **GOAL:** Join exact worktree, agent, test/lease, ownership, and external-resource owner observations into conservative ticket plan projection.
+- **DEPENDENCIES:** TW-02L authenticated live owner evidence; TW-04R read-only external-resource inspection; exact agent host/workspace association and complete host-store read; test-lease ledger/adapter scope and semantics; ticket ownership and host proof; source-owned freshness and validated cross-clock handoff. These gate complete positive evidence, not partial read-only display. TW-02F fixture matching alone is insufficient for live evidence; TW-05G effect authority is not a read-side dependency.
+- **OWNERSHIP:** Ticket-domain provider worker after owner-source contracts are frozen; Orca owner adapters separately reviewed.
+- **FILES / MODULES LIKELY INVOLVED:** Ticket-domain plan evidence provider/CLI; Orca execution-host status store and observation ports.
+- **INPUT CONTRACT:** One invocation-bound, source-owned observation per required authority, with target identity, completeness, provenance, and clock handoff.
+- **OUTPUT CONTRACT:** Versioned read-only `plan` evidence and blocker projection; incomplete/unverifiable where any required proof is missing.
+- **CONSTRAINTS:** Positive blockers may be conservative; empty Git status and marker absence alone never yield `clear`; no WSL/Windows wall-clock equivalence assumption.
+- **DO_NOT_TOUCH:** Parallel agent-status store, cached clear result, resource mutations, public `clear` before every source contract is proven.
+- **ACCEPTANCE CRITERIA:** All six required observations attest their exact subject and source owner, complete negative coverage, and owner-clock freshness before any public `clear`. Four `clear` rows plus reachable host and matching ownership pass today's structural admission without those proofs, so the provider must not promote them. Missing, partial, stale, or older-peer evidence fails closed as `unverifiable`; current CLI remains `incomplete` without a provider.
+- **VERIFICATION:** Cross-source fixture matrix, clock/cancel/partial-failure tests, provider contract and independent integration review.
+- **PARALLELIZATION SAFETY:** Owner-source research can be parallel by authority; final composition is serial after contracts stabilize.
+- **POTENTIAL CONFLICTS:** Exact agent status, test lease, ownership, external universe, WSL route, and clock handoff remain unresolved.
+
+### TW-04A — Freeze external-resource adapter contracts and fixtures
+
+- **STATUS:** Common versioned universe DTO, validator, generated artifact, and 50-case synthetic corpus implemented in private source `54477c2` and approved by independent Sol review. Docker/IIS production pairs remain gated on owner evidence; no production adapter or effect is implemented.
+- **GOAL:** Define `discover/plan/provision/inspect/teardown`, resource ownership, evidence, preview, and retry semantics before effects.
+- **DEPENDENCIES:** TW-00 verifies canonical schema/CAS and contract repository.
+- **OWNERSHIP:** Fresh Luna worker in the ticket-domain repository; no Orca runtime edits.
+- **FILES / MODULES LIKELY INVOLVED:** Current canonical ticket `/v1` resource envelope as migration input; a separate versioned universe DTO, generated artifact, and synthetic corpus. Typed Docker/IIS intent and observation variants follow only after owner-ratified identities and routes; dev server and test lease remain later resource families.
+- **INPUT CONTRACT:** Ticket authority/epoch/revision, repository role, execution domain, target-bound resource identity, and reviewed adapter discriminator/host/evidence semantics. The current `/v1` catalog is generic; the older default export is not its schema source.
+- **OUTPUT CONTRACT:** A strict versioned universe DTO and synthetic corpus with partial-failure, owner/host, clock, and complete-query semantics while preserving generic `/v1` rows. Typed production adapter variants remain an explicitly unavailable output until the relevant owner evidence is ratified.
+- **CONSTRAINTS:** `referenced` repositories remain read-only; effects belong only to `isolated` resources; Orca receipts cannot stand in for external evidence.
+- **DO_NOT_TOUCH:** Live Docker/IIS resources, Orca worktree mutations, renderer actions.
+- **ACCEPTANCE CRITERIA:** Preserve generic `/v1` rows and ratify catalog v2 before structured typed production rows. The common universe DTO and synthetic fixtures fail closed on incomplete scope, missing route/owner/clock proof, permission gaps, and stale capture. Any Docker/IIS typed intent, observation, or positive production fixture additionally requires owner-ratified discriminator, physical identity, ownership, query scope, and clock handoff; absent evidence leaves that adapter unsupported and TW-04B blocked.
+- **VERIFICATION:** Contract tests and failure fixtures; cross-platform/host-domain review.
+- **PARALLELIZATION SAFETY:** The reviewed design was safe beside TW-00C package preparation in separate docs. Contract-package implementation must be serial with TW-00C package edits because both own `packages/contracts`; TW-04B remains downstream.
+- **POTENTIAL CONFLICTS:** Shared role/schema fields and resource-universe semantics affect TW-03 and TW-04B. The older package default model has incompatible typed Docker/IIS contracts; copying it would create a second authority.
+
+### TW-04R — Collect read-only external-resource evidence
+
+- **STATUS:** Required capability separated by Astra audit; NEEDS_OWNER_EVIDENCE/PACKET for each resource family. No collector implementation is authorized by this definition alone.
+- **GOAL:** Return authenticated scoped `discover/inspect` observations without provisioning, teardown or effect authority.
+- **DEPENDENCIES:** TW-04A common read-side contract; owner-ratified endpoint/route, identity, ownership, complete scope and clock handoff for the selected family. Typed persisted catalog changes need their own compatibility contract. No TW-05G dependency.
+- **OWNERSHIP:** One private adapter owner per resource family; shared typed schema has one owner.
+- **FILES / MODULES LIKELY INVOLVED:** Private read-side observation modules and focused fixtures; reuse the common universe validator and existing authority readers.
+- **INPUT CONTRACT:** Exact ticket/repository/host subject, trusted adapter identity/query scope and source-owned read start; no mutation token.
+- **OUTPUT CONTRACT:** Proven present/absent/unverifiable read-side evidence; unavailable where identity, scope or freshness is missing.
+- **CONSTRAINTS:** No read-triggered resource/WSL start, inferred owner, incomplete negative census or wall-clock equivalence. Inspection never grants effect authority.
+- **DO_NOT_TOUCH:** Live mutation, provision/teardown, effect gateway, Orca lifecycle/status, user config or unreviewed schema migration.
+- **ACCEPTANCE CRITERIA:** Foreign/shared collisions and partial/failed reads remain unavailable; exact complete negative scope can establish absence; no fabricated `clear` or state changes.
+- **VERIFICATION:** Family-specific fixtures/fault tests and source-contract review; real read-only evidence follows the existing authorized scope. New operational changes or actual credential/security choices require root-routed approval, not each read-only investigation.
+- **PARALLELIZATION SAFETY:** Docker and IIS may separate after their contracts and schema boundaries freeze; provider composition remains serial.
+- **POTENTIAL CONFLICTS:** Shared catalog typing and clock/route evidence; production owner inputs are still unresolved.
+
+### TW-04B — Execute external-resource effects under the root gateway
+
+- **GOAL:** Provision, reconcile and prune only ticket-owned external resources under explicit user confirmation, consuming independently collected read-side evidence; prepare role receipts for later Orca-action convergence.
+- **DEPENDENCIES:** TW-04A and TW-05G; TW-00 verified ledger CAS, while the target-bound external-action preview/token contract must be frozen through TW-04A/TW-05G before effects. The pinned source does not yet implement mutation commands.
+- **OWNERSHIP:** Ticket-domain adapter worker with one resource family at a time unless interfaces and files are isolated.
+- **FILES / MODULES LIKELY INVOLVED:** Adapter implementations, ledger evidence/CAS, role transition commands, platform scripts.
+- **INPUT CONTRACT:** One-use target-bound plan token, attested root Run and binding fence, confirmed target/current ledger revision, and adapter-specific resource evidence. Read-only `plan` observations never grant mutation authority.
+- **OUTPUT CONTRACT:** Idempotent stage receipts and independent external-resource verdicts; safe recovery after partial/unknown effects.
+- **CONSTRAINTS:** Reverse dependency cleanup, no deletion of unowned resources, no focus theft, no WSL auto-start by read-only checks.
+- **DO_NOT_TOUCH:** Orca-owned worktree/agent/terminal lifecycles and unrelated user resources.
+- **ACCEPTANCE CRITERIA:** Failure injection and retry preserve branches, documents, and ownership; external adapter stages are independently observable and recoverable. Full role convergence remains TW-04C.
+- **VERIFICATION:** Adapter unit/fault tests and isolated integration fixtures before live pilot.
+- **PARALLELIZATION SAFETY:** Resource families may split only after TW-04A freezes interfaces; shared ledger commands remain single-owner.
+- **POTENTIAL CONFLICTS:** Docker/IIS execution domains may differ from repository host; lease state and auth provider contracts remain open.
+
+### TW-04C — Integrate repository-role convergence
+
+- **GOAL:** Join ticket role/CAS transitions, external adapter stages, and Orca workspace actions without treating one authority's receipt as another's success.
+- **DEPENDENCIES:** TW-04B and TW-08.
+- **OWNERSHIP:** One ticket-domain integration worker with Orca action seam frozen by the Orchestrator.
+- **FILES / MODULES LIKELY INVOLVED:** Ticket-domain role convergence/CAS commands, external stage evidence, Orca action receipt consumer.
+- **INPUT CONTRACT:** Target-bound confirmed transition, current ledger revision, root gateway authority, adapter evidence, and Orca mutation receipts/read-back.
+- **OUTPUT CONTRACT:** Durable role state with independently verified Orca and external outcomes, including `requires_orca_action` or unverifiable recovery state.
+- **CONSTRAINTS:** No effect inferred from a read-only plan, missing receipt, contact loss, or another authority's success.
+- **DO_NOT_TOUCH:** Orca lifecycle implementation or renderer as a second state owner.
+- **ACCEPTANCE CRITERIA:** Partial Orca/external failure can be retried without duplicate effects or false convergence; excluded/referenced roles retain their safety boundaries.
+- **VERIFICATION:** Cross-authority failure/replay tests and independent integration review.
+- **PARALLELIZATION SAFETY:** Serial after both action and adapter contracts stabilize.
+- **POTENTIAL CONFLICTS:** Ticket CAS revision races and independent cleanup/read-back verdicts.
+
+### TW-05 — Coordinator folder and local artifacts
+
+- **STATUS:** Folder/artifact/enrollment decision draft passed independent review. No production creation, publication, or enrollment code exists. Folder host/storage identity, document allowlist, migration only for a nonempty opaque legacy artifact pointer, strict Run caller attestation, and compatible catalog versioning are implementation gates.
+- **GOAL:** Create the ticket coordinator folder/document lifecycle using the existing Orca Run root agent.
+- **DEPENDENCIES:** TW-00 published the catalog schema; M0 Run ownership. TW-05 must first freeze coordinator artifact/document, enrollment, and root-authority handoff contracts; the published source has only shallow coordinator and artifact references.
+- **OWNERSHIP:** Ticket-domain worker for catalog/artifacts; Orca changes only through an agreed seam.
+- **FILES / MODULES LIKELY INVOLVED:** Ticket-domain coordinator folder, artifact revision/retention, first-run enrollment; Orca `Repo(kind: 'folder')` registration/read-back seam if selected.
+- **INPUT CONTRACT:** Validated ticket identity, explicit user choice, and a newly specified strict Orca caller/root attestation seam. Existing `runCreate`/`runUse` can fall back to a request-supplied terminal `from` handle when evidence is absent, then resolve its pane.
+- **OUTPUT CONTRACT:** Durable folder/document references and recoverable ticket-to-Run correlation. A complete host-qualified folder identity must be proven; current `folderWorkspace.create` does not always populate a host stamp.
+- **CONSTRAINTS:** External ticket process never impersonates a coordinator; enrollment failure after Run creation must preserve and retry safely.
+- **DO_NOT_TOUCH:** Orca agent-status or terminal ownership, unrelated workspace focus.
+- **ACCEPTANCE CRITERIA:** Freeze the document set, revision/retention, explicit folder ownership, strict server-side caller attestation, host-qualified folder identity, idempotent Run enrollment, and recovery contract before implementation. Resume/rebind and local documents then survive partial failure with no duplicate root Run enrollment.
+- **VERIFICATION:** Command-authority fixtures, resume/failure tests, focused E2E on isolated display or CI if UI is involved.
+- **PARALLELIZATION SAFETY:** Can proceed beside TW-04A after schema freeze; TW-04B must wait for TW-05G, which depends on this task.
+- **POTENTIAL CONFLICTS:** `repo.add` host-unaware path deduplication can return a row from another host; `folderWorkspace.create` has no Repo ID. An opaque nonempty legacy `artifact.revision` blocks publication until migration preserves its sole reference and defines the initial manifest revision. Document choices and retention remain open; folder-only setup must be a separate operation when artifact publication is blocked.
+
+### TW-05G — Enforce the root coordinator gateway for effects
+
+- **GOAL:** Admit ticket effects only from the attested root Run through the existing Orca orchestration authority.
+- **DEPENDENCIES:** TW-05 durable ticket-to-Run correlation; freeze the one-use token, server-side root attestation, and durable binding-fence contract before effect-gateway implementation. TW-00 did not supply that protocol.
+- **OWNERSHIP:** One gateway worker; Orchestrator freezes the cross-repository token and Run-binding contract first.
+- **FILES / MODULES LIKELY INVOLVED:** Ticket-domain command authority/enrollment, Orca Run attestation and binding fence seam.
+- **INPUT CONTRACT:** Proposed one-use, five-minute target-bound plan capability (TTL not ratified), ticket/authority/ledger revision, and newly proven strict server-derived root Run/pane identity.
+- **OUTPUT CONTRACT:** Admission proof tied to a durable binding fence, revalidated immediately before each effect, or an explicit unavailable/blocked result.
+- **CONSTRAINTS:** Serialize with every Run binding mutation and `orchestration.reset --all`/Run deletion; preserve any durable in-flight exclusion across reset and restart. No external process impersonation, cached root context, or adapter effect on ambiguous authority.
+- **DO_NOT_TOUCH:** Parallel coordinator/Run owner, agent-status store, renderer-created authority tokens.
+- **ACCEPTANCE CRITERIA:** Changed Run, token reuse/expiry, lost contact, changed ledger or target, and fence failure prevent effects. Reset/delete during an effect cannot erase the exclusion or authorize a replacement root.
+- **VERIFICATION:** Command-authority fixtures, concurrency/replay tests, host attestation review.
+- **PARALLELIZATION SAFETY:** Serial with TW-05 identity and shared token contract; gates TW-04B effects and the ticket-effect subset of TW-08, not read-only collectors or existing navigation.
+- **POTENTIAL CONFLICTS:** Run binding generation and ticket ledger revision may change between preview and effect.
+
+### TW-06P — Produce a bounded ticket navigator snapshot
+
+- **STATUS:** The logical-v1 injected-only protocol, P4/P5 projection policy and T1-T12 vectors passed fresh independent Sol review on 2026-09-30. The continuing Luna private projector/handler packet passed 23 focused tests, CLI typecheck, independent source review and cross-peer fake-duplex conformance. It is published at private `f0b3181`; no production service artifact or setup exists. Ticket orchestration host IDs remain opaque; injected policy uses separate exact allowlists while production host mapping remains open.
+- **GOAL:** Project one validated, current ticket catalog read into an immutable `TicketNavigatorSnapshotV1` without claiming an Orca owner match.
+- **DEPENDENCIES:** TW-00 published the canonical catalog/snapshot contracts; the exact logical-v1 protocol, projection policy, shared golden vectors and injected projector/handler passed independent review. Production service setup additionally needs trusted host-ID mapping and artifact provenance.
+- **OWNERSHIP:** One ticket-domain worker owns the producer and service-side response in the private ticket repository; no Orca runtime edits.
+- **FILES / MODULES LIKELY INVOLVED:** Ticket contracts, catalog reader, navigator projector, and resident service-side protocol tests.
+- **INPUT CONTRACT:** A request bound to the configured profile, authority, epoch, and authenticated resident connection; one fresh validated catalog read per request or an independently reviewed source-currentness proof.
+- **OUTPUT CONTRACT:** Exact UTF-8 bytes of one strictly validated, digest-checked ticket-owned snapshot, or a typed unavailable result, from a source-pinned resident service artifact with version and provenance that TW-06T setup can verify. The snapshot is immutable after publication; Orca owner matches use a separate result tied to `snapshotRevision`.
+- **CONSTRAINTS:** The producer never starts a CLI/coordinator for a read, queries Orca owner state, or claims `matched`. SSH refs project as `unsupported` under the canonical validator; other unverified refs remain `unavailable`.
+- **DO_NOT_TOUCH:** Orca catalog binding, agent-status store, main/preload IPC, renderer, external effects.
+- **ACCEPTANCE CRITERIA:** Mixed local/SSH targets project conservatively; missing/untrusted catalog, revision/digest equivocation, and a valid catalog whose projection exceeds 2 MiB return unavailable with no partial snapshot. Repeated fresh reads, source ordering, and clock/TTL semantics are explicit. The resident service artifact is reproducible, source-pinned and independently checked for the negotiated protocol/version; its provenance is a separate output from TW-M1P base Node/CLI/profile delivery.
+- **VERIFICATION:** Contract corpus, projector and service-side tests, byte-exact artifact checks, typecheck, and independent semantic review.
+- **PARALLELIZATION SAFETY:** The injected projector/handler and TW-06T fake-duplex client ran in parallel under separate repository owners and passed the logical-v1 gate. Production setup stays serial behind runtime, artifact, host and credential proofs.
+- **POTENTIAL CONFLICTS:** The catalog has no ticket `availability` field or snapshot disposition counterpart. Freeze pruning/pruned/excluded target suppression, SSH orchestration-only and mixed-host behavior, service producer identity, equal-tuple digest high-water owner, and cross-clock currentness before implementation.
+
+### TW-06P-F1 — Make private resident tests self-contained
+
+- **STATUS:** Complete and independently reviewed on 2026-09-30; published as private `f7d66d1`. The historical `f0b3181` test read the golden vector from its Orca parent. The current test owns its exact fixture and passed 23 focused tests plus CLI typecheck from an isolated source checkout using local dependency junctions; the later exact-main `14c69a1` fresh Ubuntu/ext4 run passed frozen installation and the full native CLI suite. TW-00-R4 also passed genuine WSL replay; TW-M1P-C1 passed experimental offline runtime closure.
+- **GOAL:** Preserve the reviewed golden-vector assertions when the private repository is cloned alone.
+- **DEPENDENCIES:** Published private `f0b3181`, the separately approved public golden-vector Git bytes (41,713 bytes, SHA-256 `ce04e7a8602ef59488c774d3971617f25e9230273653b39b089ad9df280dfb36`), and one private test owner.
+- **OWNERSHIP:** Continuing Luna ticket producer workstream, restricted to the private server test, fixture, and exact-path fixture LF rule.
+- **FILES / MODULES LIKELY INVOLVED:** `ticket-workspace/packages/cli/test/ticket-workspace-resident-server-v1.test.ts`, `ticket-workspace/packages/cli/test/fixtures/resident-ticket-transport-v1-golden-vectors.json`, and `ticket-workspace/.gitattributes`.
+- **INPUT CONTRACT:** Exact approved vector bytes; tests must not resolve any path outside the private repository.
+- **OUTPUT CONTRACT:** Tracked private fixture with verified hash and a local test path; no change to production protocol, Orca code, or approved public vector bytes.
+- **CONSTRAINTS:** Keep all golden handshake/frame assertions and fixture semantics. Do not infer production readiness from focused tests.
+- **DO_NOT_TOUCH:** Private `packages/cli/src/`, Orca `src/`, public vectors, main/preload IPC, endpoint/setup/effects.
+- **ACCEPTANCE CRITERIA:** A standalone private source checkout contains every byte needed by the resident tests; fixture hash equals the approved public blob; all 23 focused tests and CLI typecheck pass without an enclosing Orca checkout. These criteria passed with local dependency junctions. Clean dependency installation and the current-pin full CLI replay remain separate gates.
+- **VERIFICATION:** Exact fixture SHA-256 and staged-blob equality, scoped LF attribute, bounded isolated-source-checkout test replay, focused resident suite and CLI typecheck; fresh Sol approved changed paths and provenance.
+- **PARALLELIZATION SAFETY:** Independent of Orca runtime/UI and production contract research; serialize with any private CLI test-fixture or producer-artifact edits.
+- **POTENTIAL CONFLICTS:** Nested tests masked the historical missing fixture. The 157-blob manifest covers `31b3768`, not published `f7d66d1` or local successor `9f10125`; do not treat isolated-source tests with dependency junctions as a clean-install or full-suite proof.
+
+### TW-06T — Establish the resident no-start ticket transport
+
+- **STATUS:** Orca runtime/WSL survey, exact logical-v1 protocol/crypto vectors and injected fake-duplex client passed independent Sol review on 2026-09-30. The client passed 30 focused tests, changed-code quality, Node typecheck with an 8 GiB heap, and cross-peer conformance. The user approved its public PR publication; code HEAD `a29bc2169` passed PR CI with 31 successes and eight skips. Pinned WSL stdio remains an unselected production endpoint candidate; the WSL hook relay cannot supervise ticket reads.
+- **GOAL:** Establish and own an authenticated resident ticket endpoint/connection lifecycle during explicit setup, then provide a no-start transport from Orca main during snapshot reads.
+- **DEPENDENCIES:** TW-00 strict snapshot/corpus and M0 host ownership; injected TW-06P/T are complete. Explicit pilot setup requires its approved pinned runtime/profile, actual resident entrypoint/artifact, endpoint, credential handoff and host mapping. Full updater/recovery and separate CLI/service distribution lifecycles are not prerequisites. Production enablement still needs applicable trust/currentness/owner proofs.
+- **OWNERSHIP:** One Orca main transport worker after cross-repository protocol ownership is fixed.
+- **FILES / MODULES LIKELY INVOLVED:** Orca main local integration service and resident client; the ticket-domain producer belongs to TW-06P.
+- **INPUT CONTRACT:** Configured coordinator/authority/profile binding, explicit setup authority and reviewed logical-v1/launch protocols. ENTRY/LEASE implement local producer/lifecycle seams; operational endpoint, artifact/profile and key/host trust proof remain separate activation inputs.
+- **OUTPUT CONTRACT:** Owned resident endpoint/connection lifecycle plus bounded snapshot byte stream with authenticated source/provenance, or unavailable during disconnected reads.
+- **CONSTRAINTS:** Snapshot reads never launch WSL, CLI, or coordinator; connection setup requires its separate explicit authority. No path/secret exposure, new state owner, or silent local fallback.
+- **DO_NOT_TOUCH:** Main/preload snapshot cache and renderer UI until TW-06 owns that layer.
+- **ACCEPTANCE CRITERIA:** Disconnected, wrong authority/profile, oversized, partial, or untrusted endpoint fails closed without starting a process. Reads call no WSL command, including a running-distro query; an absent/dead authenticated lease returns unavailable. A candidate stdio client must explicitly pipe/drain streams, own byte limits, timeout/cancellation settlement, child retirement and quit teardown rather than assuming `spawnProcess` supplies them.
+- **VERIFICATION:** No-start, auth binding, stream bound, cancellation and reconnect tests; independent transport review.
+- **PARALLELIZATION SAFETY:** Serial with TW-06 main handler integration; fixture-only schema work can proceed after TW-00 in disjoint files.
+- **POTENTIAL CONFLICTS:** The injected transport and producer are not wired to a production endpoint. The CLI `status` report is a different one-shot DTO and cannot satisfy the no-start snapshot read. Authenticated response correlation alone does not establish a fresh source observation.
+
+### TW-06F — Complete the original M4 fixture snapshot boundary
+
+- **STATUS:** Main/preload fixture bridge and bounded presentation implemented and approved by independent integration review; actual bundled preload semantic corpus passed. TW-07F subsequently completed Projects/Tickets UI fallback and click navigation integration.
+- **GOAL:** Implement the original M4 read-only fixture service through Orca main/preload and a reusable Orca presentation boundary. Live resident transport remains a separate later integration.
+- **DEPENDENCIES:** TW-00C full semantic runtime contract and TW-00F reviewed fixture IPC/corpus delivery; M0 Orca boundary ownership. It does not depend on TW-06P or TW-06T.
+- **OWNERSHIP:** One continuing Luna main/preload workstream, exclusive to new fixture service, IPC/preload registration, Orca presentation projection and focused tests; no TW-02F runtime selector/binder or renderer tree ownership.
+- **FILES / MODULES LIKELY INVOLVED:** Orca main ticket fixture service and canonical snapshot accessor, bounded IPC handler, preload bridge, targetless presentation projection and focused contract tests. TW-02F owns separate runtime selection/binding modules.
+- **INPUT CONTRACT:** The exact approved source-pinned fixture archive and six files, strict zero-argument IPC request, and delivered full ticket-owned `parseTicketNavigatorSnapshotUtf8V1` / `validateTicketNavigatorSnapshotV1` runtime validator in main and sandboxed preload. The approved fixture-envelope validator returns status/provenance but not the parsed snapshot, so the presentation projection must use the validated canonical payload separately.
+- **OUTPUT CONTRACT:** Bounded Orca-owned presentation result `{ status: 'fixture', provenance: { kind: 'fixture', snapshotCaseId, snapshotRevision }, orcaMatch: { status: 'not-evaluated' }, tickets }`, otherwise Tickets-only unavailable. Each ticket row is `{ ticketKey, label, lifecycle, availability, coordinatorTargetDeclared, workspaces }`; each workspace row is `{ repositoryId, label, role, actualState, branch? }`. `coordinatorTargetDeclared` is only a boolean projected from the ticket-declared reference and cannot imply Orca coordinator presence or match; `availability` and `actualState` are ticket-reported display data only. Main also offers an internal accessor that reloads its own canonically validated active fixture by `snapshotRevision` or returns unavailable; TW-02F receives it as an injected callback for selector-only click rebind. No ticket `actions`, `target`, `coordinatorTarget`, producer `referenceState`, raw paths/tokens or copied agent/Run authority enter the renderer result. It makes no live `current` or owner-match claim.
+- **CONSTRAINTS:** No WSL/CLI/process start on read; no path/token exposure in the fixture presentation; reuse existing runtime clients and preload bridges rather than wrapping their lifecycles in ticket IPC. Keep fixtures isolated from live cache and authority. A fixture must never become a live snapshot by changing presentation metadata.
+- **DO_NOT_TOUCH:** Seven approved public files, TW-02F runtime mapping/binder, resident transport, production provider, existing Projects state, renderer tree and mutation paths.
+- **ACCEPTANCE CRITERIA:** Original M4 accepts a fixture snapshot safely without affecting Projects. Main and preload enforce the full semantic corpus, ticket/workspace/string/byte limits, invalid-response isolation, cache partition, fixture provenance, timeout, service restart, integration disable, and late-response discard. The targetless rows above support TW-07F hierarchy while omitting all ticket actions and owner claims; main's accessor rejects an unknown or changed revision and never trusts renderer snapshot/ref/ID bytes. Existing Orca lifecycle authority remains untouched.
+- **VERIFICATION:** Main/preload fixture and failure corpus tests, timeout/restart/disable/late-response tests, actual Orca preload build/parity, Projects regression, changed-code quality and independent review.
+- **PARALLELIZATION SAFETY:** Safe beside TW-02F in disjoint main/preload/projection versus runtime binding files under the frozen canonical input and injected accessor contract. TW-07F performs the navigation join serially after both; live TW-06P/TW-06T require their own protocol freeze.
+- **POTENTIAL CONFLICTS:** The ignored IPC proposal assumes generated Zod validation alone, which misses runtime semantic checks; shared main handler files will later be touched by TW-06 live cutover.
+
+### TW-06 — Cut the validated snapshot boundary over to live ticket state
+
+- **STATUS:** Read-only source survey and independent Sol review confirmed fixture/cache reuse limits and found additional producer-policy, unsupported-result and overlay gates. No live cache, overlay, or handler is implemented.
+- **GOAL:** Transport and validate one bounded ticket snapshot across main/preload with no new state owner.
+- **DEPENDENCIES:** TW-06F provides the accepted fixture boundary; TW-06P delivers the producer and TW-06T delivers the resident no-start transport. The snapshot core may follow that protocol; publication of any live `matched` Orca overlay additionally waits for TW-02L authenticated exact owner evidence. This edge does not make TW-02L depend on the overlay.
+- **OWNERSHIP:** One Orca main/preload worker; renderer is read-only consumer in TW-07.
+- **FILES / MODULES LIKELY INVOLVED:** Shared Zod schema, main IPC handler/cache, preload bridge, ticket snapshot boundary fixtures.
+- **INPUT CONTRACT:** Accepted fixture boundary, authenticated resident transport, immutable canonical ticket snapshot, profile/authority/epoch provenance, and a separate Orca-owned match result tied to `snapshotRevision` when owner status is shown.
+- **OUTPUT CONTRACT:** Proposed `current`, `last-verified-stale`, or Tickets-only `unavailable` result under the 2 MiB UTF-8 cap; decide how whole-snapshot `unsupported` from ticket admission maps to the live IPC before freezing the result union. Any Orca overlay is a separate bounded result tied to the exact snapshot revision and full source tuple.
+- **CONSTRAINTS:** No distro/CLI startup, no raw path/token exposure, main and preload both validate; stale snapshots disable actions.
+- **DO_NOT_TOUCH:** Existing Projects/runtime state, renderer ownership, mutation authority, unnegotiated remote wire opcodes.
+- **ACCEPTANCE CRITERIA:** Full ticket-owned runtime semantic validation in main and preload, including duplicate identities and canonical digest; an additional negotiated initial-producer policy rejects schema-valid producer `matched` or action rows. Separate bounded Orca overlay validation checks exact revision/source tuple and never treats preload shape validation as owner proof. Freeze a cache partition with execution host, full profile, authority and epoch, plus durable high-water/rebind/update rules, source-clock-to-host-monotonic currentness, stale display lifetime and failure quarantine. A stale snapshot never carries a live matched overlay. Fixture parity, invalid response isolation, byte bounds, mixed unsupported policy, older-peer behavior, and no focus/state disruption are covered. A generated JSON Schema alone is insufficient.
+- **VERIFICATION:** Main/preload contract tests, generated fixture parity, changed-code quality and mixed-version review.
+- **PARALLELIZATION SAFETY:** Live main handler integration is serial after TW-06F, TW-06P and TW-06T; no concurrent edits to fixture/main handler files.
+- **POTENTIAL CONFLICTS:** The live cutover must preserve fixture-path tests without promoting fixture evidence to live authority.
+
+### TW-07F — Complete the original M5 read-only fixture tree
+
+- **STATUS:** Complete as the original fixture-backed M5 checkpoint, including same-head PR CI at `fa4e622f4`. The selector-only main/preload bridge and renderer Phase A/B passed separate fresh Sol reviews. Phase A covers full virtualized rows, Projects fallback, accessible panels/focus, mutation entry guards, and supported tinted contrast. Phase B sends only the three selectors, rebinds on click, and activates only the correlated Orca ID with fixed local host; the shipped fixture remains an owner-mismatch negative. Focused tests passed 17/17, `pnpm tc` and changed-quality/design gates passed, and hidden Electron CDP E2E passed 1/1 with a screenshot and no visible window. Live status, actions and public `clear` remain outside this checkpoint.
+- **GOAL:** Deliver Projects/Tickets switching, ticket hierarchy and preview from the accepted fixture boundary, with mutation actions hidden and existing Orca navigation/status authorities reused.
+- **DEPENDENCIES:** TW-06F fixture renderer DTO and accepted M4 boundary; TW-02F fixture exact Orca owner mapping/rebind for workspace activation. No live producer or resident transport prerequisite.
+- **OWNERSHIP:** The continuing main/preload Luna workstream owns the narrow selector-only IPC, runtime registration and preload validation first. One renderer Luna workstream then owns the workspaces-body Projects/Tickets mode, tree/preview and navigation. The same renderer workstream retains related follow-on work; no two workers edit the same sidebar or IPC seam concurrently.
+- **FILES / MODULES LIKELY INVOLVED:** `src/main/ipc/`, `src/main/startup/main-process-ipc-bootstrap.ts`, the existing runtime owner-binding seam, `src/preload/api/`, `src/renderer/src/components/sidebar/`, existing activation and agent-status readers, and focused tests. Reuse the current sidebar virtualization/focus patterns; its worktree viewport includes drag/actions and must not receive ticket rows directly.
+- **INPUT CONTRACT:** TW-06F's targetless, action-free fixture presentation or bounded unavailable result. Match and click requests contain exactly `{ snapshotRevision, ticketKey, repositoryId }`; main reloads its own validated fixture and uses the existing Orca binder. The preload validates bounded exact-key Orca-owned match and click responses; renderer-provided snapshot, target, path, worktree ID or binder token is rejected. Run data comes only from Orca's orchestration authority, and agent status only from the execution host's single hook-server status store; either requires an exact Orca-owned association.
+- **OUTPUT CONTRACT:** A bounded separate `matched` / `unavailable` Orca result keyed by the three selectors; a click returns a path-encoding Orca-attested worktree ID only after fresh main-side rebind and only through the click response. The UI shows a read-only Projects/Tickets submode inside the existing workspaces sidebar body, with historical-fixture, loading, empty and unavailable states. Unavailable, disabled or error results fall back to Projects; a changed revision fails matching/navigation without clock-judging historical fixture timestamps. No mutation action is displayed or enabled.
+- **CONSTRAINTS:** Follow `docs/STYLEGUIDE.md`, tokens/primitives, platform keyboard rules and the single agent-status store. The fixture carries `coordinatorTargetDeclared` only; show a declared coordinator placeholder, never a verified Run or agent. Show agent rows only when Orca provides an exact association, otherwise unavailable. The fixture has no issue/MR identifiers, so do not fabricate links. Preserve Projects behavior, focus and reveal actions.
+- **DO_NOT_TOUCH:** Resident/live transport, ticket ledger, effect/action routing, root authority and the approved public fixture bytes. The selector-only match/click path is the only shared IPC/preload addition in this packet.
+- **ACCEPTANCE CRITERIA:** First freeze the exact separate match/click response shapes and fail-closed IPC boundary. Then register them in main/preload with no renderer authority input beyond the three selectors; preload enforces exact response keys and bounds for both, and a path-encoding ID appears only in the click response after main-side rebind. The shipped `snapshot.full` remains a negative owner-match and navigation case. Positive end-to-end navigation injects both presentation and main accessor through a test-only seam at the same recomputed synthetic revision; it never changes the approved public fixture or production revision pin. Next add the Projects/Tickets submode and read-only ticket/workspace preview using established virtualizer, row focus, keyboard and scroll patterns. Tickets also closes existing Projects mutation entry points: native folder drop, Workspace board trigger/drawer and any already-open board, and the Setup Script prompt; a drop invalidated by entering Tickets cannot later open Add Project after returning to Projects. Projects restores its ordinary controls. A failed or changed binding leaves activation unavailable. On click, main rebinds and the renderer passes only its returned ID plus fixed `executionHostId: 'local'` to `activateAndRevealWorkspace`. Any workspace reveal while Tickets is showing switches to Projects before replaying the reveal, including store-initiated reveal. Disabled/error input also returns to Projects. Narrow widths, long names, accessible labels, empty/unavailable/historical fixture states and Projects regressions are covered. No ticket-provided status becomes Orca `matched`, no mutation action appears, and no issue/MR or agent association is invented.
+- **VERIFICATION:** Focused IPC/preload and renderer/navigation/state tests, full typecheck, `pnpm run check:code-quality:changed`, design-system gate, actual bundled-preload parity, Projects/reveal regressions and hidden-renderer Playwright CDP screenshots with `ORCA_BACKGROUND_LAUNCH=1`.
+- **PARALLELIZATION SAFETY:** Serial order: interface freeze → continuing main/preload Luna IPC join → renderer Luna tree/preview → same renderer Luna exact navigation/status association → independent Sol M5 review. TW-07 live cutover and other sidebar edits may not overlap. Do not spawn the renderer worker until the IPC output contract is stable and its work is ready.
+- **POTENTIAL CONFLICTS:** Sidebar mode/reveal behavior and style enforcement; live statuses cannot be inferred from fixture data. The current shipped fixture cannot demonstrate positive navigation in the app.
+
+### TW-07 — Cut the read-only Tickets tree over to live snapshots
+
+- **GOAL:** Present ticket hierarchy and workspace status from a validated snapshot without owning canonical state.
+- **DEPENDENCIES:** TW-07F accepted fixture tree, TW-06 live validated boundary, and TW-02L authenticated Orca owner evidence before live workspace status is shown.
+- **OWNERSHIP:** Renderer worker with exclusive sidebar/ticket-view files.
+- **FILES / MODULES LIKELY INVOLVED:** Existing sidebar tree/virtualization, ticket preview components, renderer snapshot projection.
+- **INPUT CONTRACT:** Accepted fixture renderer path plus preload-validated live current/stale/unavailable renderer DTO.
+- **OUTPUT CONTRACT:** Accessible read-only Tickets tree and preview; existing Projects mode remains available.
+- **CONSTRAINTS:** Follow `docs/STYLEGUIDE.md`, existing tokens/primitives, keyboard/platform rules, single agent-status store.
+- **DO_NOT_TOUCH:** Main transport/schema, ticket ledger, destructive actions, focus-changing prune behavior.
+- **ACCEPTANCE CRITERIA:** Bounded trees, loading/failure states, stable selection/focus, stale actions disabled, Projects regression absent. A retained `WorkspaceRef` on a pruning/pruned ticket or excluded repository cannot become a live matched/actionable target merely because Orca's exact local binder finds it; apply the frozen TW-06P/T owner-join disposition policy.
+- **VERIFICATION:** Renderer tests and hidden-renderer CDP screenshots with `ORCA_BACKGROUND_LAUNCH=1`; design-system gate.
+- **PARALLELIZATION SAFETY:** Serial with TW-07F sidebar files; starts after TW-06 live contract freeze.
+- **POTENTIAL CONFLICTS:** Shared sidebar state and snapshot DTO churn.
+
+### TW-08 — Connect existing workspace and agent actions
+
+- **STATUS:** Read-only Orca action/receipt audit and the [action/authority matrix](./action-authority-matrix.md) passed fresh Sol review after corrections. The matrix is a contract survey; no ticket effect gateway or action code is implemented.
+- **GOAL:** Expose ticket actions through Orca's existing worktree, agent, Run, and confirmation authorities.
+- **DEPENDENCIES:** For ticket effects: M3 coordinator foundation, TW-05G strict root gateway, TW-02L exact live owner evidence, TW-06/TW-07 live state and separately proven per-action preview/authority contracts. Existing workspace navigation is complete in TW-02F/TW-07F. Other existing Orca action seams may use separate exact-host/target/caller contracts and existing Orca confirmations without unrelated external-effect prerequisites; no such new packet is approved here. Fixtures supply no mutation authority.
+- **OWNERSHIP:** One integration worker per agreed action seam, with Orchestrator controlling shared contracts.
+- **FILES / MODULES LIKELY INVOLVED:** Orca orchestration commands, worktree action routing, ticket action descriptors, renderer confirmation UI.
+- **INPUT CONTRACT:** Ticket effects require a live current validated snapshot, exact target/host, root gateway authority and effect confirmation. Separate existing Orca action packets require independently verified real Orca target/caller and their existing authority/confirmation; fixture declarations cannot substitute for either.
+- **OUTPUT CONTRACT:** Existing Orca mutation receipts and ticket correlation; no copied lifecycle state.
+- **CONSTRAINTS:** Preserve branch, folder, artifacts and focus; SSH/folder behavior cannot regress even though Tickets MVP is local. Ticket worktree removal sets `preserveBranchOnDelete: true` on the target host's authoritative metadata before invoking Orca removal. The ordinary boolean confirmation and its skip preference are UX precedents, not ticket authority; a ticket effect needs target-bound one-use confirmation. Require an attested host even where an older RPC permits an omitted host, and do not inherit sidebar deletion's active-worktree focus change.
+- **DO_NOT_TOUCH:** Parallel worktree manager, message bus, agent-status store, unowned external resources.
+- **ACCEPTANCE CRITERIA:** Existing actions work from ticket context with idempotent replay. Removal verifies same-host exact ref HEAD, registration, and path read-back; archive, Orca removal, and external cleanup have independent blocked/unverifiable retry verdicts.
+- **VERIFICATION:** Existing Orca action tests, fault/replay matrix, hidden UI E2E where applicable.
+- **PARALLELIZATION SAFETY:** A read-only action/authority matrix can run beside TW-07F and TW-06P/T contract work. TW-05G ratifies root/fence cells, TW-02L ratifies exact host/target cells, and TW-04B ratifies adapter cells. Implementation is serial with the shared action DTO and confirmation UI; distinct actions may split only after contract freeze.
+- **POTENTIAL CONFLICTS:** M0 receipt semantics and TW-04B external stage ordering.
+
+### TW-09 — Integrate real ticket state and Sellmate flow
+
+- **GOAL:** Join ticket catalog, adapters, coordinator, provider, snapshot, and actions into the MVP workflow.
+- **DEPENDENCIES:** TW-03, TW-04C, TW-05, TW-06, TW-08.
+- **OWNERSHIP:** Sol Orchestrator integration cycle with continuing Luna workstreams on owned defects and fresh Astra xhigh independent review.
+- **FILES / MODULES LIKELY INVOLVED:** Ticket-domain CLI/provider, Orca main/preload/renderer, Sellmate profile and adapter configuration.
+- **INPUT CONTRACT:** Verified source-owned evidence and explicit resource/action contracts from predecessor tasks.
+- **OUTPUT CONTRACT:** One ticket can be provisioned, coordinated, inspected, role-changed, and safely pruned.
+- **CONSTRAINTS:** Mixed-version fail-closed behavior, no hidden state owner, no focus theft, durable recovery from partial effects.
+- **DO_NOT_TOUCH:** User resources outside the confirmed ticket ownership set.
+- **ACCEPTANCE CRITERIA:** MVP scenarios in the local work plan pass with isolated/referenced/excluded roles and partial-failure recovery.
+- **VERIFICATION:** Cross-component contract/integration/E2E, Windows and WSL pilot, independent semantic review.
+- **PARALLELIZATION SAFETY:** Integration is serial at shared contracts; independent defects may be assigned by module ownership.
+- **POTENTIAL CONFLICTS:** Host-domain clocks, adapter dependencies, action/ledger revision races.
+
+### TW-10 — Package, roll out, and maintain the fork
+
+- **GOAL:** Ship and validate repeatable installation/update/rollback on a clean machine.
+- **DEPENDENCIES:** TW-09 accepted; package/profile provenance and compatibility contracts verified.
+- **OWNERSHIP:** Release worker with Sol Orchestrator approval gates.
+- **FILES / MODULES LIKELY INVOLVED:** Ticket package/profile installer, Orca packaging/CI, documentation, fork update process.
+- **INPUT CONTRACT:** Accepted MVP build and verified native dependency/release provenance.
+- **OUTPUT CONTRACT:** Reproducible install/update/rollback and pilot report.
+- **CONSTRAINTS:** `pnpm install:release` before cross-architecture packaging; preserve user state and mixed-version behavior.
+- **DO_NOT_TOUCH:** Live user resources without explicit target confirmation.
+- **ACCEPTANCE CRITERIA:** Clean-machine pilot, rollback, packaging, and update scenarios pass on supported platforms.
+- **VERIFICATION:** Release CI, clean-machine smoke, native module checks, documented rollback drill.
+- **PARALLELIZATION SAFETY:** Release gate follows integration; platform checks may run in parallel on isolated runners.
+- **POTENTIAL CONFLICTS:** Private ticket submodule access, native toolchains, fork/upstream compatibility.
+
+## Current execution checkpoint and next allocation
+
+1. **Verified foundation:** TW-01 owner capture, TW-02F fixture binding, TW-06F fixture boundary, TW-07F fixture UI/navigation and private TW-04A common resource contract are complete in their scopes. B1, owner composition, admission/currentness, IJ, verifier and L1 also passed their code/type/quality/review and published CI gates. Current exact commits and CI evidence are in project-state. These do not establish an actual-ticket pilot or production activation.
+2. **Next critical path:** Source/shared IPC/main/preload are published through CI-green `77c940a56`. C/B completed the reviewed common-join/document-publication increments with code/integration approval and local type/test gates. Next freeze parent receipt-owner policy/signatures before implementation, full C2E and C3 live view. Actual endpoint/key/host/artifact/durable proof and serial provider activation remain separate gates. The shipped fixture remains a negative authority case; fixture navigation cannot satisfy actual-ticket acceptance.
+3. **Next allocation gate:** Validate all remaining local code candidates against current source and freeze concrete packets before assigning continuing Luna workstreams. The user's authorization covers reviewed reversible local work; publication, operational setup and real key/security choices retain separate approval. Production setup still joins the verified base runtime/profile with a pinned resident service artifact and P1–P8 proofs. The completed TW-07F sidebar remains single-owner for any future live cutover.
+4. **Still gated:** TW-06P/TW-06T production producer/transport and TW-05/TW-05G coordinator/root authority need their own contract gates. TW-02L authenticated owner evidence waits for live source authority; TW-03 production `plan`, TW-04B/C production adapters/role changes, TW-06/TW-07 live cutovers, TW-08 effects, TW-09 integration and TW-10 release retain their DAG dependencies. A fixture cannot claim live `current`, mutation authority or public `clear`.
+
+## Full parallel frontier at this checkpoint
+
+The accepted fixture M5 is a completed prerequisite. The nine rows below name preparation workstreams that can overlap when their document and source ownership is separate, not simultaneous code authorization. Within each row, its stated gates and serial order still apply.
+
+| Workstream                             | Current safe work                                                                                                                                                                                                          | Implementation gate and ownership boundary                                                                                                                                                                                              |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TW-06P/TW-06T live snapshot            | Logical-v1 injected producer/client and cross-peer conformance are complete. Remaining service-artifact/endpoint integration candidates need concrete next packets; production authentication and host proofs remain open. | Real setup joins verified base runtime/profile, a pinned service artifact and applicable production proofs. Existing injected protocol/client do not need reimplementation.                                                             |
+| TW-02L live owner design               | TW-02L-I and actual owner/source IJ are complete at `5b39c5963`, including exact joins, completeness, deadlines and final rechecks.                                                                                        | Real owner activation needs production admitted currentness and setup/host proofs. Fixture IPC/sidebar and public clear retain their own gates.                                                                                         |
+| TW-08 action authority                 | The read-only action matrix is complete. Existing navigation is implemented; other existing Orca actions need their own exact target/caller packets.                                                                       | M3/live/TW-05G conditions apply to ticket effects. No fixture grants mutation authority; unrelated external-effect infrastructure is not a navigation prerequisite.                                                                     |
+| TW-05 coordinator and TW-05G authority | Source audit and decision matrix are complete; owner ratification of folder identity, documents, migration, enrollment, strict Run caller and reset fence can proceed separately.                                          | TW-05 code waits for those decisions. TW-05G effect-gateway code waits for durable TW-05 correlation and a binding-fence/token contract. Private catalog/ledger edits cannot overlap TW-06P or TW-M1P edits without a frozen interface. |
+| TW-04A Docker evidence                 | The Docker owner can supply exact engine endpoint/route, physical identity, owner marker, complete discovery/read-back and clock evidence. The initial source survey found none of that production evidence.               | Typed production fixtures/adapter wait for owner-ratified Docker evidence; TW-04B effects additionally wait for TW-05G. No live resource mutation in evidence collection.                                                               |
+| TW-04A IIS evidence                    | The IIS owner can independently supply Windows configuration authority/route, site and pool physical identity, owner marker, complete discovery/read-back and clock evidence.                                              | Typed production fixtures/adapter wait for owner-ratified IIS evidence; TW-04B effects additionally wait for TW-05G. No live resource mutation in evidence collection.                                                                  |
+| TW-03 other owner sources              | Independent agent/test/lease/ownership/host/clock contracts remain to be supplied. Partial read-only output can explicitly report unavailable.                                                                             | Complete evidence/public `clear` needs TW-02L, TW-04R and all required source proofs. No second status store; no TW-05G dependency for read-side collectors.                                                                            |
+| TW-M1P profile delivery                | Verifier/L1 are complete; L2/staging/backend/recovery are deferred delivery work, not the current next implementation.                                                                                                     | First pilot needs its approved pinned runtime/profile plus resident entrypoint/setup proofs. Full updater/recovery is later; actual trust choices remain owner-gated.                                                                   |
+| TW-06 live cache/overlay contract      | B1 shared port and TW-06-I admission/high-water/currentness are complete, with actual owner/source integration at `5b39c5963`. Next durable-store or IPC integration candidates require concrete packets.                  | Durable adapter proof and live IPC/UI activation retain setup/owner dependencies; preserve fixture boundaries and source order across updates/rollback.                                                                                 |
+
+These rows describe capability/owner preparation, not ready implementation allocations. Current next packets must serve the actual-ticket pilot described above; L2/staging/recovery remain deferred. Docker and IIS read-only evidence can proceed independently within approved scope. TW-05 enrollment and typed resource persistence still share one catalog-compatibility decision before changing v1 readers/CAS. Current commits and CI belong in project-state, not repeated frontier statements.
+
+The earlier universal production-provisioning gate was corrected for injected modules. Astra's later value audit also found that more ready internal modules need not advance the usable milestone. Prioritize a finite pilot packet rather than allocate the deferred delivery frontier. Shared private catalog/ledger, public registration/sidebar and authority seams remain serialized; do not relax currentness or security contracts without explicit design review.

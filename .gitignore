@@ -28,7 +28,8 @@ out/
 /build/
 release/
 native/**/.build/
-# node-gyp output for the vendored Windows registry addon; generated per host and ABI.
+# node-gyp output for native Windows addons; generated per host and ABI.
+native/windows-path-evidence/build/
 native/windows-registry/build/
 native/windows-registry/bin/
 
@@ -103,6 +104,19 @@ docs/**
 !docs/readme/
 !docs/readme/**
 !docs/STYLEGUIDE.md
+!docs/reference/ticket-workspace-state/
+!docs/reference/ticket-workspace-state/master-plan.md
+!docs/reference/ticket-workspace-state/project-state.md
+!docs/reference/ticket-workspace-state/review-findings.md
+!docs/reference/ticket-workspace-state/task-graph.md
+!docs/reference/ticket-workspace-state/ticket-source-audit.md
+!docs/reference/ticket-workspace-state/ticket-source-files.sha256
+!docs/reference/ticket-workspace-state/ticket-published-source.sha256
+!docs/reference/ticket-workspace-state/ticket-publication-candidate.md
+!docs/reference/ticket-workspace-state/workspace-owner-boundary.md
+!docs/reference/ticket-workspace-state/resident-ticket-transport.md
+!docs/reference/ticket-workspace-state/coordinator-root-authority.md
+!docs/reference/ticket-workspace-state/external-resource-contract.md
 !docs/agent-skill-sharing-implementation-checklist.md
 !docs/mobile-terminal-shortcut-bar.md
 !docs/reference/

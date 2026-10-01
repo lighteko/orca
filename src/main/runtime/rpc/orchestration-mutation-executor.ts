@@ -7,6 +7,10 @@ import type { OrcaRuntimeService } from '../orca-runtime'
 import { OrchestrationError } from '../orchestration/orchestration-error'
 import type { RpcRequest } from './core'
 import {
+  createWorkerCallerPayloadIdentity,
+  matchesWorkerCallerPayloadHash
+} from './orchestration-mutation-payload-identity'
+import {
   attachMutationReceipt,
   EFFECT_FREE_WORKER_DONE_CHECKPOINT,
   getPendingWorkerStartRecovery,
@@ -15,6 +19,7 @@ import {
   markReplayedPromptIncarnationReplaced,
   readPromptBasePayloadHash,
   readPromptBindingPayloadHash,
+  readTerminalPromptHandle,
   replayStableCallerParams,
   shouldObserveCompletedMutation
 } from './orchestration-mutation-receipt'
@@ -61,18 +66,40 @@ export class OrchestrationMutationExecutor {
     }
     const callerFingerprint =
       callerFingerprintOverride ?? this.getLocalAuthenticatedCallerFingerprint()
+    const atomicWorkerAcceptance =
+      request.method === 'orchestration.workerStart' ||
+      request.method === 'orchestration.federationAttachStart'
+    const workerPayloadIdentity = atomicWorkerAcceptance
+      ? createWorkerCallerPayloadIdentity(this.runtime, request.method, params)
+      : undefined
     const stableParams = replayStableCallerParams(this.runtime, params)
-    const basePayloadHash = hashCanonical({ method: request.method, params: stableParams })
+    const basePayloadHash =
+      workerPayloadIdentity?.stableHash ??
+      hashCanonical({ method: request.method, params: stableParams })
     const key = `${callerFingerprint}:${requestId}`
     const db = this.runtime.getOrchestrationDb()
     const isPromptMutation = isTerminalPromptMutation(request.method, params)
     const existingPromptReceipt = isPromptMutation
       ? db.getMutationReceipt(callerFingerprint, requestId)
       : undefined
+    const existingWorkerReceipt = atomicWorkerAcceptance
+      ? db.getMutationReceipt(callerFingerprint, requestId)
+      : undefined
     if (
       existingPromptReceipt &&
       (existingPromptReceipt.method !== request.method ||
         readPromptBasePayloadHash(existingPromptReceipt.payload_hash) !== basePayloadHash)
+    ) {
+      throw new OrchestrationError(
+        'request_mismatch',
+        `Mutation request ${requestId} was already used with different input.`
+      )
+    }
+    if (
+      existingWorkerReceipt &&
+      (existingWorkerReceipt.method !== request.method ||
+        !workerPayloadIdentity ||
+        !matchesWorkerCallerPayloadHash(existingWorkerReceipt.payload_hash, workerPayloadIdentity))
     ) {
       throw new OrchestrationError(
         'request_mismatch',
@@ -87,24 +114,27 @@ export class OrchestrationMutationExecutor {
     const promptBindingChanged =
       recordedPromptBindingHash !== null &&
       recordedPromptBindingHash !==
-        this.readTerminalPromptBindingHash((params as { terminal: string }).terminal)
+        this.readTerminalPromptBindingHash(readTerminalPromptHandle(params))
     const payloadHash = existingPromptReceipt
       ? existingPromptReceipt.payload_hash
-      : isPromptMutation
-        ? `${basePayloadHash}:${hashCanonical(
-            this.runtime.getTerminalPromptRequestBinding((params as { terminal: string }).terminal)
-          )}`
-        : basePayloadHash
+      : existingWorkerReceipt
+        ? existingWorkerReceipt.payload_hash
+        : isPromptMutation
+          ? `${basePayloadHash}:${hashCanonical(
+              this.runtime.getTerminalPromptRequestBinding(readTerminalPromptHandle(params))
+            )}`
+          : (workerPayloadIdentity?.payloadHash ?? basePayloadHash)
     const identity = { callerFingerprint, requestId, method: request.method, payloadHash }
-    const atomicWorkerAcceptance =
-      request.method === 'orchestration.workerStart' ||
-      request.method === 'orchestration.federationAttachStart'
     // Worker starts perform asynchronous topology validation before their durable
     // acceptance claim. Join an identical in-process attempt before that boundary.
     if (atomicWorkerAcceptance) {
       const active = this.inFlight.get(key)
       if (active) {
-        if (active.method !== request.method || active.payloadHash !== payloadHash) {
+        if (
+          active.method !== request.method ||
+          !workerPayloadIdentity ||
+          !matchesWorkerCallerPayloadHash(active.payloadHash, workerPayloadIdentity)
+        ) {
           throw new OrchestrationError(
             'request_mismatch',
             `Mutation request ${requestId} was already used with different input.`
@@ -121,7 +151,11 @@ export class OrchestrationMutationExecutor {
             if (!row) {
               return { disposition: 'started' as const }
             }
-            if (row.method !== request.method || row.payload_hash !== payloadHash) {
+            if (
+              row.method !== request.method ||
+              !workerPayloadIdentity ||
+              !matchesWorkerCallerPayloadHash(row.payload_hash, workerPayloadIdentity)
+            ) {
               throw new OrchestrationError(
                 'request_mismatch',
                 `Mutation request ${requestId} was already used with different input.`

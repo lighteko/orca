@@ -11,8 +11,7 @@ const { createPackagedRuntimeNodeModuleResources } = require('../packaged-runtim
 const readProject = (file) => readFileSync(join(projectDir, file), 'utf8')
 const packageJson = JSON.parse(readProject('package.json'))
 const pnpmWorkspace = parse(readProject('pnpm-workspace.yaml'))
-// Why not process.platform: the win32 plan resolves wherever its os-gated npm addon is
-// installed; @orca/windows-registry is a workspace link and present everywhere.
+// Why not process.platform: the win32 plan resolves wherever its os-gated npm addon is installed.
 const windowsAddonsInstalled = existsSync(
   join(projectDir, 'node_modules', '@vscode', 'windows-process-tree', 'package.json')
 )

@@ -1,7 +1,7 @@
-import { createHash } from 'node:crypto'
 import { isTerminalPromptMutation } from '../../../shared/orchestration-rpc-contract'
-import { parsePaneKey } from '../../../shared/stable-pane-id'
-import type { OrcaRuntimeService } from '../orca-runtime'
+import { OrchestrationError } from '../orchestration/orchestration-error'
+
+export { hashCanonical, replayStableCallerParams } from './orchestration-mutation-payload-identity'
 
 export const EFFECT_FREE_WORKER_DONE_CHECKPOINT = JSON.stringify({
   pending: { effectFree: 'worker_done' }
@@ -9,39 +9,21 @@ export const EFFECT_FREE_WORKER_DONE_CHECKPOINT = JSON.stringify({
 
 const REPLAY_NUDGE_KEY = '__orcaReplayNudge'
 
+export function readTerminalPromptHandle(params: unknown): string {
+  if (
+    !params ||
+    typeof params !== 'object' ||
+    !('terminal' in params) ||
+    typeof params.terminal !== 'string'
+  ) {
+    throw new OrchestrationError('invalid_params', 'Terminal prompt requires a terminal handle.')
+  }
+  return params.terminal
+}
+
 export type MutationReplayNudge =
   | { kind: 'messages'; targets: { to: string; type: string }[] }
   | { kind: 'federation'; runId?: string }
-
-export function replayStableCallerParams(runtime: OrcaRuntimeService, params: unknown): unknown {
-  if (!params || typeof params !== 'object' || Array.isArray(params)) {
-    return params
-  }
-  const source = params as Record<string, unknown>
-  const result = { ...source }
-  delete result.waitSubmitMs
-  for (const property of ['from', 'callerTerminalHandle', 'terminal'] as const) {
-    const handle = source[property]
-    if (typeof handle !== 'string') {
-      continue
-    }
-    const paneKey =
-      property === 'from' && typeof source.senderPaneKey === 'string'
-        ? source.senderPaneKey
-        : runtime.getTerminalPaneKey(handle)
-    if (paneKey) {
-      const leafId = parsePaneKey(paneKey)?.leafId
-      result[property] = leafId ? { paneLeafId: leafId } : { paneKey }
-    }
-  }
-  return result
-}
-
-export function hashCanonical(value: unknown): string {
-  return createHash('sha256')
-    .update(JSON.stringify(canonicalize(value)))
-    .digest('hex')
-}
 
 export function readPromptBasePayloadHash(payloadHash: string): string {
   return payloadHash.split(':', 1)[0] ?? payloadHash
@@ -195,23 +177,6 @@ export function getPendingWorkerStartRecovery(
   } catch {
     return undefined
   }
-}
-
-function canonicalize(value: unknown): unknown {
-  if (Array.isArray(value)) {
-    return value.map(canonicalize)
-  }
-  if (!value || typeof value !== 'object') {
-    return value
-  }
-  const source = value as Record<string, unknown>
-  const result: Record<string, unknown> = {}
-  for (const key of Object.keys(source).sort()) {
-    if (source[key] !== undefined) {
-      result[key] = canonicalize(source[key])
-    }
-  }
-  return result
 }
 
 function isWorkerDoneSend(method: string, params: unknown): boolean {

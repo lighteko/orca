@@ -22,7 +22,7 @@ const runtime = readRuntimeArg()
 const NATIVE_MODULES = [
   'node-pty',
   ...(process.platform === 'win32'
-    ? ['@orca/windows-registry', '@vscode/windows-process-tree']
+    ? ['@orca/windows-path-evidence', '@orca/windows-registry', '@vscode/windows-process-tree']
     : [])
 ]
 const NODE_PTY_CONPTY_RUNTIME_FILES = ['conpty.dll', 'OpenConsole.exe']
@@ -259,6 +259,11 @@ function collectNativeModuleFailures() {
 }
 
 function loadNativeModule(moduleName) {
+  if (moduleName === '@orca/windows-path-evidence') {
+    const evidence = require(moduleName)
+    void evidence.queryDosDeviceTarget('C:')
+    return
+  }
   if (moduleName === '@vscode/windows-process-tree') {
     // A bare require loads the .node addon on win32, so it catches an ABI
     // mismatch on its own. What it cannot catch is *which* addon loaded: the

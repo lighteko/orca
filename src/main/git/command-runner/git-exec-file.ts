@@ -26,6 +26,10 @@ import { buildNetworkSshPolicyEnv } from './git-ssh-policy-env'
 import { nonInteractiveGitEnv, untranslatedGitOutputEnv } from './git-process-env'
 import { acquireGitAdmission } from './git-subprocess-admission'
 import { GitCommandTimeoutError, gitCommandTimeoutMs } from './git-command-timeout'
+import {
+  assertNativeGitExecutionOptions,
+  assertResolvedNativeGitExecution
+} from './native-git-execution-policy'
 
 /**
  * Async git command execution. Drop-in replacement for
@@ -39,6 +43,7 @@ async function gitExecFileAsyncUnlocked(
   return withGitSpan(
     { args, ...(options.cwd !== undefined ? { cwd: options.cwd } : {}) },
     async (span) => {
+      assertNativeGitExecutionOptions(options)
       if (isWslLinkedWorktreeGitRoutingCandidate(options.cwd, options.wslDistro)) {
         await prepareWslLinkedWorktreeGitRouting(options.cwd, options.wslDistro, {
           signal: options.signal
@@ -49,6 +54,7 @@ async function gitExecFileAsyncUnlocked(
         await readEnvironmentReady
       }
       let resolved = resolveGitCommand(args, options, false, options.captureWslLoginShellOutput)
+      assertResolvedNativeGitExecution(options, resolved)
       const environmentReady = prepareWindowsHostGitEnvironment(
         resolved,
         options.env,
@@ -62,6 +68,7 @@ async function gitExecFileAsyncUnlocked(
         false,
         effectiveOptions.captureWslLoginShellOutput
       )
+      assertResolvedNativeGitExecution(effectiveOptions, resolved)
       const policy = effectiveOptions.useConfiguredSshCommandForNetwork
         ? await buildNetworkSshPolicyEnv(effectiveOptions)
         : { env: nonInteractiveGitEnv(effectiveOptions.env), mode: 'default' as const }
@@ -128,6 +135,7 @@ async function gitExecFileAsyncUnlocked(
               true,
               effectiveOptions.captureWslLoginShellOutput
             )
+            assertResolvedNativeGitExecution(effectiveOptions, fallback)
             result = await capture(fallback)
             // Why: matching failures can be normal Git control flow; only a successful login retry proves the direct environment was insufficient.
             disableDirectWslGitAfterSuccessfulFallback(wasMissing, resolved)

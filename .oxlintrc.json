@@ -173,6 +173,19 @@
       }
     },
     {
+      "files": ["config/ticket-workspace-fixture-v1/boundary-runtime.mjs"],
+      "rules": {
+        "curly": "off"
+      }
+    },
+    {
+      "files": ["config/ticket-workspace-fixture-v1/replay.mjs"],
+      "rules": {
+        "curly": "off",
+        "prefer-template": "off"
+      }
+    },
+    {
       "files": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
       "rules": {
         "max-lines": ["error", { "max": 800, "skipBlankLines": true, "skipComments": true }]

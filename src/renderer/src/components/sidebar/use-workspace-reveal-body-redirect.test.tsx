@@ -15,8 +15,8 @@ vi.mock('@/store', () => ({
     selector({ setSidebarBody: mocks.setSidebarBody })
 }))
 
-function Host({ agentsBodyShowing }: { agentsBodyShowing: boolean }): null {
-  useWorkspaceRevealBodyRedirect(agentsBodyShowing)
+function Host({ rowsHidden, onShowRows }: { rowsHidden: boolean; onShowRows?: () => void }): null {
+  useWorkspaceRevealBodyRedirect(rowsHidden, onShowRows)
   return null
 }
 
@@ -38,7 +38,7 @@ afterEach(() => {
 describe('useWorkspaceRevealBodyRedirect', () => {
   it('switches the body to Spaces and replays the request once the list is mounted', () => {
     act(() => {
-      root.render(<Host agentsBodyShowing />)
+      root.render(<Host rowsHidden />)
     })
     const seen: unknown[] = []
     const listener = (event: Event): void => {
@@ -58,7 +58,7 @@ describe('useWorkspaceRevealBodyRedirect', () => {
     // The worktree list mounts (and registers its listener) when the body flips.
     window.addEventListener(SCROLL_TO_CURRENT_WORKSPACE_REVEAL_REQUEST_EVENT, listener)
     act(() => {
-      root.render(<Host agentsBodyShowing={false} />)
+      root.render(<Host rowsHidden={false} />)
     })
     window.removeEventListener(SCROLL_TO_CURRENT_WORKSPACE_REVEAL_REQUEST_EVENT, listener)
 
@@ -67,11 +67,40 @@ describe('useWorkspaceRevealBodyRedirect', () => {
 
   it('does not intercept requests while Spaces is already showing', () => {
     act(() => {
-      root.render(<Host agentsBodyShowing={false} />)
+      root.render(<Host rowsHidden={false} />)
     })
     act(() => {
       window.dispatchEvent(new CustomEvent(SCROLL_TO_CURRENT_WORKSPACE_REVEAL_REQUEST_EVENT))
     })
     expect(mocks.setSidebarBody).not.toHaveBeenCalled()
+  })
+
+  it('uses the supplied Projects redirect before replaying a Tickets reveal', () => {
+    const onShowRows = vi.fn()
+    act(() => {
+      root.render(<Host rowsHidden onShowRows={onShowRows} />)
+    })
+    const seen: unknown[] = []
+    const listener = (event: Event): void => {
+      seen.push(event instanceof CustomEvent ? event.detail : null)
+    }
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent(SCROLL_TO_CURRENT_WORKSPACE_REVEAL_REQUEST_EVENT, {
+          detail: { target: { type: 'active-workspace' } }
+        })
+      )
+    })
+    expect(onShowRows).toHaveBeenCalledOnce()
+    expect(mocks.setSidebarBody).not.toHaveBeenCalled()
+
+    window.addEventListener(SCROLL_TO_CURRENT_WORKSPACE_REVEAL_REQUEST_EVENT, listener)
+    act(() => {
+      root.render(<Host rowsHidden={false} onShowRows={onShowRows} />)
+    })
+    window.removeEventListener(SCROLL_TO_CURRENT_WORKSPACE_REVEAL_REQUEST_EVENT, listener)
+
+    expect(seen).toEqual([{ target: { type: 'active-workspace' } }])
   })
 })

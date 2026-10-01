@@ -14,6 +14,7 @@ import {
   writeFakeUsableElectronPackage,
   writeFakeWindowsProcessTree,
   writeFakeWindowsProcessTreeWithNodeAddonApi,
+  writeFakeWindowsPathEvidence,
   writeFakeWindowsRegistry,
   writeNodePtyPatchFile,
   writePatchedNodePtyBuildArtifacts,
@@ -229,6 +230,7 @@ describe('rebuild-native-deps patched node-pty rebuild', () => {
         writeFakeUsableElectronPackage(projectDir, { platform: 'win32' })
         writeFakeElectronRebuild(projectDir, { logPathEnv: 'ORCA_REBUILD_TEST_LOG' })
         writeFakeLoadableNodePty(projectDir)
+        writeFakeWindowsPathEvidence(projectDir)
         writeFakeWindowsProcessTree(projectDir)
         writeFakeNodePtyConptyPayload(projectDir, process.arch)
 

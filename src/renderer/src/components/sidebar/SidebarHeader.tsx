@@ -12,11 +12,13 @@ import { cn } from '@/lib/utils'
 type SidebarHeaderProps = {
   onWorkspaceBoardMenuOpenChange: (open: boolean) => void
   activityOptionsTarget?: React.Ref<HTMLDivElement>
+  ticketsViewActive?: boolean
 }
 
 const SidebarHeader = React.memo(function SidebarHeader({
   onWorkspaceBoardMenuOpenChange,
-  activityOptionsTarget
+  activityOptionsTarget,
+  ticketsViewActive = false
 }: SidebarHeaderProps) {
   // Subscribe this memoized header to locale changes before using translate().
   useTranslation()
@@ -128,6 +130,7 @@ const SidebarHeader = React.memo(function SidebarHeader({
         <SidebarHeaderActions
           onWorkspaceBoardMenuOpenChange={onWorkspaceBoardMenuOpenChange}
           agentsViewActive={agentsViewActive}
+          ticketsViewActive={ticketsViewActive}
         />
       </div>
     </div>

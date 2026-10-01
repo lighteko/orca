@@ -30,6 +30,8 @@ import {
   setWorktreeMetaForHost as setWorktreeMetaForHostOperation
 } from './worktree-identity-metadata'
 import { mergeWorktreeMetaForWrite } from './worktree-meta-write-normalization'
+import type { WorktreeCatalogBindingRequest } from './worktree-catalog-binding-types'
+import { getWorktreeCatalogBindingSourceSnapshot } from './worktree-catalog-binding-source-snapshot'
 import {
   captureNativeLocalWorktreeMetadataScanExpectation as captureNativeLocalWorktreeMetadataScanExpectationOperation,
   pruneSessionlessMissingLocalWorktreeMetadataForRepo as pruneSessionlessMissingLocalWorktreeMetadataForRepoOperation,
@@ -38,7 +40,10 @@ import {
   type NativeLocalWorktreeMetadataScanExpectation
 } from '../tracking-repos/missing-local-worktree-metadata-pruning'
 
-type MetadataLineageOperationsRuntime = Pick<StoreRuntimeState, 'state'>
+type MetadataLineageOperationsRuntime = Pick<
+  StoreRuntimeState,
+  'state' | 'worktreeCatalogBindingRevision' | 'worktreeCatalogIncarnationId'
+>
 
 const metadataLineageOperationsContext = Symbol('MetadataLineageOperations')
 type MetadataLineageOperationsContext = {
@@ -96,6 +101,11 @@ export class MetadataLineageOperations {
       this[metadataLineageOperationsContext].runtime,
       executionHostId
     )
+  }
+
+  getWorktreeCatalogBindingSourceSnapshot(request: WorktreeCatalogBindingRequest) {
+    const { runtime } = this[metadataLineageOperationsContext]
+    return getWorktreeCatalogBindingSourceSnapshot(runtime, request)
   }
 
   captureNativeLocalWorktreeMetadataScanExpectation(

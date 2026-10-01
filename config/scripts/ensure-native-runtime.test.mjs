@@ -299,6 +299,16 @@ function writeFakeWindowsRegistry(projectDir, { requiresMarker = false } = {}) {
   if (process.platform !== 'win32') {
     return
   }
+  const pathEvidenceDir = join(projectDir, 'node_modules', '@orca', 'windows-path-evidence')
+  mkdirSync(pathEvidenceDir, { recursive: true })
+  writeFileSync(
+    join(pathEvidenceDir, 'package.json'),
+    '{"name":"@orca/windows-path-evidence","main":"index.js"}\n'
+  )
+  writeFileSync(
+    join(pathEvidenceDir, 'index.js'),
+    'exports.queryDosDeviceTarget = async () => null\n'
+  )
   const registryDir = join(projectDir, 'node_modules', '@orca', 'windows-registry')
   mkdirSync(registryDir, { recursive: true })
   writeFileSync(

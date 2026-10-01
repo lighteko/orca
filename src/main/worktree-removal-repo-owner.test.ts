@@ -9,7 +9,9 @@ import {
   resolveWorktreeRemovalMetadata,
   resolveWorktreeRemovalRepoOwner
 } from './worktree-removal-repo-owner'
+import type { ExecutionHostId } from '../shared/execution-host'
 import type { Repo } from '../shared/repo-types'
+import type { WorktreeMeta } from '../shared/worktree/meta-types'
 
 function makeRepo(overrides: Partial<Repo> & Pick<Repo, 'id'>): Repo {
   return {
@@ -28,6 +30,22 @@ function makeStore(repos: readonly Repo[]): {
   return {
     getRepos: () => repos,
     getRepo: (repoId) => repos.find((repo) => repo.id === repoId)
+  }
+}
+
+function makeRemovalMeta(overrides: Partial<WorktreeMeta>): WorktreeMeta {
+  return {
+    displayName: '',
+    comment: '',
+    linkedIssue: null,
+    linkedPR: null,
+    linkedLinearIssue: null,
+    isArchived: false,
+    isUnread: false,
+    isPinned: false,
+    sortOrder: 0,
+    lastActivityAt: 0,
+    ...overrides
   }
 }
 
@@ -90,6 +108,27 @@ describe('resolveWorktreeRemovalRepoOwner', () => {
         'local'
       )
     ).toBe(localMeta)
+  })
+
+  it('uses the host-qualified metadata row without falling back to another host', () => {
+    const localMeta = makeRemovalMeta({ hostId: 'local', preserveBranchOnDelete: false })
+    const remoteMeta = makeRemovalMeta({
+      hostId: 'ssh:ssh-1',
+      preserveBranchOnDelete: true
+    })
+    const metadataStore = {
+      getRepos: () => [localRepo, sshRepo],
+      getWorktreeMeta: () => localMeta,
+      getWorktreeMetaForHost: (_worktreeId: string, hostId: ExecutionHostId) =>
+        hostId === 'ssh:ssh-1' ? remoteMeta : undefined
+    }
+
+    expect(
+      resolveWorktreeRemovalMetadata(metadataStore, 'repo1', 'repo1::/shared/worktree', 'ssh:ssh-1')
+    ).toBe(remoteMeta)
+    expect(
+      resolveWorktreeRemovalMetadata(metadataStore, 'repo1', 'repo1::/shared/worktree', 'local')
+    ).toBeUndefined()
   })
 
   it('keeps legacy persisted host metadata when the repo id has one owner', () => {

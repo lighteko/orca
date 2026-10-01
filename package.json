@@ -79,6 +79,7 @@
     "verify:cli-bin": "node config/scripts/verify-cli-bin.mjs",
     "verify:built-skills-cli": "node config/scripts/verify-skills-cli-runtime.cjs out",
     "verify:renderer-boot-graph": "node config/scripts/verify-renderer-boot-graph.mjs",
+    "verify:ticket-workspace-snapshot-fixture": "node config/scripts/verify-ticket-workspace-snapshot-fixture.mjs",
     "verify:localization-catalog": "node config/scripts/verify-localization-catalog.mjs",
     "sync:localization-catalog": "node config/scripts/verify-localization-catalog.mjs --fix",
     "verify:localization-runtime-catalog": "node config/scripts/generate-runtime-required-english-catalog.mjs",
@@ -200,6 +201,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@electron-toolkit/tsconfig": "^2.0.0",
     "@electron/rebuild": "^4.2.0",
+    "@lighteko/ticket-workspace-contracts": "file:config/ticket-workspace-contracts-v1/lighteko-ticket-workspace-contracts-1.0.0.tgz",
     "@monaco-editor/react": "^4.7.0",
     "@oxlint/plugins": "1.80.0",
     "@playwright/test": "^1.59.1",
@@ -305,6 +307,7 @@
     "zustand": "^5.0.14"
   },
   "optionalDependencies": {
+    "@orca/windows-path-evidence": "workspace:*",
     "@orca/windows-registry": "workspace:*",
     "@vscode/windows-process-tree": "0.8.0",
     "sherpa-onnx-darwin-arm64": "1.12.37",
@@ -317,7 +320,7 @@
     "{*.{ts,tsx,js,jsx,mjs,mts,cts},!(cloud)/**/*.{ts,tsx,js,jsx,mjs,mts,cts}}": [
       "oxlint",
       "oxlint --config config/oxlint-react-doctor.json",
-      "oxfmt --write"
+      "oxfmt --write --no-error-on-unmatched-pattern"
     ],
     "{*.{json,css},!(cloud)/**/*.{json,css}}": [
       "oxfmt --write"

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { removeStaleDurableWriteTempFiles } from '../../durable-file-write'
 import type { GlobalSettings } from '../../../shared/global-settings-types'
 import type { PersistedState } from '../../../shared/persisted-state-types'
@@ -38,6 +39,10 @@ export class StoreRuntimeState {
   pendingSnapshotFileWork: Promise<void> | null = null
   readonly staleTempCleanup: Promise<void>
   writeGeneration = 0
+  /** Per-process catalog incarnation; restart/restore can never reuse its binding tokens. */
+  readonly worktreeCatalogIncarnationId = randomUUID()
+  /** Conservative fence advanced by every scheduled persisted-state write. */
+  worktreeCatalogBindingRevision = 0
   inFlightAsyncTmpFile: string | null = null
   backupRotationInFlight = false
   writesFrozen = false

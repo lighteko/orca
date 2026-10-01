@@ -81,15 +81,17 @@ function NewWorkspaceButton({
 
 export function SidebarHeaderActions({
   onWorkspaceBoardMenuOpenChange,
-  agentsViewActive = false
+  agentsViewActive = false,
+  ticketsViewActive = false
 }: {
   onWorkspaceBoardMenuOpenChange: (open: boolean) => void
   agentsViewActive?: boolean
+  ticketsViewActive?: boolean
 }): React.JSX.Element {
   return (
     <div className="flex shrink-0 items-center gap-1" data-sidebar-header-actions="">
-      {/* Why both hidden in the agents view: it lists activity, not projects. */}
-      {agentsViewActive ? null : (
+      {/* Project creation controls belong to the Projects view. */}
+      {agentsViewActive || ticketsViewActive ? null : (
         <>
           <SidebarWorkspaceOptionsMenu
             preserveWorkspaceBoardOpen
@@ -98,7 +100,7 @@ export function SidebarHeaderActions({
           <AddProjectButton preserveWorkspaceBoardOpen />
         </>
       )}
-      <NewWorkspaceButton preserveWorkspaceBoardOpen />
+      {ticketsViewActive ? null : <NewWorkspaceButton preserveWorkspaceBoardOpen />}
     </div>
   )
 }

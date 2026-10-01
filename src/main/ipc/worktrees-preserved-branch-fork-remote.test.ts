@@ -143,7 +143,7 @@ describe('registerWorktreeHandlers', () => {
     )
   })
 
-  it('force-deletes a preserved SSH branch without borrowing colliding local metadata', async () => {
+  it('uses host-qualified SSH preservation metadata and routes later force-delete remotely', async () => {
     const repo = {
       id: 'repo-ssh',
       path: '/remote/repo',
@@ -182,13 +182,18 @@ describe('registerWorktreeHandlers', () => {
     store.getRepos.mockReturnValue([localRepo, repo])
     store.getRepo.mockReturnValue(localRepo)
     store.getWorktreeMeta.mockReturnValue(
-      makeWorktreeMeta({ hostId: 'local', preserveBranchOnDelete: true })
+      makeWorktreeMeta({ hostId: 'local', preserveBranchOnDelete: false })
+    )
+    store.getWorktreeMetaForHost.mockReturnValue(
+      makeWorktreeMeta({ hostId: 'ssh:conn-1', preserveBranchOnDelete: true })
     )
     getSshGitProviderMock.mockReturnValue(provider)
     getActiveMultiplexerMock.mockReturnValue({ request: vi.fn(), notify: vi.fn() })
 
     await handlers['worktrees:remove'](null, { worktreeId, hostId: 'ssh:conn-1' })
-    expect(provider.removeWorktree).toHaveBeenCalledWith('/remote/feature-wt', undefined)
+    expect(provider.removeWorktree).toHaveBeenCalledWith('/remote/feature-wt', undefined, {
+      deleteBranch: false
+    })
     const result = await handlers['worktrees:forceDeletePreservedBranch'](null, {
       worktreeId,
       branchName: 'feature/test',

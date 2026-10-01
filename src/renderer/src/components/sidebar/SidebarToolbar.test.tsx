@@ -43,12 +43,14 @@ const roots: Root[] = []
 async function renderToolbar(onWorkspaceBoardToggle = vi.fn()): Promise<{
   container: HTMLDivElement
   rerender: () => Promise<void>
+  setBoardToggleVisibility: (visible: boolean) => Promise<void>
   onWorkspaceBoardToggle: ReturnType<typeof vi.fn>
 }> {
   const container = document.createElement('div')
   document.body.appendChild(container)
   const root = createRoot(container)
   roots.push(root)
+  let boardToggleVisible = true
 
   const render = async (): Promise<void> => {
     await act(async () => {
@@ -56,13 +58,22 @@ async function renderToolbar(onWorkspaceBoardToggle = vi.fn()): Promise<{
         <SidebarToolbar
           workspaceBoardOpen={false}
           onWorkspaceBoardToggle={onWorkspaceBoardToggle}
+          showWorkspaceBoardToggle={boardToggleVisible}
         />
       )
     })
   }
   await render()
 
-  return { container, rerender: render, onWorkspaceBoardToggle }
+  return {
+    container,
+    rerender: render,
+    setBoardToggleVisibility: async (visible) => {
+      boardToggleVisible = visible
+      await render()
+    },
+    onWorkspaceBoardToggle
+  }
 }
 
 describe('SidebarToolbar moved workspace board hint', () => {
@@ -153,5 +164,17 @@ describe('SidebarToolbar moved workspace board hint', () => {
 
     expect(container.textContent).not.toContain('Profile')
     expect(container.textContent).toContain('Settings')
+  })
+
+  it('hides the board trigger in Tickets and restores it in Projects', async () => {
+    const { container, setBoardToggleVisibility } = await renderToolbar()
+    const selector = 'button[aria-label="Workspace board"]'
+    expect(container.querySelector(selector)).not.toBeNull()
+
+    await setBoardToggleVisibility(false)
+    expect(container.querySelector(selector)).toBeNull()
+
+    await setBoardToggleVisibility(true)
+    expect(container.querySelector(selector)).not.toBeNull()
   })
 })

@@ -35,6 +35,7 @@ const PACKAGED_RUNTIME_PACKAGE_ROOTS = [
 ]
 const WINDOWS_PACKAGED_RUNTIME_PACKAGE_ROOTS = [
   '@vscode/windows-process-tree',
+  '@orca/windows-path-evidence',
   '@orca/windows-registry'
 ]
 
@@ -552,26 +553,40 @@ function assertPackagedNativeVariantsInstalled(electronPlatformName, electronArc
     }
   }
 
-  // Why one package: @vscode/windows-process-tree is the only os: win32 npm addon;
-  // @orca/windows-registry is a workspace link present on every host, so its presence proves nothing.
+  // Workspace package presence does not prove that the Windows-only native build ran.
   const missingWindowsAddons = []
   if (electronPlatformName === 'win32' && !isInstalled('@vscode/windows-process-tree')) {
     missingWindowsAddons.push('@vscode/windows-process-tree')
+  }
+  if (
+    electronPlatformName === 'win32' &&
+    !existsSync(
+      join(
+        nodeModulesDir,
+        '@orca',
+        'windows-path-evidence',
+        'build',
+        'Release',
+        'orca_windows_path_evidence.node'
+      )
+    )
+  ) {
+    missingWindowsAddons.push('@orca/windows-path-evidence')
   }
 
   if (missing.length === 0 && missingWindowsAddons.length === 0) {
     return
   }
-  // Why separate remedies: install:release widens only the CPU set, so the os: win32 addon
-  // never arrives on a non-Windows host and is compiled only by the Windows-only rebuild.
+  // Why separate remedies: install:release widens only the CPU set; Windows addons require
+  // the Windows-only rebuild and its host toolchain.
   const remedies = []
   if (missing.length > 0) {
     remedies.push('Run pnpm install:release to install another architecture.')
   }
   if (missingWindowsAddons.length > 0) {
     remedies.push(
-      'Windows packaging requires a Windows host: the Windows addons are installed only where ' +
-        'os: win32 matches and compiled only by the Windows-only rebuild.'
+      'Windows packaging requires a Windows host: Windows addons are compiled only by the ' +
+        'Windows-only rebuild.'
     )
   }
   throw new Error(

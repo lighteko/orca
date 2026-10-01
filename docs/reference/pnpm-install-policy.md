@@ -31,18 +31,20 @@ therefore calls `assertPackagedNativeVariantsInstalled` in
 [`config/packaged-runtime-node-modules.cjs`](../../config/packaged-runtime-node-modules.cjs),
 which fails the build when the target platform/architecture's native variants
 are not installed: `sherpa-onnx-*`, `@parcel/watcher-*`, and on Windows the
-node-gyp addon `@vscode/windows-process-tree`. The error names every missing
+node-gyp addons `@vscode/windows-process-tree` and `@orca/windows-path-evidence`. The error names every missing
 package and gives the remedy that fits: another architecture's variants come
 from `pnpm install:release`, the Windows addon does not (see below).
 
 Windows packaging requires a Windows host. `@vscode/windows-process-tree` is an
 `os: win32` npm addon, so it is installed only where that matches;
-`@orca/windows-registry` is a workspace package that links on every host, but
-its native binary is still compiled only on Windows. Both are compiled only by
-the Windows-only rebuild in `config/scripts/rebuild-native-deps.mjs`
-(`allowBuilds` in `pnpm-workspace.yaml` keeps pnpm itself from running node-gyp
-for them). The guard checks `@vscode/windows-process-tree` alone because the
-workspace link is present everywhere and proves nothing. `pnpm install:release`
+`@orca/windows-registry` and `@orca/windows-path-evidence` are workspace
+packages that link on every host, but their native binaries are compiled only
+on Windows. A Windows install can invoke node-gyp for a workspace package's
+`binding.gyp`; the root native-runtime scripts also include these modules when
+building for Electron. Their `allowBuilds` entries keep dependency script
+approval explicit. The guard checks the path-evidence binary itself because its
+workspace link is present everywhere and proves nothing; it also checks the
+process-tree package. `pnpm install:release`
 does not help on macOS or Linux because it does not widen the OS set.
 
 Tests that inspect installed Windows addons and their packaging closure run on

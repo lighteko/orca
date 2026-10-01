@@ -70,11 +70,18 @@ export function hasWorktreeRemovalRepoOwnerOnOtherHost(
 export function resolveWorktreeRemovalMetadata(
   store: Pick<WorktreeRemovalRepoSource, 'getRepos'> & {
     getWorktreeMeta: (worktreeId: string) => WorktreeMeta | undefined
+    getWorktreeMetaForHost?: (
+      worktreeId: string,
+      executionHostId: ExecutionHostId
+    ) => WorktreeMeta | undefined
   },
   repoId: string,
   worktreeId: string,
   hostId: ExecutionHostId
 ): WorktreeMeta | undefined {
+  if (store.getWorktreeMetaForHost) {
+    return store.getWorktreeMetaForHost(worktreeId, hostId)
+  }
   const meta = store.getWorktreeMeta(worktreeId)
   if (!meta) {
     return undefined

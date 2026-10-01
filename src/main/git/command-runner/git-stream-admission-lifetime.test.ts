@@ -18,6 +18,7 @@ import {
   _gitAdmissionSnapshotForTests,
   _resetGitAdmissionForTests
 } from './git-subprocess-admission'
+import { NativeGitStatusRecordParser } from '../worktree-status-record-parser'
 
 function mockChild(): ChildProcess {
   const child = new EventEmitter() as EventEmitter & Record<string, unknown>
@@ -75,5 +76,95 @@ describe('git stream admission lifetime', () => {
     child.emit('close', null, 'SIGKILL')
     await Promise.resolve()
     expect(_gitAdmissionSnapshotForTests().budgets.general?.baseUsed).toBe(0)
+  })
+
+  it('reports and enforces the route resolved at the actual spawn boundary', async () => {
+    const child = mockChild()
+    gitSpawnMock.mockImplementation((_args, _options, onCommandResolved) => {
+      onCommandResolved?.({ wsl: null, wslMode: null })
+      return child
+    })
+    const pending = gitStreamStdout(['status'], {
+      cwd: '/repo',
+      requireNativeExecution: true,
+      onStdout: () => {}
+    })
+    await vi.waitFor(() => expect(gitSpawnMock).toHaveBeenCalledOnce())
+    child.emit('close', 0, null)
+
+    await expect(pending).resolves.toMatchObject({
+      stoppedEarly: false,
+      executionRoute: 'native'
+    })
+  })
+
+  it('refuses a WSL route selected at spawn even when the earlier route was native', async () => {
+    gitSpawnMock.mockImplementation((_args, _options, onCommandResolved) => {
+      onCommandResolved?.({ wsl: { distro: 'Ubuntu' }, wslMode: 'login-shell' })
+      return mockChild()
+    })
+
+    await expect(
+      gitStreamStdout(['status'], {
+        cwd: '/repo',
+        requireNativeExecution: true,
+        onStdout: () => {}
+      })
+    ).rejects.toThrow('native_git_execution_unavailable')
+  })
+
+  it('rejects an incomplete final UTF-8 sequence when strict validation is requested', async () => {
+    const child = mockChild()
+    gitSpawnMock.mockReturnValue(child)
+    const parser = new NativeGitStatusRecordParser()
+
+    const pending = gitStreamStdout(['status'], {
+      cwd: '/repo',
+      requireValidUtf8: true,
+      onStdout: (chunk) => parser.update(chunk)
+    })
+    const rejection = expect(pending).rejects.toThrow()
+    await vi.waitFor(() => expect(gitSpawnMock).toHaveBeenCalledOnce())
+    child.stdout?.emit(
+      'data',
+      Buffer.from(`# branch.oid ${'a'.repeat(40)}\n# branch.head feature\n`)
+    )
+    child.stdout?.emit('data', Buffer.from([0xc3]))
+    child.emit('close', 0, null)
+
+    await rejection
+    parser.finish()
+    expect(parser.result()).toMatchObject({ complete: true, rawRecordCount: 0 })
+  })
+
+  it('does not settle an aborted capture until the child has closed', async () => {
+    const child = mockChild()
+    const controller = new AbortController()
+    gitSpawnMock.mockReturnValue(child)
+    const pending = gitStreamStdout(['status'], {
+      cwd: '/repo',
+      signal: controller.signal,
+      waitForTerminationOnStop: true,
+      onStdout: () => {}
+    })
+    await vi.waitFor(() => expect(gitSpawnMock).toHaveBeenCalledOnce())
+
+    let settled = false
+    void pending.then(
+      () => {
+        settled = true
+      },
+      () => {
+        settled = true
+      }
+    )
+    controller.abort()
+    await Promise.resolve()
+    expect(settled).toBe(false)
+    expect(killSpawnedCommandTreeMock).toHaveBeenCalledOnce()
+
+    child.emit('close', null, 'SIGTERM')
+    await expect(pending).rejects.toMatchObject({ name: 'AbortError' })
+    expect(settled).toBe(true)
   })
 })
