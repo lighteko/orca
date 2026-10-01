@@ -1,5 +1,5 @@
 import { performance } from 'node:perf_hooks'
-import { Duplex, PassThrough } from 'node:stream'
+import { Duplex, PassThrough, type Readable } from 'node:stream'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import * as processRunner from '../../shared/child-process/run-process'
 import {
@@ -177,8 +177,15 @@ describe('resident foreground process lease', () => {
     if (opened.status !== 'connected') {
       throw new Error(JSON.stringify(opened))
     }
-    await opened.lease.close()
-    expect(childStderr).toContain('2100|2100')
+    try {
+      if (!child) {
+        throw new Error('Expected the resident child to be started')
+      }
+      await waitForStreamText(child.stderr, () => childStderr, '2100|2100', 2_000)
+      expect(childStderr).toContain('2100|2100')
+    } finally {
+      await opened.lease.close()
+    }
   })
 
   it('retires when child stderr exceeds its drain ceiling', async () => {
@@ -360,4 +367,48 @@ function waitForChildClose(child: ReturnType<typeof realSpawnProcess>): Promise<
     return Promise.resolve()
   }
   return new Promise<void>((resolve) => child.once('close', () => resolve()))
+}
+
+function waitForStreamText(
+  stream: Readable,
+  readText: () => string,
+  expected: string,
+  timeoutMs: number
+): Promise<void> {
+  if (readText().includes(expected)) {
+    return Promise.resolve()
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    const cleanup = (): void => {
+      clearTimeout(timeout)
+      stream.off('data', check)
+      stream.off('error', fail)
+      stream.off('close', closed)
+    }
+    const finish = (error?: Error): void => {
+      cleanup()
+      if (error) {
+        reject(error)
+      } else {
+        resolve()
+      }
+    }
+    const check = (): void => {
+      if (readText().includes(expected)) {
+        finish()
+      }
+    }
+    const fail = (error: Error): void => finish(error)
+    const closed = (): void => finish(new Error('Stream closed before expected output'))
+    const timeout = setTimeout(
+      () => finish(new Error('Timed out waiting for expected output')),
+      timeoutMs
+    )
+
+    stream.on('data', check)
+    stream.once('error', fail)
+    stream.once('close', closed)
+    check()
+  })
 }
