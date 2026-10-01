@@ -47,7 +47,7 @@
   - 준비 조사는 병렬 가능하다. A/C strict Run·owner 파일과 B/C/D setup·admission·등록 통합은 소유권 분리 또는 직렬화한다. [전체 계약](./task-graph.md#reviewed-next-preparation-frontier--2026-10-01).
 - [x] **이번 통합·게시:** A1·A2·C1·B0 관련 9개 파일/108개 테스트, 동결 코드 16개 해시와 Node/Web 타입 검사를 확인했다. Fresh Astra 리뷰와 사용자 승인 후 코드 4개·문서 1개 커밋을 `2f00e82e6`까지 게시했다.
 - [x] **TW-PILOT-C1-CLI-F1 — 로컬 수정:** 기존 C Luna가 한 파일의 import를 공개 계약 JSON 재사용으로 바꿨다. CLI·Node·전체 Web 타입 검사, 기존 DTO 테스트 11개, 실제 CLI 출력 로딩과 품질·형식 검사 및 Astra CODE_APPROVE를 통과했다. 제한 값과 parser 동작은 같다.
-- [ ] **수정 게시·CI:** `2f00e82e6`의 [PR Checks](https://github.com/lighteko/orca/actions/runs/36832917047)는 20개 성공·6개 skip·6개 실패다. ESM/CommonJS 오류를 놓친 이전 로컬 검증에 CLI 검사를 추가했다. 검토된 추가 커밋의 게시 승인을 받은 뒤 새 정확한 커밋의 CI를 확인한다.
+- [x] **수정 게시·CI:** 사용자 추가 승인 후 `823c918ea`를 게시하고 원격 해시를 확인했다. [정확한 커밋의 PR Checks](https://github.com/lighteko/orca/actions/runs/36836563109)는 26개 성공·6개 skip·실패 0개이며 Mobile·Computer-use e2e·PR test LoC도 성공이다. 이전 `2f00e82e6`의 CLI 컴파일 실패는 이 수정으로 해결됐다.
 - [ ] **후속 pilot 통합:** 실제 티켓과 기존 Run/workspace의 엄격한 연결, durable HWM, live DTO·preload·Tickets·클릭 재검증을 연결한다. 완료 기준은 실제 티켓 한 건의 표시와 정확한 workspace 이동이다. 누락된 관측은 unavailable이며 effect·공개 `clear`는 비활성이다.
 
 **다음 실행 경계:** C2A 상세 결과/남은 수명 packet, C2B receipt·공통 owner 결합 계약, C2C/D 채널·오류·preload 계약, C3 refresh/expiry 준비, B1 내구성 결정, D1 승인 실행서 준비는 파일·보고 소유권을 나눠 진행할 수 있다. injected C2 통합은 실제 WSL·운영 키·durable 구현을 기다릴 필요가 없다. 실제 pilot 활성화는 별도 운영·내구성·제품 연결 게이트다.

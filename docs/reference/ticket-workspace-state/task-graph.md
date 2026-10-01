@@ -39,7 +39,7 @@ Independent code, integration, plan and direction reviews use fresh **Astra xhig
 
 ### Current CI repair gate — TW-PILOT-C1-CLI-F1
 
-- **STATUS:** Existing C Luna's one-file repair has fresh Astra CODE_APPROVE; CLI/Node/full Web, 11 tests, actual CLI emit/load and exact quality/format passed. Root commit and separately approved publication/CI remain. Five commits through `2f00e82e6` are published; their CI failed CLI TS1479 after earlier local verification omitted CLI types.
+- **STATUS:** Complete and published `823c918ea` after separate user approval. Existing C Luna's one-file repair has Astra CODE_APPROVE; CLI/Node/full Web, 11 tests, actual CLI emit/load and quality passed. Exact-head PR Checks passed 26/six skips/zero failures and all three other workflows succeeded. Earlier `2f00e82e6` failed CLI TS1479 after local verification omitted CLI types.
 - **GOAL:** Restore CLI CommonJS compatibility without changing C1 semantics.
 - **DEPENDENCIES:** Published C1; reproduced `tc:cli` failure; independent public-artifact reuse review.
 - **OWNERSHIP:** C Luna edits; Sol owns shared state, commits and approval routing.
@@ -189,7 +189,7 @@ Fresh Astra independently inspected all four Luna reports and source, preserving
 | B1 store/commit/history                      | Decision packet prepared; NEEDS_DECISION | Transport Luna; late persistence/publication and independent adoption witness are proposals. Current policy unchanged.                                   |
 | B0 internal budget/queue                     | CODE_APPROVE; published c010f3a66        | Transport Luna; no post-abandon reads; raw ownership and original terminal cleanup preserved. Node gate passed; frozen before C2.                        |
 | B2 durable HWM                               | Not CODE_READY; follows B1               | Ticket-specific adapter/client/protocol/worker/tests; serial build registrations. No orchestration v42 migration without necessity.                      |
-| C1 exact live DTO/validators                 | CLI-F1 locally approved; CI pending      | Owner/presentation Luna; three bounded shared files. Prior injected CODE_APPROVE omitted CLI compatibility; repair gate above. No production exposure.   |
+| C1 exact live DTO/validators                 | Published CLI-F1; exact-head CI success  | Owner/presentation Luna; three bounded shared files. Prior injected CODE_APPROVE omitted CLI compatibility; repair gate above. No production exposure.   |
 | C2 detailed source + main/preload            | Contract proposal prepared; see C2A–E    | C2A lifetime and C2C/D channel/error proposals await review; C2B decisions remain. Injected C2E does not await production provisioning.                  |
 | C3 live view/navigation                      | NEEDS_CONTRACT; follows C1               | Renderer may use an injected typed API after C1. Product sidebar cutover follows C2; fixture remains historical.                                         |
 | D0 current offline candidate                 | EVIDENCE_APPROVE; local closure complete | Verification then existing artifact Luna; source/tree/lock and cached inputs verified. OS-temp-only unsigned Windows-built candidate.                    |
@@ -199,7 +199,7 @@ Fresh Astra independently inspected all four Luna reports and source, preserving
 | Actual ticket display → exact navigation     | Downstream acceptance                    | Approved activation plus durable admission; missing evidence unavailable, effects/public clear disabled.                                                 |
 | L2/updater/recovery/folder/documents/effects | Deferred or separately gated             | Preserve existing work; no first-pilot prerequisite added.                                                                                               |
 
-**Critical path:** completed A1/A2/B0 + reviewed C1 → C1-CLI-F1 compatibility gate → C2 detailed source, common receipt/association/repository settlement and bridge → C3 live view. In parallel, B1 durable history/commit decisions and D1/D2 approved target/trust/run sheet prepare actual activation. One serial source/HWM/lease registration join leads to actual display/navigation. Injected module/integration work does not wait for operational provisioning; actual activation does. Schema or policy proposals are not decisions.
+**Critical path:** completed A1/A2/B0/C1 + published C1-CLI-F1 CI success → C2 detailed source, common receipt/association/repository settlement and bridge → C3 live view. In parallel, B1 durable history/commit decisions and D1/D2 approved target/trust/run sheet prepare actual activation. One serial source/HWM/lease registration join leads to actual display/navigation. Injected module/integration work does not wait for operational provisioning; actual activation does. Schema or policy proposals are not decisions.
 
 ### TW-PILOT-A1 — synchronous strict runtime facts
 
@@ -235,7 +235,7 @@ Fresh Astra independently inspected all four Luna reports and source, preserving
 
 ### TW-PILOT-C1 — pure live boundary
 
-- **STATUS:** Published `9077430c2` under `2f00e82e6`; prior Astra CODE_APPROVE covered 14 tests, 266 browser checks, Node/Web types and quality/format. CLI compatibility was omitted and is now the open one-file gate above. No production exposure; stateful receipt policy remains C2.
+- **STATUS:** Published `9077430c2` under `2f00e82e6`; prior Astra CODE_APPROVE covered 14 tests, 266 browser checks, Node/Web types and quality/format. Omitted CLI compatibility is repaired by published `823c918ea`, with exact-head CI success above. No production exposure; stateful receipt policy remains C2.
 - **GOAL:** Define strict live presentation/selection DTOs and a standalone typed API, without exposing navigation authority.
 - **DEPENDENCIES:** Existing public contract primitives and owner boundary; reviewed exact DTO proposal.
 - **OWNERSHIP:** C Luna; root owns state, integration and commits.
