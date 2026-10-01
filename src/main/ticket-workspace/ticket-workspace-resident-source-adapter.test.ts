@@ -3,7 +3,7 @@ import {
   serializeTicketNavigatorSnapshotUtf8V1,
   type TicketNavigatorSnapshotV1
 } from '@lighteko/ticket-workspace-contracts/navigator-snapshot-v1'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   binding,
   parseProtectedRequestId,
@@ -54,6 +54,40 @@ describe('resident source adapter', () => {
     source.close()
     expect(source.isCurrent(read)).toBe(false)
     expect(source.getDisplayedBaseline(value.snapshotRevision)).toBeNull()
+  })
+
+  it('checks the synchronous registration guard before the adapter constructor can register HWM', async () => {
+    const duplex = new ScriptedDuplex((index, _frame, push) => {
+      if (index === 0) {
+        push(Buffer.from(vector.hello.serverHello.wireHex, 'hex'))
+      }
+      if (index === 2) {
+        push(sourceBoundWire)
+      }
+    })
+    const highWater = new TicketWorkspaceResidentHighWater(
+      new MemoryResidentSourceHighWaterStore(),
+      {
+        authorizeFirstAdoption: async () => true,
+        authorizeRebind: async () => true,
+        authorizeRecovery: async () => true
+      }
+    )
+    const registerLease = vi.spyOn(highWater, 'registerLease')
+    const connected = await connectTicketWorkspaceResidentSourceAdapter({
+      duplex,
+      setupKey,
+      expectedBinding: binding,
+      highWater,
+      clock: { now: () => 100, suspendGeneration: () => 0 },
+      getDisplayedSnapshotRevision: () => null,
+      canRegisterLease: () => false,
+      randomBytes: randomSource()
+    })
+
+    expect(connected).toEqual({ status: 'unavailable', reason: 'deadline_exceeded' })
+    expect(registerLease).not.toHaveBeenCalled()
+    expect(duplex.destroyed).toBe(true)
   })
 
   it('preserves an earlier token and displayed baseline across timestamp-only rereads', async () => {

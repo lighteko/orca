@@ -1,14 +1,11 @@
 import type { TicketNavigatorSnapshotV1 } from '@lighteko/ticket-workspace-contracts/navigator-snapshot-v1'
+import type { TicketWorkspaceResidentClient } from './ticket-workspace-resident-client'
 import {
   issueTicketWorkspaceCurrentnessToken,
   type CurrentTicketOwnerRead
 } from './ticket-workspace-resident-source-port'
-import {
-  TicketWorkspaceResidentClient,
-  type TicketResidentConnectResult
-} from './ticket-workspace-resident-client'
-import type { TicketWorkspaceResidentClientOptions } from './ticket-workspace-resident-client-contract'
 import type { TicketResidentBinding } from './ticket-workspace-resident-protocol'
+import { connectResidentSourceAdapterAfterSetup } from './ticket-workspace-resident-source-adapter-connection'
 import { admitTicketWorkspaceResidentSnapshot } from './ticket-workspace-resident-admission'
 import { waitForResidentSourceAdmission } from './ticket-workspace-resident-source-admission-wait'
 import { ResidentSourceCurrentness } from './ticket-workspace-resident-source-currentness'
@@ -39,36 +36,21 @@ export async function connectTicketWorkspaceResidentSourceAdapter(
 ): Promise<TicketWorkspaceResidentSourceConnectResult> {
   const expectedBinding = freezeResidentValue(structuredClone(options.expectedBinding))
   const clock = new ResidentSourceClockMonitor(options.clock)
-  const clientOptions: TicketWorkspaceResidentClientOptions = {
-    duplex: options.duplex,
-    setupKey: options.setupKey,
+  return await connectResidentSourceAdapterAfterSetup(
+    options,
     expectedBinding,
-    now: clock.now,
-    ...(options.randomBytes ? { randomBytes: options.randomBytes } : {})
-  }
-  const connected: TicketResidentConnectResult =
-    await TicketWorkspaceResidentClient.connect(clientOptions)
-  if (connected.status !== 'connected') {
-    return connected
-  }
-  const ledgerEpoch = connected.client.boundLedgerEpoch
-  const connectionIncarnation = connected.client.connectionIncarnation
-  if (!ledgerEpoch || !connectionIncarnation || connected.client.isRetired) {
-    connected.client.close()
-    return { status: 'unavailable', reason: 'invalid_protocol' }
-  }
-  return {
-    status: 'connected',
-    source: new ResidentSourceAdapter(
-      connected.client,
-      expectedBinding,
-      ledgerEpoch,
-      connectionIncarnation,
-      options.highWater,
-      clock,
-      options.getDisplayedSnapshotRevision
-    )
-  }
+    clock,
+    (client, binding, ledgerEpoch, connectionIncarnation) =>
+      new ResidentSourceAdapter(
+        client,
+        binding,
+        ledgerEpoch,
+        connectionIncarnation,
+        options.highWater,
+        clock,
+        options.getDisplayedSnapshotRevision
+      )
+  )
 }
 
 class ResidentSourceAdapter implements TicketWorkspaceResidentSourceAdapter {

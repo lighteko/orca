@@ -10,18 +10,15 @@ import type {
   TicketResidentUnavailableReason,
   TicketWorkspaceResidentClientOptions
 } from './ticket-workspace-resident-client-contract'
-import { parseTicketResidentCanonicalJson } from './ticket-workspace-resident-canonical'
-import {
-  createTicketResidentClientHello,
-  encodeTicketResidentHelloFrame,
-  verifyTicketResidentServerHello
-} from './ticket-workspace-resident-crypto'
+import { setupResidentClientBinding } from './ticket-workspace-resident-client-setup'
+import { parseResidentLaunchReady } from './ticket-workspace-resident-launch-bootstrap'
 import { TicketResidentByteStream } from './ticket-workspace-resident-byte-stream'
 import { TicketResidentProtectedChannel } from './ticket-workspace-resident-protected-channel'
 import { TicketResidentReadOperation } from './ticket-workspace-resident-read-operation'
 import { TicketResidentSnapshotResponse } from './ticket-workspace-resident-snapshot-response'
 
 const SETUP_DEADLINE_MS = 5_000
+const STARTUP_BUDGET_MAX_MS = 10_000
 const READ_DEADLINE_MS = 10_000
 
 export type TicketResidentConnectResult =
@@ -40,6 +37,17 @@ export class TicketWorkspaceResidentClient {
   static async connect(
     options: TicketWorkspaceResidentClientOptions
   ): Promise<TicketResidentConnectResult> {
+    const setupBudgetMs = options.setupBudgetMs ?? SETUP_DEADLINE_MS
+    if (
+      !Number.isSafeInteger(setupBudgetMs) ||
+      setupBudgetMs < 1 ||
+      setupBudgetMs > STARTUP_BUDGET_MAX_MS
+    ) {
+      if (options.duplex && typeof options.duplex.destroy === 'function') {
+        options.duplex.destroy()
+      }
+      return { status: 'unavailable', reason: 'invalid_deadline_budget' }
+    }
     let client: TicketWorkspaceResidentClient
     try {
       client = new TicketWorkspaceResidentClient(options)
@@ -63,6 +71,8 @@ export class TicketWorkspaceResidentClient {
   private readonly expectedBinding: TicketResidentBinding
   private readonly now: () => number
   private readonly randomBytes: (size: number) => Buffer
+  private readonly setupBudgetMs: number
+  private readonly expectLaunchReady: boolean
   private readonly reader: TicketResidentByteStream
   private readonly channel: TicketResidentProtectedChannel
   private readonly snapshotResponse = new TicketResidentSnapshotResponse()
@@ -80,10 +90,20 @@ export class TicketWorkspaceResidentClient {
     if (!validateTicketResidentBinding(options.expectedBinding)) {
       throw new Error('Expected service binding is invalid')
     }
+    const setupBudgetMs = options.setupBudgetMs ?? SETUP_DEADLINE_MS
+    if (
+      !Number.isSafeInteger(setupBudgetMs) ||
+      setupBudgetMs < 1 ||
+      setupBudgetMs > STARTUP_BUDGET_MAX_MS
+    ) {
+      throw new Error('invalid_deadline_budget')
+    }
     this.setupKey = Buffer.from(options.setupKey)
     this.expectedBinding = structuredClone(options.expectedBinding)
     this.now = options.now ?? (() => performance.now())
     this.randomBytes = options.randomBytes ?? ((size) => systemRandomBytes(size))
+    this.setupBudgetMs = setupBudgetMs
+    this.expectLaunchReady = options.expectLaunchReady ?? false
     this.reader = new TicketResidentByteStream(
       options.duplex,
       () => this.onStreamFailure(),
@@ -177,65 +197,43 @@ export class TicketWorkspaceResidentClient {
   }
 
   private async setupAndBind(): Promise<void> {
-    const deadline = this.now() + SETUP_DEADLINE_MS
-    const clientHello = createTicketResidentClientHello(
-      this.setupKey,
-      this.expectedBinding,
-      this.randomBytes
-    )
-    const clientHelloFrame = encodeTicketResidentHelloFrame(clientHello)
-    await this.reader.write(clientHelloFrame, deadline, this.now)
-
-    const serverHelloFrame = await this.reader.readHelloFrame(deadline, this.now)
-    const serverHelloValue = parseTicketResidentCanonicalJson(serverHelloFrame.body)
-    if (
-      this.reader.hasBytesInBatch(serverHelloFrame.deliveryBatchId) ||
-      this.reader.hasBufferedBytes()
-    ) {
-      throw new Error('Unexpected data followed server hello')
-    }
-    const handshake = verifyTicketResidentServerHello(
-      this.setupKey,
-      this.expectedBinding,
-      clientHello,
-      serverHelloValue
-    )
-    this.handshake = handshake
-    this.channel.setHandshake(handshake)
-    this.state = 'authenticated-unbound'
-
-    await this.reader.write(
-      encodeTicketResidentHelloFrame(handshake.clientFinish),
-      deadline,
-      this.now
-    )
-    const bindBudget = this.remainingBudget(deadline, SETUP_DEADLINE_MS)
-    const bindRequestId = this.allocateRequestId()
-    const bindRequest = {
-      type: 'source.bind' as const,
-      requestId: bindRequestId,
-      profile: this.expectedBinding.profile,
-      authorityId: this.expectedBinding.authorityId,
-      deadlineBudgetMs: bindBudget
-    }
-    await this.channel.send(bindRequest, deadline)
-    const response = await this.channel.receive(deadline)
-    if (response.message.type === 'error' && response.message.requestId === bindRequestId) {
-      throw new Error(response.message.code)
-    }
-    if (
-      response.message.type !== 'source.bound' ||
-      response.message.requestId !== bindRequestId ||
-      response.message.authorityId !== this.expectedBinding.authorityId ||
-      this.reader.hasBytesInBatch(response.deliveryBatchId) ||
-      this.reader.hasBufferedBytes()
-    ) {
-      throw new Error('Invalid source binding receipt')
-    }
-    if (this.now() >= deadline) {
+    const startupDeadline = this.now() + this.setupBudgetMs
+    if (!Number.isFinite(startupDeadline) || this.now() >= startupDeadline) {
       throw new Error('Deadline exceeded')
     }
-    this.ledgerEpoch = response.message.ledgerEpoch
+    let deadline = Math.min(startupDeadline, this.now() + SETUP_DEADLINE_MS)
+    if (this.expectLaunchReady) {
+      const readyFrame = await this.reader.readHelloFrame(startupDeadline, this.now)
+      const ready = parseResidentLaunchReady(readyFrame.body)
+      if (
+        this.reader.hasBytesInBatch(readyFrame.deliveryBatchId) ||
+        this.reader.hasBufferedBytes()
+      ) {
+        throw new Error('Unexpected data followed launch ready')
+      }
+      const remainingStartup = Math.floor(startupDeadline - this.now())
+      const setupBudget = Math.min(SETUP_DEADLINE_MS, ready, remainingStartup)
+      if (setupBudget < 1) {
+        throw new Error('Deadline exceeded')
+      }
+      deadline = Math.min(startupDeadline, this.now() + setupBudget)
+    }
+    const setup = await setupResidentClientBinding({
+      setupKey: this.setupKey,
+      expectedBinding: this.expectedBinding,
+      now: this.now,
+      randomBytes: this.randomBytes,
+      reader: this.reader,
+      channel: this.channel,
+      deadline,
+      allocateRequestId: () => this.allocateRequestId(),
+      onAuthenticated: (handshake) => {
+        this.handshake = handshake
+        this.state = 'authenticated-unbound'
+      }
+    })
+    this.handshake = setup.handshake
+    this.ledgerEpoch = setup.ledgerEpoch
     this.state = 'bound-idle'
     this.setupKey.fill(0)
   }

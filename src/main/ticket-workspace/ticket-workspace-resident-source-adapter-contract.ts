@@ -18,6 +18,9 @@ export type TicketWorkspaceResidentSourceAdapterOptions = Readonly<{
   highWater: TicketWorkspaceResidentHighWater
   clock: TicketWorkspaceResidentSourceClock
   getDisplayedSnapshotRevision(): string | null
+  setupBudgetMs?: number
+  expectLaunchReady?: boolean
+  canRegisterLease?: () => boolean
   randomBytes?: TicketWorkspaceResidentClientOptions['randomBytes']
 }>
 

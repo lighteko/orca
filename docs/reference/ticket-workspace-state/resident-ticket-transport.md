@@ -544,6 +544,39 @@ The reviewed TW-06T fake-duplex packet proved no-start reads, exact request corr
 
 The separate private producer and Orca fake-duplex client packets ran in parallel against the reviewed logical-v1 schemas and vectors under disjoint ownership. **TW-06P** still owns a deployable ticket service artifact; **TW-06T** still owns real Orca-main setup, authenticated no-start lease and connection lifecycle, excluding IPC/UI. TW-06T production setup waits for both the TW-06P service artifact and TW-M1P verified base runtime/profile. **TW-06** owns live main/preload validation and IPC/cache; its shared fixture IPC changes must be serialized with the completed TW-07F boundary. TW-06T must not alter agent-status ownership or terminal/SSH transport without an explicit reuse decision. **TW-02L** separately owns fresh source tuple/ref and eligibility checks before any live Orca workspace match.
 
+### First-ticket pilot foreground launch contract
+
+Fresh Astra xhigh approved this contract and the two finite local implementation packets on 2026-10-01; operational activation remains gated. It adds a launch prelude around the existing logical-v1 stream and changes no logical-v1 bytes or messages. An explicit main-owned setup receives already-resolved trusted profile/machine config paths, exact `ResidentBindingV1`, independently verified service artifact identity, and the two separately sourced allowlists. It starts one foreground private `resident serve` child with `spawnProcess` and `buildWslExecArgs`; the private command receives only `--profile-config <absolute-path>` and `--machine-config <absolute-path>` as explicit arguments. Reads borrow the returned in-memory source lease and never launch, probe, attach, reconnect, or respawn.
+
+The complete launch-control union is two unprotected, canonical frames on the inherited stdio stream. Each frame is `uint32be(bodyBytes) || UTF8(canonicalJsonV1(value))`; the prefix counts only the body. Body length is `1..4096`. The exact shapes are:
+
+```ts
+type ResidentLaunchBootstrapV1 = {
+  contract: 'ticket.navigator.resident.launch'
+  version: 1
+  type: 'bootstrap'
+  remainingStartupMs: number // safe integer 1..10_000
+  binding: ResidentBindingV1
+  setupKey: B64_32 // canonical unpadded base64url for exactly 32 random bytes
+  allowedOrchestrationIds: Identifier[]
+  allowedReferenceHostIds: Identifier[]
+}
+type ResidentLaunchReadyV1 = {
+  contract: 'ticket.navigator.resident.launch'
+  version: 1
+  type: 'ready'
+  remainingSetupMs: number // safe integer 1..5_000
+}
+```
+
+`ResidentBindingV1` is the exact logical-v1 binding defined above. Each identifier array is strictly ascending by JavaScript string order, contains only unique valid identifiers, and is passed as opaque membership data; neither peer infers an allowed host. Both frames require fatal UTF-8, exact keys and values, no duplicate/unknown/missing fields, and byte-for-byte canonical reserialization. Reject an invalid or oversized prefix before allocating its body. Invalid startup closes the stream without free-form diagnostics or a success frame. The key is fresh per child, exists only in the bootstrap and in-memory setup, and is never put in argv, environment, renderer IPC or logs. The `ready` frame signals preparation only; it proves neither host nor artifact identity.
+
+Orca starts one `performance.now()` deadline of 10,000 ms at explicit setup entry, before spawn. Immediately before writing bootstrap it sends only `floor(min(10_000, deadline - now()))`. The private CLI starts a 10,000 ms local deadline at entry so a missing or partial prelude is bounded; after accepting bootstrap it uses the earlier of that entry deadline and `childNow + remainingStartupMs`. Config, authority and catalog capability resolution must finish within that deadline. After preparation it writes `ready` with `floor(min(5_000, childDeadline - childNow()))`. The parent clamps the unchanged logical-v1 hello plus `source.bind` phase to `floor(min(5_000, ready.remainingSetupMs, parentDeadline - parentNow()))`; its deadline begins immediately before the first hello write and covers bind. The server also clamps hello/bind to five seconds and the child-local startup deadline. No absolute monotonic time crosses stdio, and no phase resets the parent deadline. A nonpositive or expired budget fails unavailable without sending hello or binding.
+
+The private entry uses one `ResidentFrameReaderV1` for bootstrap and the logical-v1 server, passing that reader through so bytes coalesced with bootstrap are preserved. After writing `ready`, it recomputes positive local time and synchronously transfers the one startup timer to the existing server setup; the server clears that timer only on authenticated `source.bound`. This timer does not stop an established resident. The public client consumes `ready` through its one existing `TicketResidentByteStream` before hello; it does not create a second reader over child stdout. Terminal failure or deadline synchronously marks the setup retired before awaiting cleanup, closes the exact pipes and retires the source, then attempts termination of that exact child with a bounded two-second cleanup grace. A late config/capability completion must check the sticky retired/deadline state before it can invoke the server. A late client result must check the same state synchronously before source-adapter construction/high-water lease registration; otherwise it is closed and rejected. On WSL, loss of the `wsl.exe` wrapper or stdio is only transport loss: the resident is `unverifiable`, not `exited`. Do not infer a guest PID, terminate the distro broadly, or auto-recover on read.
+
+**Disjoint implementation allocation, Astra approved:** private **ENTRY** owns the existing CLI entrypoint, launch frame parsing/ready emission, local config/capability preparation, and shared reader handoff. Public **LEASE** owns one new main process-lease module and focused tests, plus only the narrow client/source-adapter seams needed for a bounded setup budget, `ready` consumption, and a synchronous pre-registration `canRegisterLease()` guard. It reuses the existing resident client, adapter and high-water; it does not activate `MemoryResidentSourceHighWaterStore`, add a second store, wire IPC/UI, or change admission/currentness. Production use still requires verified TW-M1P runtime/profile and TW-06P artifact, selected host/profile/distro and allowlist provenance, proof of inherited-pipe privacy and executable identity, a real Linux/WSL catalog/stdio conformance run, durable production high-water, and a separately approved actual-ticket/Run association and Tickets presentation. Windows fake-I/O tests establish adapter behavior only, not Linux executable, trusted catalog, or WSL process-death proof.
+
 ## Review checklist for the protocol gate
 
 - Reads and renderer refreshes make zero WSL/CLI/coordinator start attempts, including disconnected and retry paths.

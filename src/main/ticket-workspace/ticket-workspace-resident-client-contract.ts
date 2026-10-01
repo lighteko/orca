@@ -21,6 +21,8 @@ export type TicketWorkspaceResidentClientOptions = {
   duplex: Duplex
   setupKey: Buffer
   expectedBinding: TicketResidentBinding
+  setupBudgetMs?: number
+  expectLaunchReady?: boolean
   now?: () => number
   randomBytes?: (size: number) => Buffer
 }

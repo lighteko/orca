@@ -1,6 +1,8 @@
+import { Duplex } from 'node:stream'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import vector from '../../../docs/reference/ticket-workspace-state/resident-ticket-transport-v1-golden-vectors.json'
 import { TicketWorkspaceResidentClient } from './ticket-workspace-resident-client'
+import { ticketResidentCanonicalJson } from './ticket-workspace-resident-canonical'
 import {
   binding,
   connect,
@@ -459,4 +461,183 @@ describe('resident injected duplex client', () => {
     ).resolves.toEqual({ status: 'unavailable', reason: 'deadline_exceeded' })
     expect(duplex.destroyed).toBe(true)
   })
+
+  it('consumes launch ready on the same stream and clamps hello/bind to its relative budget', async () => {
+    const duplex = new LaunchReadyDuplex(
+      launchReadyFrame(4_200),
+      (index, push) => {
+        if (index === 0) {
+          push(Buffer.from(vector.hello.serverHello.wireHex, 'hex'))
+        }
+        if (index === 2) {
+          push(sourceBoundWire)
+        }
+      },
+      true
+    )
+    const connected = await TicketWorkspaceResidentClient.connect({
+      duplex,
+      setupKey,
+      expectedBinding: binding,
+      setupBudgetMs: 8_000,
+      expectLaunchReady: true,
+      now: () => 100,
+      randomBytes: randomSource()
+    })
+
+    expect(connected.status).toBe('connected')
+    expect(duplex.writes).toHaveLength(3)
+    expect(parseFrame(duplex.writes[2]).message).toMatchObject({
+      type: 'source.bind',
+      deadlineBudgetMs: 4_200
+    })
+    if (connected.status === 'connected') {
+      connected.client.close()
+    }
+  })
+
+  it('rejects malformed launch ready before sending client hello', async () => {
+    const extraField = frameBody(
+      Buffer.from(
+        ticketResidentCanonicalJson({
+          contract: 'ticket.navigator.resident.launch',
+          remainingSetupMs: 5_000,
+          type: 'ready',
+          version: 1,
+          unexpected: true
+        }),
+        'utf8'
+      )
+    )
+    const bom = frameBody(Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), launchReadyBody(5_000)]))
+    const unknownType = frameBody(
+      Buffer.from(
+        ticketResidentCanonicalJson({
+          contract: 'ticket.navigator.resident.launch',
+          remainingSetupMs: 5_000,
+          type: 'hello',
+          version: 1
+        }),
+        'utf8'
+      )
+    )
+    const oversized = Buffer.alloc(4)
+    oversized.writeUInt32BE(4_097)
+    const coalesced = Buffer.concat([launchReadyFrame(5_000), Buffer.from([0, 0, 0, 1, 0x7b])])
+
+    for (const ready of [extraField, bom, unknownType, oversized, coalesced]) {
+      const duplex = new LaunchReadyDuplex(ready, () => undefined)
+      await expect(
+        TicketWorkspaceResidentClient.connect({
+          duplex,
+          setupKey,
+          expectedBinding: binding,
+          setupBudgetMs: 8_000,
+          expectLaunchReady: true,
+          now: () => 100,
+          randomBytes: randomSource()
+        })
+      ).resolves.toMatchObject({ status: 'unavailable', reason: 'invalid_protocol' })
+      expect(duplex.writes).toHaveLength(0)
+      expect(duplex.destroyed).toBe(true)
+    }
+  })
+
+  it('settles a partial launch-ready frame at the caller startup budget', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(0))
+    const partial = Buffer.alloc(4)
+    partial.writeUInt32BE(100)
+    const duplex = new LaunchReadyDuplex(partial, () => undefined)
+    const pending = TicketWorkspaceResidentClient.connect({
+      duplex,
+      setupKey,
+      expectedBinding: binding,
+      setupBudgetMs: 750,
+      expectLaunchReady: true,
+      now: () => Date.now(),
+      randomBytes: randomSource()
+    })
+    await vi.advanceTimersByTimeAsync(750)
+    await expect(pending).resolves.toMatchObject({
+      status: 'unavailable',
+      reason: 'deadline_exceeded'
+    })
+    expect(duplex.writes).toHaveLength(0)
+    expect(duplex.destroyed).toBe(true)
+  })
+
+  it('rejects invalid startup budgets without emitting a handshake frame', async () => {
+    for (const setupBudgetMs of [0, -1, 10_001, 1.5, Number.NaN]) {
+      const duplex = new ScriptedDuplex(() => undefined)
+      await expect(
+        TicketWorkspaceResidentClient.connect({
+          duplex,
+          setupKey,
+          expectedBinding: binding,
+          setupBudgetMs,
+          expectLaunchReady: true,
+          now: () => 100,
+          randomBytes: randomSource()
+        })
+      ).resolves.toEqual({ status: 'unavailable', reason: 'invalid_deadline_budget' })
+      expect(duplex.writes).toHaveLength(0)
+      expect(duplex.destroyed).toBe(true)
+    }
+  })
 })
+
+class LaunchReadyDuplex extends Duplex {
+  readonly writes: Buffer[] = []
+
+  constructor(
+    ready: Buffer,
+    private readonly onWrite: (index: number, push: (bytes: Buffer) => void) => void,
+    splitReady = false
+  ) {
+    super()
+    queueMicrotask(() => {
+      if (splitReady) {
+        const split = Math.min(2, ready.byteLength)
+        this.push(ready.subarray(0, split))
+        queueMicrotask(() => this.push(ready.subarray(split)))
+      } else {
+        this.push(ready)
+      }
+    })
+  }
+
+  _read(): void {}
+
+  _write(chunk: Buffer, _encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+    const index = this.writes.push(Buffer.from(chunk)) - 1
+    try {
+      this.onWrite(index, (bytes) => this.push(bytes))
+      callback()
+    } catch (error) {
+      callback(error instanceof Error ? error : new Error('Launch fake peer failed'))
+    }
+  }
+}
+
+function launchReadyBody(remainingSetupMs: number): Buffer {
+  return Buffer.from(
+    ticketResidentCanonicalJson({
+      contract: 'ticket.navigator.resident.launch',
+      remainingSetupMs,
+      type: 'ready',
+      version: 1
+    }),
+    'utf8'
+  )
+}
+
+function launchReadyFrame(remainingSetupMs: number): Buffer {
+  return frameBody(launchReadyBody(remainingSetupMs))
+}
+
+function frameBody(body: Buffer): Buffer {
+  const prefix = Buffer.alloc(4)
+  prefix.writeUInt32BE(body.byteLength)
+  return Buffer.concat([prefix, body])
+}
