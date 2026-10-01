@@ -6,9 +6,18 @@
 
 - [x] **source·공통 IPC·main·preload:** 기존 C·B Luna가 18개 코드·테스트 파일을 구현했고 Astra 코드·통합 리뷰 후 `0abb7c5d6`에 로컬 커밋했다. 실제 provider는 아직 null이며 live Tickets 완료가 아니다.
 - [x] **로컬 검증:** CLI·Node·Web 타입, 관련 185개 테스트·코드 품질을 통과했다. 타입 전용 수정 뒤 source 49개·main 39개도 재확인했다. Astra는 실제 main/preload 105건·브라우저 12건을 추가 검증했다. Node/Web 타입 검사는 작업 한정 8 GiB로 통과했다.
-- [ ] **원격 게시·CI:** 정확한 커밋 후보에 대한 사용자 승인 후 기존 공개 PR #1에 게시하고 Node 24 CI를 확인한다. 비공개 소스·서브모듈 핀 변경은 없다.
-- [ ] **다음 C2B 계약:** 같은 C Luna가 receipt·문서 수명·공통 Run/coordinator/repository 결합을 읽기 전용으로 준비 중이다. 계약·소유권 고정과 Astra 검토 전에는 구현하지 않는다.
-- [ ] **병렬 준비:** 기존 B Luna는 C2E 통합 사례를 읽기 전용으로 준비 중이다. C3 refresh/expiry·선택, B1 내구성 결정, D1 운영 입력도 독립 준비 가능하다. 실제 provider 활성화는 증명과 운영 승인 후 직렬 통합한다.
+- [x] **원격 게시:** 사용자 별도 승인 후 검토된 네 커밋을 `77c940a56`까지 기존 공개 PR #1에 게시하고 원격 해시를 확인했다. 비공개 소스·서브모듈 핀과 이후 로컬 준비 문서는 포함하지 않았다.
+- [x] **정확한 커밋 CI:** `77c940a56`의 [PR Checks](https://github.com/lighteko/orca/actions/runs/36847968121)는 26개 성공·6개 건너뜀·실패 0개다. Mobile·Computer-use E2E·테스트 분량 검사도 모두 성공했다.
+- [x] **다음 계약·사례 조사:** 같은 C·B Luna가 C2B 공통 owner 계약과 C2E 통합 네 사례를 읽기 전용으로 준비했다. 마지막 시점의 selected repository·문서 수명 증명을 기존 코드에 연결할 최소 계약이 필요하다.
+- [x] **다음 방향 검증:** 새 Astra가 실제 코드를 확인해 공통 owner 연결의 NEXT_PREPARATION_APPROVE를 판정했다. 호출자의 마지막 await 뒤 최종 검증과 교차 catalog 변경·늦은 receipt 설치 방지 사례를 요구했다.
+- [x] **공통 join 계약 승인:** 별도 Fresh Astra가 시간 제한·정확한 원래 read·타입 계약을 보완한 6개 파일 packet을 CODE_READY / NEXT_APPROVE로 승인했다. 부모 receipt/lifecycle·C2E·실제 활성화는 승인 범위가 아니다.
+- [x] **수명·최종 IPC 계약 승인:** 새 Fresh Astra가 기존 lifecycle 재사용과 호출별 guard 등록·마감 규칙을 검토했다. 그 보완을 그대로 고정한 4개 파일 packet을 기존 B Luna에게 배정했다.
+- [x] **공통 join·수명 코드 리뷰:** 같은 C·B Luna가 만료·등록 변경과 누락된 거절 사례를 보완했고 Astra CODE_APPROVE를 받았다. C 독립 70개·B 독립 63개 테스트가 통과했다.
+- [x] **최종 로컬 검증:** Node 오류 3개를 최소 타입 수정으로 해결하고 Astra 재승인을 받았다. 최종 16개 파일·159개 테스트와 Node·CLI 타입 검사가 통과했다. 전체 변경 품질 204개 파일·6개 검사와 수정 후 파일별 품질 검사가 통과했다.
+- [x] **통합 리뷰:** 새 Astra INTEGRATION_APPROVE. 실제 common join·main·preload의 9개 조합 검증이 통과했다. 주입된 source·host·receipt를 사용하는 경계 검증이며 전체 C2E나 실제 활성화 완료는 아니다.
+- [x] **코드 커밋:** 정확히 10개 코드·테스트 파일을 `511c35412`에 커밋했다. hook 이후에도 승인된 해시가 모두 일치한다. 아직 원격 게시하지 않았다.
+- [x] **상태 문서:** 이전 설명을 정리한 문서 4개가 Astra STATE_APPROVE를 받았다. 구현된 guard와 미연결 runtime을 구분하고 과거 allocation은 역사 기록으로 표시했다.
+- [ ] **다음 계약 리뷰:** 같은 C Luna의 4개 신규 파일 receipt owner 제안을 새 Astra가 검토한다. global receipt·refresh·stale 정책과 원래 시간 제한·상태 변경 전 검증을 고정해야 한다. 아직 CODE_READY가 아니며 부모 owner·실제 활성화는 미완료다. 새 원격 게시에는 별도 승인이 필요하다.
 
 ## 완료된 실행 기록 — 2026-10-01
 

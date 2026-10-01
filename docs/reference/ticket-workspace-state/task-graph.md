@@ -37,7 +37,7 @@ Independent code, integration, plan and direction reviews use fresh **Astra xhig
 
 ## Direction correction — Astra xhigh, 2026-10-01
 
-### Current CI repair gate — TW-PILOT-C1-CLI-F1
+### Completed CI repair gate — TW-PILOT-C1-CLI-F1
 
 - **STATUS:** Complete and published `823c918ea` after separate user approval. Existing C Luna's one-file repair has Astra CODE_APPROVE; CLI/Node/full Web, 11 tests, actual CLI emit/load and quality passed. Exact-head PR Checks passed 26/six skips/zero failures and all three other workflows succeeded. Earlier `2f00e82e6` failed CLI TS1479 after local verification omitted CLI types.
 - **GOAL:** Restore CLI CommonJS compatibility without changing C1 semantics.
@@ -179,27 +179,27 @@ A strict enrollment + B durable admission + C live view + D trusted explicit set
 
 Fresh Astra independently inspected all four Luna reports and source, preserving existing modules and first-pilot direction. It approved the corrected frontier; no blanket CODE_READY. Root assigned the four contract refinements below in parallel. The one-file CI observation repair passed eight tests/types/default lint and Astra CODE_APPROVE and user-approved `70b0c763b` is now published with all four exact-SHA workflows successful. A1 and D0 subsequently passed their corrected packet gates; readiness below records the current state.
 
-| Candidate                                    | Current readiness                           | Ownership / dependency                                                                                                                                   |
-| -------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TW-PILOT-LEASE-CI-F1                         | Published; exact-SHA CI success             | Transport Luna; only lease test. No product/pairing changes.                                                                                             |
-| A1 strict runtime attestation                | CODE_APPROVE; published a909f7a69           | A Luna; two new public runtime files. Synchronous internal facts; injected existing-DB readonly lookup, no RPC/mutation/lazy DB.                         |
-| A2 minimum pilot association                 | CODE_APPROVE; published `61c8ebe04`         | Existing A Luna; join/facts/test files. V1 per-invocation join, final original-owner and displayed-baseline checks; no enrollment or restart relink.     |
-| A3 catalog v2 / durable enrollment           | NEEDS_CONTRACT; code deferred               | Private schema/validation/readers/CAS/projector rollout together; first-pilot necessity unproved.                                                        |
-| A4 protected enrollment-write capability     | Deferred; necessity/contract unproved       | Cross-repository negotiated wire ownership; no demonstrated read-only pilot necessity.                                                                   |
-| B1 store/commit/history                      | Decision packet prepared; NEEDS_DECISION    | Transport Luna; late persistence/publication and independent adoption witness are proposals. Current policy unchanged.                                   |
-| B0 internal budget/queue                     | CODE_APPROVE; published c010f3a66           | Transport Luna; no post-abandon reads; raw ownership and original terminal cleanup preserved. Node gate passed; frozen before C2.                        |
-| B2 durable HWM                               | Not CODE_READY; follows B1                  | Ticket-specific adapter/client/protocol/worker/tests; serial build registrations. No orchestration v42 migration without necessity.                      |
-| C1 exact live DTO/validators                 | Published CLI-F1; exact-head CI success     | Owner/presentation Luna; three bounded shared files. Prior injected CODE_APPROVE omitted CLI compatibility; repair gate above. No production exposure.   |
-| C2 detailed source + main/preload            | C2A/C2C0/C2C/C2D LOCAL_COMPLETE `0abb7c5d6` | Source and guarded bridge passed types/code/integration review. C2B contract and full C2E join remain; publication/CI is pending.                        |
-| C3 live view/navigation                      | NEEDS_CONTRACT; follows C1                  | Renderer may use an injected typed API after C1. Product sidebar cutover follows C2; fixture remains historical.                                         |
-| D0 current offline candidate                 | EVIDENCE_APPROVE; local closure complete    | Verification then existing artifact Luna; source/tree/lock and cached inputs verified. OS-temp-only unsigned Windows-built candidate.                    |
-| D1 actual WSL conformance                    | Run sheet prepared; review/inputs open      | Natural HOME/XDG/default UID require exact read-path approval or a narrow seam. Memory HWM conformance is not pilot acceptance; no WSL action allocated. |
-| D2 target/profile/trust                      | OWNER_INPUT                                 | Root selects no actual host/profile/artifact/key/allowlist implicitly. Developer trust policy need not implement full publisher/update infrastructure.   |
-| Registration/start/stop/API cutover          | NEEDS_CONTRACT; serial join                 | One integration owner after A/B/C/D contracts/modules; exclusive startup/source/HWM/presentation lifecycle ownership.                                    |
-| Actual ticket display → exact navigation     | Downstream acceptance                       | Approved activation plus durable admission; missing evidence unavailable, effects/public clear disabled.                                                 |
-| L2/updater/recovery/folder/documents/effects | Deferred or separately gated                | Preserve existing work; no first-pilot prerequisite added.                                                                                               |
+| Candidate                                    | Current readiness                        | Ownership / dependency                                                                                                                                   |
+| -------------------------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TW-PILOT-LEASE-CI-F1                         | Published; exact-SHA CI success          | Transport Luna; only lease test. No product/pairing changes.                                                                                             |
+| A1 strict runtime attestation                | CODE_APPROVE; published a909f7a69        | A Luna; two new public runtime files. Synchronous internal facts; injected existing-DB readonly lookup, no RPC/mutation/lazy DB.                         |
+| A2 minimum pilot association                 | CODE_APPROVE; published `61c8ebe04`      | Existing A Luna; join/facts/test files. V1 per-invocation join, final original-owner and displayed-baseline checks; no enrollment or restart relink.     |
+| A3 catalog v2 / durable enrollment           | NEEDS_CONTRACT; code deferred            | Private schema/validation/readers/CAS/projector rollout together; first-pilot necessity unproved.                                                        |
+| A4 protected enrollment-write capability     | Deferred; necessity/contract unproved    | Cross-repository negotiated wire ownership; no demonstrated read-only pilot necessity.                                                                   |
+| B1 store/commit/history                      | Decision packet prepared; NEEDS_DECISION | Transport Luna; late persistence/publication and independent adoption witness are proposals. Current policy unchanged.                                   |
+| B0 internal budget/queue                     | CODE_APPROVE; published c010f3a66        | Transport Luna; no post-abandon reads; raw ownership and original terminal cleanup preserved. Node gate passed; frozen before C2.                        |
+| B2 durable HWM                               | Not CODE_READY; follows B1               | Ticket-specific adapter/client/protocol/worker/tests; serial build registrations. No orchestration v42 migration without necessity.                      |
+| C1 exact live DTO/validators                 | Published CLI-F1; exact-head CI success  | Owner/presentation Luna; three bounded shared files. Prior injected CODE_APPROVE omitted CLI compatibility; repair gate above. No production exposure.   |
+| C2 detailed source + main/preload            | Published `77c940a56`; all four CI green | Source/bridge published; common join and lifecycle/publication seams now locally approved and verified. Parent receipt owner and full C2E remain.        |
+| C3 live view/navigation                      | NEEDS_CONTRACT; follows C1               | Renderer may use an injected typed API after C1. Product sidebar cutover follows C2; fixture remains historical.                                         |
+| D0 current offline candidate                 | EVIDENCE_APPROVE; local closure complete | Verification then existing artifact Luna; source/tree/lock and cached inputs verified. OS-temp-only unsigned Windows-built candidate.                    |
+| D1 actual WSL conformance                    | Run sheet prepared; review/inputs open   | Natural HOME/XDG/default UID require exact read-path approval or a narrow seam. Memory HWM conformance is not pilot acceptance; no WSL action allocated. |
+| D2 target/profile/trust                      | OWNER_INPUT                              | Root selects no actual host/profile/artifact/key/allowlist implicitly. Developer trust policy need not implement full publisher/update infrastructure.   |
+| Registration/start/stop/API cutover          | NEEDS_CONTRACT; serial join              | One integration owner after A/B/C/D contracts/modules; exclusive startup/source/HWM/presentation lifecycle ownership.                                    |
+| Actual ticket display → exact navigation     | Downstream acceptance                    | Approved activation plus durable admission; missing evidence unavailable, effects/public clear disabled.                                                 |
+| L2/updater/recovery/folder/documents/effects | Deferred or separately gated             | Preserve existing work; no first-pilot prerequisite added.                                                                                               |
 
-**Critical path:** completed A1/A2/B0/C1 and local C2A/C2C0/C2C/C2D → exact C2B receipt/lifecycle/common A2/coordinator/selected-repository contract → C2B owner → full C2E join and C3 live view. C2B and C2E case packets prepare read-only in C and B respectively; C3 preparation may overlap B1 durable history/commit decisions and D1/D2 target/trust/run sheet. One serial source/HWM/lease/provider registration join leads to actual display/navigation. Injected module/integration work does not wait for operational provisioning; actual activation does. New remote publication/CI is pending; schema or policy proposals are not decisions.
+**Critical path:** published/CI-verified A1/A2/B0/C1/source/bridge plus locally code/integration-approved common join and lifecycle/publication → exact receipt policy/owner packet → owner implementation → full C2E and C3 live view. C3 and finite-case preparation may overlap B1 durable history/commit decisions and D1/D2/association inputs under disjoint ownership. One serial source/HWM/lease/provider registration join leads to actual display/navigation. Injected module/integration work does not wait for operational provisioning; actual activation does. Additional publication requires separate authorization; schema or policy proposals are not decisions.
 
 ### TW-PILOT-A1 — synchronous strict runtime facts
 
@@ -283,7 +283,7 @@ Fresh Astra independently inspected all four Luna reports and source, preserving
 
 ### Reviewed C2 / renderer continuation
 
-Fresh Astra reviewed the completed source/bridge cycle against actual source. C2A/C2C0/C2C/C2D are locally committed and approved; C2B/common-owner contract preparation and C2E finite-case preparation are assigned read-only to existing C and B Luna. The following packets preserve each completed scope and remaining dependency; unclosed contracts confer no code permission. B1 decision and D1/D2 run-sheet preparation retain the full contracts of TW-PILOT-B-PREP and TW-PILOT-D-PREP above. No injected integration depends on actual provisioning.
+Source/shared/main/preload are published and CI-verified through `77c940a56`. Common-join and lifecycle/publication increments now have independent code/integration approval and final local gates; parent C2B receipt-owner policy/signatures remain preparation only. Existing C prepares that exact owner packet read-only; full C2E follows its freeze and implementation. The following packets preserve each completed scope and remaining dependency; unclosed contracts confer no code permission. B1 and D1/D2 preparation retain TW-PILOT-B-PREP/TW-PILOT-D-PREP. No injected integration depends on actual provisioning.
 
 ```text
 B0 frozen ──> C2A detailed source / lifetime
@@ -298,7 +298,7 @@ actual source/HWM/lease registration remains one serial activation join
 
 #### TW-PILOT-C2A — detailed source and remaining lifetime
 
-- **STATUS:** LOCAL_COMPLETE at `0abb7c5d6`; source F1 CODE_APPROVE and final INTEGRATION_APPROVE. Independent 49 tests/15 actual-source probes resolved both terminal P1 findings. Minimal Node type repairs preserve behavior; final CLI/Node/Web gates passed. Remote publication and exact-head CI remain pending.
+- **STATUS:** Complete at `0abb7c5d6`, published under user-approved `77c940a56` with all four exact-head CI workflows successful. Source F1 CODE_APPROVE and final INTEGRATION_APPROVE; independent 49 tests/15 actual-source probes resolved both terminal P1 findings. Minimal Node type repairs preserve behavior; final CLI/Node/Web gates passed.
 - **GOAL:** Distinguish complete positively unsupported source evidence from ordinary unavailable and expose existing remaining currentness lifetime privately.
 - **DEPENDENCIES:** B0 freeze, existing semantic admission/currentness and frozen detailed result.
 - **OWNERSHIP:** Existing C owner/presentation Luna after exclusive transfer of frozen B0 adapter/HWM files; B owns only disjoint C2C0 files during this allocation.
@@ -314,23 +314,124 @@ actual source/HWM/lease registration remains one serial activation join
 
 #### TW-PILOT-C2B — presentation receipt and common owner settlement
 
-- **STATUS:** NEEDS_CONTRACT; existing C Luna is preparing one exact receipt/lifecycle/common-owner packet read-only under NEXT_PREPARATION_APPROVE. No code allocation before policy, signatures and ownership freeze and fresh review.
+- **STATUS:** NEEDS_CONTRACT for receipt-owner policy/composition. The two common-join and lifecycle/publication subpackets below have completed code/integration reviews; this does not ratify receipt arbitration or stale retention. Existing C completed the minimum proposal read-only; a new fresh Astra contract review is in progress. No parent-owner implementation before exact signatures, policy, ownership and review.
 - **GOAL:** Publish bounded C1 views and authorize match/click through one current source and a final common association/repository check.
 - **DEPENDENCIES:** C2A, reviewed A2, existing repository owner composition and explicit receipt/stale/common-join policy.
 - **OWNERSHIP:** C Luna; root freezes presentation policy and shared runtime edits.
 - **FILES / MODULES LIKELY INVOLVED:** New live presentation owner/test; exact runtime composition seam only after exclusive allocation.
 - **INPUT CONTRACT:** Valid C1 requests, trusted sender/provider/source partition, current source and fresh A1/owner dependencies; no renderer target authority.
 - **OUTPUT CONTRACT:** Correlated current/stale/unavailable/unsupported view and match/click results; only successful rebound exposes the existing bounded worktree ID.
-- **CONSTRAINTS:** Reuse the source's one presentedRead authority. Freeze global receipt replacement/sender destruction, stale age/unsupported/quarantine handling and A2/repository common final rechecks. Internal equal-source reads never renew display.
+- **CONSTRAINTS:** Reuse the source's one presentedRead authority. Freeze global receipt replacement/sender destruction, stale age/unsupported/quarantine handling and A2/repository common final rechecks. Owner finalizes after awaiting the common join before receipt mutation; main synchronously rechecks the same witness after provider await and C1 validation, before its final caller checks/publication. Missing/false/throwing private guards suppress positive results. Preserve two source reads and original budget; publication guard starts no read/rebind/receipt rotation/presentation. Internal equal-source reads never renew display. No new authority token or filesystem-lock claim; public C1 remains unchanged.
 - **DO_NOT_TOUCH:** New source/currentness store, cached A2 continuing authority, effects, fixture semantics or actual launch. Do not independently await two owners and treat the earlier observation as current.
 - **ACCEPTANCE CRITERIA:** Sender/receipt/partition mismatch, supersession/out-of-order completion, expiry/disconnect/retirement and owner changes fail safely; stale navigation impossible; valid combined join is rechecked after final awaits.
 - **VERIFICATION:** Meaningful projection/receipt/race/combined-owner tests, Node types and exact quality; fresh Astra contract and code checkpoints.
 - **PARALLELIZATION SAFETY:** Preparation beside C2A/C/D; implementation beside preload only after contracts and runtime ownership freeze.
 - **POTENTIAL CONFLICTS:** One global sender-bound slot replaces another renderer's receipt; this is an unratified arbitration choice. Three-state source disposition cannot express different unavailable-retention policies by itself.
 
+**PREPARATION RESULT / PROPOSAL ONLY:** Same C completed the next owner proposal read-only. Candidate ownership is exactly four new files: `src/main/runtime/ticket-workspace-live-presentation-owner.ts`, `ticket-workspace-live-presentation-receipt.ts`, and their two `.test.ts` counterparts. One factory binds the source and receipt slot for its lifetime:
+
+```ts
+type TicketWorkspaceLivePresentationOwnerDependenciesV1 = Readonly<{
+  source: TicketWorkspaceResidentSourceAdapter
+  commonJoin: Omit<CommonJoinDependenciesV1, 'sourcePort'>
+  clock: TicketWorkspaceOwnerClock
+}>
+
+export function createTicketWorkspaceLivePresentationOwnerV1(
+  dependencies: TicketWorkspaceLivePresentationOwnerDependenciesV1
+): TicketWorkspaceLiveApiForTrustedSender
+```
+
+Unratified policies: one global sender/document-bound slot; new presentation supersedes pending work; same-revision presentation rotates the receipt; unavailable refresh may reuse an exact still-current old read only with a fresh source lifetime; unsupported clears; stale retention requires proved same document/source/lease partition. The assumption that a fixed adapter alone proves that last partition is unverified. Contract review must freeze mutation checks before both `presentSnapshot` and slot installation, original operation/lifetime handling, positive publication guards and DTO sanitization. No four-file owner implementation is allocated or CODE_READY from this proposal; source/HWM/bootstrap/renderer changes are excluded.
+
+#### TW-PILOT-C2B-COMMON-JOIN — exact common binding increment
+
+- **STATUS:** COMPLETE_LOCAL at `511c35412`; CODE_APPROVE / F2 and fresh INTEGRATION_APPROVE. Independently passed 70 tests/expiry-abort probes; final 159-test/Node/CLI gates and nine composed probes passed. Post-hook six hashes match (test 799/800). State documents/publishing remain separate; parent receipt policy and actual activation are excluded.
+- **GOAL:** Generalize A2's existing two-read operation to prove coordinator and selected repository together, exposing a repeatable synchronous main-private settlement witness.
+- **DEPENDENCIES:** Reviewed A1/A2/C1/C2A, existing owner-operation context and native Git catalog snapshot authority. Caller supplies the exact original presented read and original caller signal; no provider/WSL/durable provisioning dependency.
+- **OWNERSHIP:** Existing C Luna; root explicitly transferred former A join ownership. Exactly `src/main/runtime/ticket-workspace-root-run-join.ts`, `ticket-workspace-root-run-join-facts.ts`, `ticket-workspace-root-run-join.test.ts`, new `ticket-workspace-root-run-join-operation.ts`, `runtime-worktree-catalog-binding.ts` and its test. B owns only disjoint lifecycle/IPC contract preparation.
+- **INPUT CONTRACT:** `prepareTicketWorkspaceRootRunCommonJoinV1(dependencies: CommonJoinDependenciesV1, input: CommonJoinInputV1): Promise<TicketWorkspaceRootRunCommonJoinWitnessV1 | null>` with the exact types below. Retain the supplied operation context and original caller signal; never start another operation or deadline. Check both signals before and after `context.check()`, including final settlement. Separately validate the older original presentation through source currentness and matching facts; do not add it to `context.reads`, whose timestamps describe operation reads.
+- **OUTPUT CONTRACT:** `Readonly<{ finalize(): TicketWorkspaceRootRunCommonJoinCandidateV1 | null }>`; candidate is `Readonly<{ rootRun: TicketWorkspaceRootRunJoinCandidateV1; selectedRepositoryWorktreeId: string }>`. Each synchronous result is valid at that observation only. Reuse original facts/context/bindings without another read, binding, receipt mutation or token; never send witness/private context through IPC.
+- **CONSTRAINTS:** Extract one shared flow into the named operation module, not a parallel implementation. Generalize the existing finalizer to captured `checkOriginalOperation(): boolean`; common path uses original context/direct caller checks, while legacy A2 additionally keeps its earlier `invocationStartedAt` deadline. Preserve legacy dependency/function signature, result shape and coordinator-only event order. Deduplicate only identical complete five-field binding requests. Both bindings still need async exact validation and final synchronous catalog-token checks; the latter is not a filesystem lock. Source cap 300/test cap 800, no suppression or seventh production file.
+- **DO_NOT_TOUCH:** Source/HWM/admission, private source, renderer/preload/shared IPC, B lifecycle/context files, persistence schema, receipt/stale policies, fixture authority, actual setup/keys/host/provider activation or effects/public clear. Worker does not edit shared state documents.
+- **ACCEPTANCE CRITERIA:** Legacy compatibility; same/distinct complete requests; exact original-read identity/facts; wrong host/folder/SSH/WSL/missing/mismatched bindings unavailable without fallback; A1/map/baseline/source/token changes rejected; both cross-binding race orderings; repeatable finalization without reads/renewal. Explicit regressions: caller abort after operation cleanup, deadline expiry after cleanup, abort during final clock/check and legacy earlier-deadline boundary. Owner finalizes after JOIN await; future main publication guard reuses the same witness after provider await/C1 validation.
+- **VERIFICATION:** Focused join/catalog tests plus existing owner/source regression, Node types, exact default/native/type-aware lint, formatting/diff and fresh Astra code review. Background launch flag for all tests. Root verifies final hashes and integration before commit.
+- **PARALLELIZATION SAFETY:** B lifecycle/publication and finite integration contracts may prepare read-only; implementation is exclusive to C's six files. Other code increments require their own exact freeze/review. Actual activation is a later serial join.
+- **POTENTIAL CONFLICTS:** Retained context's cleanup removes the original caller abort listener; context signal alone is insufficient afterward. Legacy A2 has an earlier outer deadline which must not be relaxed. Receipt owner must retain original read privately; source port returns only its snapshot baseline. Lifetime/shared instance/positive publication policy remains separately gated.
+
+```ts
+type CommonJoinDependenciesV1 = Omit<
+  TicketWorkspaceRootRunJoinDependenciesV1,
+  'clock' | 'worktreeBindings'
+> &
+  Readonly<{
+    worktreeBindings: Pick<
+      RuntimeWorktreeCatalogBindingCommands,
+      | 'resolveExactLocalNativeGitTarget'
+      | 'isExactLocalNativeGitBindingCurrent'
+      | 'isExactLocalNativeGitBindingCatalogCurrent'
+    >
+  }>
+
+type CommonJoinInputV1 = Readonly<{
+  selection: TicketWorkspaceOwnerSelection
+  presentedRead: CurrentTicketOwnerRead
+  context: TicketWorkspaceOwnerOperationContext
+  callerSignal: AbortSignal | undefined
+}>
+
+// Existing private snapshot lookup; false for missing/throwing lookup.
+isExactLocalNativeGitBindingCatalogCurrent(
+  binding: ExactLocalNativeGitWorktreeBinding
+): boolean
+```
+
+#### TW-PILOT-C2B-LIFETIME — document and final-publication seam
+
+- **STATUS:** COMPLETE_LOCAL at `511c35412`; CODE_APPROVE / F1/type correction and fresh INTEGRATION_APPROVE. Astra passed 63 tests/nine handler probes and verified type-only reversal. Root final 159-test/Node/CLI gates and nine composed probes passed; post-hook four hashes match. State documents/publishing remain separate; receipt-owner/serial wiring remain gated.
+- **GOAL:** Reuse the one existing desktop sender lifecycle and convey invocation-private document/signal/publication checks to an injected owner without activating a provider.
+- **DEPENDENCIES:** Existing C1/C2C0, trusted UI/frame and request-lifetime guards; frozen same-witness boolean callback contract. Common-join completion, receipt retention policy and actual runtime wiring are not prerequisites for these injected helpers/tests.
+- **OWNERSHIP:** Existing B Luna; exactly `src/main/ipc/desktop-runtime-sender-lifecycle.ts`, new `desktop-runtime-sender-lifecycle.test.ts`, `ticket-workspace-live-ipc.ts` and `ticket-workspace-live-ipc.test.ts`. Disjoint from C's six common-join files.
+- **INPUT CONTRACT:** Exact signatures below. Parse one C1 request and verify original non-null current main frame/UI trust before accessing lifecycle getter. Obtain existing injected lifecycle, enroll through existing `connectionIdFor`, then lookup-only capture. Missing lifecycle/capture returns original correlated unavailable without provider work. Context checks original signal/frame/trust/captured generation before resolver/provider and again after synchronous resolver work.
+- **OUTPUT CONTRACT:** Same C1 one-request-argument API/channels, validated response or original correlated unavailable. Capture returns only a main-private lookup guard over original state identity/generation/frame; checks create no state/listeners. Positive current/matched/rebound requires the invocation-local publication guard; validated negatives keep final caller/document checks without evaluating that guard.
+- **CONSTRAINTS / REGISTRATION:** Fresh cell per invocation. Accept at most one guard while resolver/provider is pending. Seal immediately on main's provider-await continuation before C1 validation, and on every terminal path. Duplicate or post-seal registration invalidates that invocation's positive result, never replaces the first guard and never throws asynchronously; completed/other results cannot change. For validated positives evaluate once, require exactly true, check invalidation and final context/caller observations, then recheck the live invalid-registration latch immediately before return, without await. Missing/false/throwing/invalid guard returns correlated unavailable. No source read/rebind/receipt/presentation mutation, token/store, second lifecycle/map or bootstrap wiring.
+- **DO_NOT_TOUCH:** C runtime/join/catalog/source files, fixture/shared/preload/renderer APIs, runtime/startup/state registration, private source, schema, receipt retention/arbitration, operational host/profile/keys/provider activation and effects/public clear. Root owns documents, integration and commits.
+- **ACCEPTANCE CRITERIA:** Missing-state lookup; explicit enrollment only after valid trusted entry; original state/sender/generation/frame identity; nav/process loss/destruction/replacement rejection; same-document/blocked-navigation compatibility; old sender events cannot retire same-ID replacement; repeated capture/check never enroll/mint. Existing C1 channels/correlation and cleanup preserved. Duplicate/late guard registration and concurrent invocation isolation. One parameterized receipt/source/catalog microtask invalidation after provider resolves, guard after C1 validation, all ten selection scalars correlated; invalid response never evaluates guard. Dispose request listeners only; persistent lifecycle listeners remain.
+- **VERIFICATION:** Focused new class/live IPC plus existing lifetime/runtime/bridge regression; Node and CLI impact checks, exact quality/format/diff, fresh Astra code/integration review. All tests background; no apps needed.
+- **PARALLELIZATION SAFETY:** Independent implementation beside C common join after this signature/registration freeze. One boolean closure avoids coupling to C's concrete witness imports. Actual single-reference runtime/bootstrap wiring remains serial and separately allocated.
+- **POTENTIAL CONFLICTS:** Owner must separately prevent late receipt installation/reuse; IPC response suppression is not that proof. Early bootstrap precedes local lifecycle construction; later wiring shares the same instance without handler re-registration. No defaults imply actual provider/source startup.
+
+```ts
+captureCurrentDocument(
+  sender: WebContents
+): Readonly<{ isCurrent(): boolean }> | null
+
+export type TicketWorkspaceLiveRequestContext = Readonly<{
+  signal: AbortSignal
+  isCurrentDocument(): boolean
+  setFinalPublicationGuard(guard: () => boolean): void
+}>
+
+export type TicketWorkspaceLiveApiForTrustedSender = (
+  sender: WebContents,
+  context: TicketWorkspaceLiveRequestContext
+) => TicketWorkspaceLiveApi | null
+
+type SenderLifecycle = Pick<
+  DesktopRuntimeSenderLifecycle,
+  'connectionIdFor' | 'captureCurrentDocument'
+>
+type GetSenderLifecycle = () => SenderLifecycle | null
+
+registerTicketWorkspaceLiveIpcHandlers(
+  getApiForTrustedSender: TicketWorkspaceLiveApiForTrustedSender = () => null,
+  getSenderLifecycle: GetSenderLifecycle = () => null
+): void
+```
+
 #### TW-PILOT-C2C0 — shared live IPC contract
 
-- **STATUS:** LOCAL_COMPLETE at `0abb7c5d6`; fresh Astra CODE_APPROVE with independent 13-test, CommonJS and browser probes. Existing B Luna changed only the two new shared files. Final shared types and integration passed; remote publication and exact-head CI remain pending.
+- **STATUS:** Complete at `0abb7c5d6`, published under user-approved `77c940a56` with all four exact-head CI workflows successful. Fresh Astra CODE_APPROVE with independent 13-test, CommonJS and browser probes; B changed only two shared files. Final shared types and integration passed.
 - **GOAL:** Freeze the shared bridge contract needed by separate main and preload implementations.
 - **DEPENDENCIES:** Published and CI-verified C1; no C2A/B implementation, durable store or WSL prerequisite.
 - **OWNERSHIP:** Existing B transport Luna; only two new shared files. C retains exclusive C2A ownership.
@@ -346,7 +447,7 @@ actual source/HWM/lease registration remains one serial activation join
 
 #### TW-PILOT-C2C — live channels and injected main IPC
 
-- **STATUS:** LOCAL_COMPLETE at `0abb7c5d6`; fresh Astra CODE_APPROVE with independent 39 tests/five suites and 67 actual-module probes. Test-only type repairs passed Node types and final integration; no positive provider wiring is included. Remote publication and exact-head CI remain pending.
+- **STATUS:** Complete at `0abb7c5d6`, published under user-approved `77c940a56` with all four exact-head CI workflows successful. Fresh Astra CODE_APPROVE with independent 39 tests/five suites and 67 actual-module probes; test-only type repairs passed Node/final integration. No positive provider wiring is included. Future positive-provider publication guard is a separately frozen amendment.
 - **GOAL:** Register exact live requests against an injected presentation provider without activation.
 - **DEPENDENCIES:** Frozen C1/C2C0 channels/types/builders and existing UI frame/lifetime guards; not C2A/B implementation or actual provisioning.
 - **OWNERSHIP:** Existing B transport Luna; exclusive main IPC/bootstrap files, disjoint from C source/preload.
@@ -362,7 +463,7 @@ actual source/HWM/lease registration remains one serial activation join
 
 #### TW-PILOT-C2D — preload live API
 
-- **STATUS:** LOCAL_COMPLETE at `0abb7c5d6`; existing C Luna passed 25 focused/related tests. Final fresh Astra CODE_APPROVE / INTEGRATION_APPROVE includes 105 actual main/preload probes and 12 browser probes; all type gates passed. Fixture API is preserved. Remote publication and exact-head CI remain pending.
+- **STATUS:** Complete at `0abb7c5d6`, published under user-approved `77c940a56` with all four exact-head CI workflows successful. C passed 25 focused/related tests; final Astra CODE_APPROVE / INTEGRATION_APPROVE includes 105 actual main/preload probes and 12 browser probes. All type gates passed; fixture API is preserved.
 - **GOAL:** Expose the separate C1 live API with complete input/result/correlation validation.
 - **DEPENDENCIES:** C1 and frozen C2C boundary; not production provider or WSL.
 - **OWNERSHIP:** Existing C owner/presentation Luna; preload declaration/exposure are one exclusive ownership unit, disjoint from B main/bootstrap.
@@ -378,7 +479,7 @@ actual source/HWM/lease registration remains one serial activation join
 
 #### TW-PILOT-C2E — injected live read / receipt / click join
 
-- **STATUS:** Existing B Luna prepares the finite case packet read-only under NEXT_PREPARATION_APPROVE. Full integration implementation waits for the reviewed C2B contract/module freeze; the completed injected bridge is not full C2E.
+- **STATUS:** Existing B Luna completed the read-only four-case packet; fresh Astra approved preparation and identified exact race refinements. Propose one new integration-only `ticket-workspace-live-pilot-join-integration.test.ts` for successful join, selected-repository change, receipt supersession and source/A1 change across final awaits. Exact file/cases remain unallocated until C2B contract/module freeze and review; the completed injected bridge is not full C2E.
 - **GOAL:** Verify actual adapter/currentness, receipt, main/preload and common A2/repository seams together.
 - **DEPENDENCIES:** Relevant C2A/B/C/D and association composition; not B1 durable implementation, D1 real WSL, real keys, C3 or activation.
 - **OWNERSHIP:** One integration owner; root selects exact test files after module freeze.
@@ -387,7 +488,7 @@ actual source/HWM/lease registration remains one serial activation join
 - **OUTPUT CONTRACT:** Bounded correlated presentation/navigation integration receipt and stable code hashes.
 - **CONSTRAINTS:** No renderer authority, stale navigation, duplicate source or redundant status capture; no real pilot claim.
 - **DO_NOT_TOUCH:** Operational storage, targets/keys/WSL, product source without separate allocation or fixture authority.
-- **ACCEPTANCE CRITERIA:** Valid join works; source/receipt/A1/owner changes across awaits fail closed; private evidence absent from DTOs.
+- **ACCEPTANCE CRITERIA:** Valid join works; source/receipt/A1/owner changes across awaits fail closed; private evidence absent from DTOs. Catalog races alter an already validated binding while the other final await is held, beyond ordinary resolver rejection. Focused join tests cover both orderings; integration needs one representative branch. Owner/seam tests must prove retired documents cannot install/reuse receipt state, not only suppress IPC output. One focused microtask regression changes receipt/source/catalog between provider resolution and IPC continuation and verifies correlated unavailable; do not duplicate transport suites.
 - **VERIFICATION:** Finite integration plus relevant regression/type/quality and fresh Astra review; background only.
 - **PARALLELIZATION SAFETY:** Read-only case preparation can overlap modules; final integration follows freeze and is serial.
 - **POTENTIAL CONFLICTS:** Common owner composition and bootstrap/source construction have exclusive integration ownership.
@@ -1021,7 +1122,7 @@ actual source/HWM/lease registration remains one serial activation join
 ## Current execution checkpoint and next allocation
 
 1. **Verified foundation:** TW-01 owner capture, TW-02F fixture binding, TW-06F fixture boundary, TW-07F fixture UI/navigation and private TW-04A common resource contract are complete in their scopes. B1, owner composition, admission/currentness, IJ, verifier and L1 also passed their code/type/quality/review and published CI gates. Current exact commits and CI evidence are in project-state. These do not establish an actual-ticket pilot or production activation.
-2. **Next critical path:** Detailed source/shared IPC/main/preload are locally complete at `0abb7c5d6` with code/integration review and type gates passed; new publication/CI is pending. C prepares the exact C2B receipt/document/common-owner contract while B prepares C2E cases read-only, then reviewed C2B implementation enables the full join and C3 live view. Actual endpoint/key/host/artifact/durable proof and serial provider activation remain separate gates. The shipped fixture remains a negative authority case; fixture navigation cannot satisfy actual-ticket acceptance.
+2. **Next critical path:** Source/shared IPC/main/preload are published through CI-green `77c940a56`. C/B completed the reviewed common-join/document-publication increments with code/integration approval and local type/test gates. Next freeze parent receipt-owner policy/signatures before implementation, full C2E and C3 live view. Actual endpoint/key/host/artifact/durable proof and serial provider activation remain separate gates. The shipped fixture remains a negative authority case; fixture navigation cannot satisfy actual-ticket acceptance.
 3. **Next allocation gate:** Validate all remaining local code candidates against current source and freeze concrete packets before assigning continuing Luna workstreams. The user's authorization covers reviewed reversible local work; publication, operational setup and real key/security choices retain separate approval. Production setup still joins the verified base runtime/profile with a pinned resident service artifact and P1–P8 proofs. The completed TW-07F sidebar remains single-owner for any future live cutover.
 4. **Still gated:** TW-06P/TW-06T production producer/transport and TW-05/TW-05G coordinator/root authority need their own contract gates. TW-02L authenticated owner evidence waits for live source authority; TW-03 production `plan`, TW-04B/C production adapters/role changes, TW-06/TW-07 live cutovers, TW-08 effects, TW-09 integration and TW-10 release retain their DAG dependencies. A fixture cannot claim live `current`, mutation authority or public `clear`.
 
