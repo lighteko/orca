@@ -2,7 +2,15 @@
 
 기준일: 2026-10-01. 이 문서는 현재 실행 상태를 짧게 보여준다. 각 작업의 정확한 계약·선행 조건·검증 기준은 [Task DAG](./task-graph.md), 마일스톤 목표는 [마스터 플랜](./master-plan.md)을 따른다. `[x]`는 적힌 범위의 검증 완료를 뜻하며 마일스톤 전체 완료를 뜻하지 않는다.
 
-## 현재 실행 중 — 2026-10-01
+## 지금 완료·진행·다음 작업 — 2026-10-01
+
+- [x] **source·공통 IPC·main·preload:** 기존 C·B Luna가 18개 코드·테스트 파일을 구현했고 Astra 코드·통합 리뷰 후 `0abb7c5d6`에 로컬 커밋했다. 실제 provider는 아직 null이며 live Tickets 완료가 아니다.
+- [x] **로컬 검증:** CLI·Node·Web 타입, 관련 185개 테스트·코드 품질을 통과했다. 타입 전용 수정 뒤 source 49개·main 39개도 재확인했다. Astra는 실제 main/preload 105건·브라우저 12건을 추가 검증했다. Node/Web 타입 검사는 작업 한정 8 GiB로 통과했다.
+- [ ] **원격 게시·CI:** 정확한 커밋 후보에 대한 사용자 승인 후 기존 공개 PR #1에 게시하고 Node 24 CI를 확인한다. 비공개 소스·서브모듈 핀 변경은 없다.
+- [ ] **다음 C2B 계약:** 같은 C Luna가 receipt·문서 수명·공통 Run/coordinator/repository 결합을 읽기 전용으로 준비 중이다. 계약·소유권 고정과 Astra 검토 전에는 구현하지 않는다.
+- [ ] **병렬 준비:** 기존 B Luna는 C2E 통합 사례를 읽기 전용으로 준비 중이다. C3 refresh/expiry·선택, B1 내구성 결정, D1 운영 입력도 독립 준비 가능하다. 실제 provider 활성화는 증명과 운영 승인 후 직렬 통합한다.
+
+## 완료된 실행 기록 — 2026-10-01
 
 - [x] **독립 리뷰 운영 변경:** 사용자 요청에 따라 새 코드·통합·계획·방향 리뷰는 Fresh Astra xhigh가 담당한다. Sol은 Orchestrator, 구현은 기존 Luna xhigh workstream이 맡는다.
 
@@ -50,9 +58,13 @@
 - [x] **수정 게시·CI:** 사용자 추가 승인 후 `823c918ea`를 게시하고 원격 해시를 확인했다. [정확한 커밋의 PR Checks](https://github.com/lighteko/orca/actions/runs/36836563109)는 26개 성공·6개 skip·실패 0개이며 Mobile·Computer-use e2e·PR test LoC도 성공이다. 이전 `2f00e82e6`의 CLI 컴파일 실패는 이 수정으로 해결됐다.
 - [ ] **후속 pilot 통합:** 실제 티켓과 기존 Run/workspace의 엄격한 연결, durable HWM, live DTO·preload·Tickets·클릭 재검증을 연결한다. 완료 기준은 실제 티켓 한 건의 표시와 정확한 workspace 이동이다. 누락된 관측은 unavailable이며 effect·공개 `clear`는 비활성이다.
 
-- [x] **정확한 다음 구현 검증:** 새 Fresh Astra가 추가된 HWM stamp 검사·정상 admission 갱신 구분·파일 분리와 전체 IPC packet을 검토해 **C2A·C2C0 모두 CODE_READY / NEXT_APPROVE**로 판정했다. 기존 C Luna의 source 7개 파일과 B Luna의 새 shared boundary 2개 파일은 병렬 배정이 안전하다. A의 공통 Run/coordinator/repository 결합은 계약 보완만 준비됐다. 구현은 아직 배정하지 않았다.
+- [x] **정확한 다음 구현 검증:** 새 Fresh Astra가 추가된 HWM stamp 검사·정상 admission 갱신 구분·파일 분리와 전체 IPC packet을 검토해 **C2A·C2C0 모두 CODE_READY / NEXT_APPROVE**로 판정했다. 사용자 진행 승인 후 기존 C·B Luna에게 각각 source 7개 파일과 새 shared boundary 2개 파일을 독점 배정했다. A의 공통 Run/coordinator/repository 결합은 계약 보완만 준비됐다.
+- [x] **C2A·C2C0 통합 검증:** source의 마지막 async 경계 결함 2개는 같은 C Luna의 F1 수정 뒤 Astra가 49개 테스트·실제 source 검증 15건으로 확인했다. 공통 타입·최종 통합 리뷰를 통과해 `0abb7c5d6`에 커밋했다. 신규 원격 게시는 정확한 검토 커밋으로 별도 승인을 요청한다.
+- [x] **C2C0 코드 리뷰:** 공통 IPC의 집중 13개 테스트·CJS·브라우저 실행과 Fresh Astra CODE_APPROVE를 통과했다. 최종 공통 타입과 통합 검증도 완료했다.
+- [x] **다음 main·preload 계약 검증:** 별도 Fresh Astra가 기존 frame·renderer 수명 guard를 재사용하는 C2C 보완안과 런타임 단일 인자를 강제하는 C2D를 승인했다. 정확한 3개 main·4개 preload 파일을 DAG에 고정했다. 기존 B는 main, C는 source 후보 고정 후 preload를 이어간다. 실제 provider는 아직 연결하지 않는다.
+- [x] **C2C·C2D 연결 검증:** B의 main IPC·null provider 등록과 C의 별도 live preload API를 완료했다. main 독립 39개 테스트·67건 재현, 최종 main/preload 105건·브라우저 12건과 Astra CODE_APPROVE / INTEGRATION_APPROVE를 통과해 같은 커밋에 포함했다. 실제 source/owner provider 연결은 후속 계약·통합 게이트다.
 
-**다음 실행 경계:** 검증된 C2A source와 C2C0 공통 IPC를 병렬 구현할 수 있다. 공통 IPC 고정 뒤 main/preload packet을 배정하고, C2B receipt·공통 owner 결합은 별도 계약 검증을 마친다. C3 refresh/expiry·C2E 사례 준비, B1 내구성 결정과 D1 실행서 준비는 독립적으로 진행 가능하다. injected C2 통합은 실제 WSL·운영 키·durable 구현을 기다릴 필요가 없다. 실제 pilot 활성화는 별도 운영·내구성·제품 연결 게이트다.
+**다음 실행 경계:** C2B receipt·공통 owner 결합의 정확한 계약을 검증한 뒤 코드를 배정한다. C3 refresh/expiry·C2E 사례 준비, B1 내구성 결정과 D1 실행서 준비는 독립적으로 진행 가능하다. injected C2 통합은 실제 WSL·운영 키·durable 구현을 기다릴 필요가 없다. 실제 pilot 활성화는 별도 운영·내구성·제품 연결 게이트다.
 
 ## 완료된 기반
 
