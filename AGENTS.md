@@ -119,6 +119,8 @@ Source-control and review changes must consider GitLab and other supported git p
 
 For the ticket-workspace initiative, use the shared [master plan](./docs/reference/ticket-workspace-state/master-plan.md), [project state](./docs/reference/ticket-workspace-state/project-state.md), and [active review findings](./docs/reference/ticket-workspace-state/review-findings.md). They distinguish current Orca-repository facts from progress recorded only in local ignored plans.
 
+Sol owns orchestration; related implementation tasks continue in Luna xhigh workstream sessions. Independent code, integration, plan and direction reviews use a fresh Astra xhigh agent (`gpt-6-astra`, `xhigh`) with only the relevant goal, code, contracts, evidence and next tasks. Review correctness and whether the next work advances the agreed usable milestone.
+
 ## GitHub CLI Usage
 
 Be mindful of the user's `gh` CLI API rate limit — batch requests where possible and avoid unnecessary calls. All code, commands, and scripts must be compatible with macOS, Linux, and Windows.

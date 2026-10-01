@@ -4,6 +4,8 @@
 
 ## 현재 실행 중 — 2026-10-01
 
+- [x] **독립 리뷰 운영 변경:** 사용자 요청에 따라 새 코드·통합·계획·방향 리뷰는 Fresh Astra xhigh가 담당한다. Sol은 Orchestrator, 구현은 기존 Luna xhigh workstream이 맡는다.
+
 - [x] **TW-M1P-D1:** 기존 Luna 배포 workstream이 7가지 결정의 추천안과 private verifier packet을 완성했다. `profile-delivery.md`.
 - [x] **TW-06-CT1:** Luna 전송 workstream이 단일 시간 제한·공유 source port·high-water·monotonic 최신성 계약을 고정했다. `resident-ticket-transport.md`.
 - [x] **TW-02L-CT1:** Luna owner workstream이 같은 source 읽기의 eligibility·owner 결합·클릭 재검증 계약을 고정했다. `workspace-owner-boundary.md`.
@@ -24,7 +26,9 @@
 - [x] **Astra xhigh 방향성 감사:** 원래 플랜·현재 코드·최근 구현을 독립 검토해 **부분적 방향 이탈**로 판정했다. 올바른 내부 기반을 만들었지만 실제 사용 흐름보다 배포·롤백·복구에 투자가 앞섰다. [근거·결정](./review-findings.md#astra-direction-audit--2026-10-01).
 - [ ] **TW-M1P-L2 — 연기:** 첫 수정 전에 동결했으며 변경 파일은 없다. 실제 티켓 pilot에 필요한 근거가 생기기 전까지 staging·runtime recovery 후속 작업과 함께 연기한다. 완료된 verifier/L1 코드는 보존한다.
 - [x] **방향 재정렬:** read-only 관측기를 effect gateway에서 분리하고, 설치 전체를 첫 pilot의 선행 조건으로 두지 않도록 DAG를 수정했다. HWM 계약 단순화와 CLI/resident 단일 release는 검토할 제안이며 아직 구현 결정이 아니다.
-- [ ] **다음 실제 사용 흐름 packet:** 실제 티켓 생성·최소 enrollment, 승인된 개발 대상·신뢰 입력, resident entrypoint·명시적 lifecycle, HWM 정책과 live DTO를 고정한다. 완료 기준은 실제 티켓 한 건의 Tickets 표시·정확한 workspace 이동이며 effect·공개 `clear`는 비활성이다. 아직 새 코드 배정은 없다.
+- [ ] **바로 다음 — resident 실행 진입점:** Astra xhigh가 첫 구현 방향으로 검증했다. 기존 CLI·실제 catalog reader·resident server를 연결한다. 구현 승인 전 남은 것은 전체 startup 시간 제한과 종료 후 늦은 준비 작업 차단 계약 두 가지다. 현재 `NEEDS_PACKET`이며 새 코드 배정은 없다.
+- [ ] **병렬 후보 — Orca stdio 연결 관리:** 기존 Luna 전송 workstream이 명시적 시작·유지·종료 packet을 준비한다. 위 진입점과 공통 입력·시간 제한·종료 계약을 고정하고 독립 리뷰를 통과한 뒤 두 작업을 병행할 수 있다. 아직 구현 승인은 아니다.
+- [ ] **후속 pilot 통합:** 실제 티켓과 기존 Run/workspace의 엄격한 연결, durable HWM, live DTO·preload·Tickets·클릭 재검증을 연결한다. 완료 기준은 실제 티켓 한 건의 표시와 정확한 workspace 이동이다. 누락된 관측은 unavailable이며 effect·공개 `clear`는 비활성이다.
 
 **이번 코드 사이클 완료 기준:** 집중 테스트·적용 타입/품질 검사·독립 코드 리뷰·owner/cache 통합 리뷰·로컬 커밋. 실제 운영 설치·키·호스트 활성화는 이 사이클의 완료 조건에서 분리한다.
 
