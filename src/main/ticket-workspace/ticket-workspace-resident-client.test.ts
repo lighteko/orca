@@ -57,6 +57,131 @@ describe('resident injected duplex client', () => {
     connection.client.close()
   })
 
+  it('reduces a caller budget by monotonic time spent preparing the read', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(0))
+    let sixteenByteRequests = 0
+    const suppliedRandom = randomSource()
+    const session = await connectedDuplex(
+      (index, _frame, push) => {
+        if (index === 0) {
+          push(Buffer.from(vector.hello.serverHello.wireHex, 'hex'))
+        }
+        if (index === 2) {
+          push(sourceBoundWire)
+        }
+        if (index === 3) {
+          push(goldenErrorWire)
+        }
+      },
+      {
+        now: () => Date.now(),
+        randomBytes: (size) => {
+          const bytes = suppliedRandom(size)
+          if (size === 16 && ++sixteenByteRequests === 3) {
+            vi.advanceTimersByTime(500)
+          }
+          return bytes
+        }
+      }
+    )
+
+    await expect(session.client.readSnapshot(undefined, 2_500)).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'snapshot_too_large'
+    })
+    expect(parseFrame(session.duplex.writes[3]).message).toMatchObject({
+      type: 'snapshot.read',
+      deadlineBudgetMs: 2_000
+    })
+    session.client.close()
+  })
+
+  it('rejects invalid budgets without writing or retiring the bound lease', async () => {
+    const session = await connectedDuplex((index, _frame, push) => {
+      if (index === 0) {
+        push(Buffer.from(vector.hello.serverHello.wireHex, 'hex'))
+      }
+      if (index === 2) {
+        push(sourceBoundWire)
+      }
+    })
+    for (const budget of [0, -1, 10_001, 1.5, Number.NaN, Number.POSITIVE_INFINITY]) {
+      await expect(session.client.readSnapshot(undefined, budget)).resolves.toEqual({
+        status: 'unavailable',
+        reason: 'invalid_deadline_budget'
+      })
+    }
+    expect(session.duplex.writes).toHaveLength(3)
+    expect(session.client.isRetired).toBe(false)
+    session.client.close()
+  })
+
+  it('does not send a read when its monotonic budget is already expired', async () => {
+    let expireDuringPreflight = false
+    let preflightClockReads = 0
+    const now = (): number => {
+      if (!expireDuringPreflight) {
+        return 100
+      }
+      preflightClockReads += 1
+      return preflightClockReads === 1 ? 100 : 101
+    }
+    const session = await connectedDuplex(
+      (index, _frame, push) => {
+        if (index === 0) {
+          push(Buffer.from(vector.hello.serverHello.wireHex, 'hex'))
+        }
+        if (index === 2) {
+          push(sourceBoundWire)
+        }
+      },
+      { now }
+    )
+    expireDuringPreflight = true
+
+    await expect(session.client.readSnapshot(undefined, 1)).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'deadline_exceeded'
+    })
+    expect(session.duplex.writes).toHaveLength(3)
+    expect(session.client.isRetired).toBe(false)
+    session.client.close()
+  })
+
+  it('retires without emitting a read when framing consumes the caller budget', async () => {
+    let reading = false
+    let readClockCalls = 0
+    const now = (): number => {
+      if (!reading) {
+        return 100
+      }
+      readClockCalls += 1
+      return readClockCalls === 4 ? 2_600 : 100
+    }
+    const session = await connectedDuplex(
+      (index, _frame, push) => {
+        if (index === 0) {
+          push(Buffer.from(vector.hello.serverHello.wireHex, 'hex'))
+        }
+        if (index === 2) {
+          push(sourceBoundWire)
+        }
+      },
+      { now }
+    )
+    reading = true
+
+    await expect(session.client.readSnapshot(undefined, 2_500)).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'deadline_exceeded'
+    })
+    expect(readClockCalls).toBe(4)
+    expect(session.duplex.writes).toHaveLength(3)
+    expect(session.client.isRetired).toBe(true)
+    expect(session.duplex.destroyed).toBe(true)
+  })
+
   it('reassembles split frame and UTF-8 chunk boundaries as exact raw snapshot bytes', async () => {
     const snapshotBytes = Buffer.from('{"ticket":"한글 📦"}', 'utf8')
     const duplex = await connectedDuplex((index, _frame, push) => {
@@ -243,9 +368,60 @@ describe('resident injected duplex client', () => {
     if (connected.status !== 'connected') {
       throw new Error('Setup did not connect')
     }
-    const pendingRead = connected.client.readSnapshot()
-    await vi.advanceTimersByTimeAsync(10_000)
+    const pendingRead = connected.client.readSnapshot(undefined, 2_500)
+    expect(parseFrame(read.writes[3]).message).toMatchObject({
+      type: 'snapshot.read',
+      deadlineBudgetMs: 2_500
+    })
+    await vi.advanceTimersByTimeAsync(2_500)
     await expect(pendingRead).resolves.toEqual({
+      status: 'unavailable',
+      reason: 'deadline_exceeded'
+    })
+    expect(connected.client.isRetired).toBe(true)
+    expect(read.destroyed).toBe(true)
+  })
+
+  it('keeps cancellation settlement inside the caller deadline', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(0))
+    const read = new ScriptedDuplex((index, _frame, push) => {
+      if (index === 0) {
+        push(Buffer.from(vector.hello.serverHello.wireHex, 'hex'))
+      }
+      if (index === 2) {
+        push(sourceBoundWire)
+      }
+      if (index === 3) {
+        push(
+          protectedFrames(
+            [{ type: 'snapshot.begin', requestId: vector.inputs.readRequestId, snapshotBytes: 11 }],
+            1
+          )[0]!
+        )
+      }
+    })
+    const connected = await TicketWorkspaceResidentClient.connect({
+      duplex: read,
+      setupKey,
+      expectedBinding: binding,
+      now: () => Date.now(),
+      randomBytes: randomSource()
+    })
+    if (connected.status !== 'connected') {
+      throw new Error('Setup did not connect')
+    }
+    const abort = new AbortController()
+    const pending = connected.client.readSnapshot(abort.signal, 2_500)
+    await read.waitForWriteCount(4)
+    expect(parseFrame(read.writes[3]).message).toMatchObject({ deadlineBudgetMs: 2_500 })
+    await vi.advanceTimersByTimeAsync(2_000)
+    abort.abort()
+    await read.waitForWriteCount(5)
+    expect(parseFrame(read.writes[4]).message).toMatchObject({ type: 'cancel' })
+    await vi.advanceTimersByTimeAsync(500)
+
+    await expect(pending).resolves.toEqual({
       status: 'unavailable',
       reason: 'deadline_exceeded'
     })

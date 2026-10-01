@@ -105,8 +105,10 @@ export function randomSource(values?: Buffer[]): (size: number) => Buffer {
   }
 }
 
-export function snapshotMessages(snapshot: Buffer): object[] {
-  const requestId = vector.inputs.readRequestId
+export function snapshotMessages(
+  snapshot: Buffer,
+  requestId = vector.inputs.readRequestId
+): object[] {
   const messages: object[] = [
     { type: 'snapshot.begin', requestId, snapshotBytes: snapshot.byteLength }
   ]

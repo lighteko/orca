@@ -9,6 +9,7 @@ export type TicketResidentUnavailableReason =
   | 'cancelled'
   | 'deadline_exceeded'
   | 'disconnected'
+  | 'invalid_deadline_budget'
   | 'invalid_protocol'
   | 'request_in_flight'
 

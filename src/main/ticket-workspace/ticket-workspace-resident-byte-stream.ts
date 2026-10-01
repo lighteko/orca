@@ -60,6 +60,9 @@ export class TicketResidentByteStream {
 
   async write(frame: Buffer, deadline: number, now: () => number): Promise<void> {
     this.throwIfFailed()
+    if (now() >= deadline) {
+      throw new Error('Deadline exceeded')
+    }
     let waitForDrain: Promise<void> | undefined
     const writeDone = new Promise<void>((resolve, reject) => {
       try {

@@ -110,7 +110,21 @@ export class TicketWorkspaceResidentClient {
     return this.state === 'closed'
   }
 
-  async readSnapshot(signal?: AbortSignal): Promise<TicketResidentSnapshotResult> {
+  async readSnapshot(
+    signal?: AbortSignal,
+    deadlineBudgetMs = READ_DEADLINE_MS
+  ): Promise<TicketResidentSnapshotResult> {
+    if (
+      !Number.isSafeInteger(deadlineBudgetMs) ||
+      deadlineBudgetMs < 1 ||
+      deadlineBudgetMs > READ_DEADLINE_MS
+    ) {
+      return { status: 'unavailable', reason: 'invalid_deadline_budget' }
+    }
+    const deadline = this.now() + deadlineBudgetMs
+    if (!Number.isFinite(deadline) || this.now() >= deadline) {
+      return { status: 'unavailable', reason: 'deadline_exceeded' }
+    }
     if (this.state === 'read-in-flight' || this.state === 'admitting') {
       return { status: 'unavailable', reason: 'request_in_flight' }
     }
@@ -123,7 +137,6 @@ export class TicketWorkspaceResidentClient {
     this.state = 'read-in-flight'
     this.snapshotResponse.reset()
     try {
-      const deadline = this.now() + READ_DEADLINE_MS
       const requestId = this.allocateRequestId()
       const remaining = this.remainingBudget(deadline, READ_DEADLINE_MS)
       const request = {
@@ -295,6 +308,7 @@ function isUnavailableReason(value: string): value is TicketResidentUnavailableR
     value === 'snapshot_too_large' ||
     value === 'deadline_exceeded' ||
     value === 'cancelled' ||
+    value === 'invalid_deadline_budget' ||
     value === 'disconnected' ||
     value === 'invalid_protocol' ||
     value === 'request_in_flight'

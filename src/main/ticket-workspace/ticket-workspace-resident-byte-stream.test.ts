@@ -32,6 +32,22 @@ describe('resident byte stream deadline', () => {
     stream.destroy()
   })
 
+  it('does not write a frame when its deadline expires before duplex write', async () => {
+    const duplex = new EmptyDuplex()
+    const stream = new TicketResidentByteStream(
+      duplex,
+      () => undefined,
+      () => true
+    )
+    let clockReads = 0
+    const now = (): number => (clockReads++ === 0 ? 0 : 10)
+
+    expect(now()).toBe(0)
+    await expect(stream.write(Buffer.from([1]), 10, now)).rejects.toThrow('Deadline exceeded')
+    expect(duplex.writes).toHaveLength(0)
+    stream.destroy()
+  })
+
   it.each([
     { name: 'hello', size: 4_096 },
     { name: 'protected', size: 24_576 }
@@ -77,13 +93,12 @@ describe('resident byte stream deadline', () => {
 })
 
 class EmptyDuplex extends Duplex {
+  readonly writes: Buffer[] = []
+
   _read(): void {}
 
-  _write(
-    _chunk: Buffer,
-    _encoding: BufferEncoding,
-    callback: (error?: Error | null) => void
-  ): void {
+  _write(chunk: Buffer, _encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+    this.writes.push(Buffer.from(chunk))
     callback()
   }
 }

@@ -2,10 +2,15 @@ import { describe, expect, it } from 'vitest'
 import vector from '../../../docs/reference/ticket-workspace-state/resident-ticket-transport-v1-golden-vectors.json'
 import { encodeTicketResidentHelloFrame } from './ticket-workspace-resident-crypto'
 import {
+  isTicketWorkspaceCurrentnessToken,
+  issueTicketWorkspaceCurrentnessToken
+} from './ticket-workspace-resident-source-port'
+import {
   authenticatedOversizedControl,
   binding,
   connect,
   connectedDuplex,
+  parseFrame,
   parseProtectedRequestId,
   protectedFrame,
   protectedFrames,
@@ -15,6 +20,13 @@ import {
 } from './ticket-workspace-resident-test-peer'
 
 describe('resident protocol fail-closed boundaries', () => {
+  it('recognizes only currentness tokens issued by the main module', () => {
+    const token = issueTicketWorkspaceCurrentnessToken()
+
+    expect(isTicketWorkspaceCurrentnessToken(token)).toBe(true)
+    expect(isTicketWorkspaceCurrentnessToken(Object.freeze({}))).toBe(false)
+  })
+
   it.each([
     {
       name: 'service binding',
@@ -266,8 +278,11 @@ describe('resident protocol fail-closed boundaries', () => {
       }
     })
     const abort = new AbortController()
-    const pending = session.client.readSnapshot(abort.signal)
+    const pending = session.client.readSnapshot(abort.signal, 2_500)
     await session.duplex.waitForWriteCount(4)
+    expect(parseFrame(session.duplex.writes[3]).message).toMatchObject({
+      deadlineBudgetMs: 2_500
+    })
     abort.abort()
     await expect(pending).resolves.toEqual({ status: 'unavailable', reason: 'cancelled' })
     session.duplex.push(
